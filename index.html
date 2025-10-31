@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homehome :: Local Server</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            /* Solarized Light colors */
+            background-color: #fdf6e3;
+            color: #586e75;
+            font-family: 'Courier New', 'Courier', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: min(600px, 100%);
+            aspect-ratio: 2 / 3;
+            height: min(80vh, 900px);
+            border: 3px solid #93a1a1;
+            background-color: #eee8d5;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 4px 0px #93a1a1;
+        }
+
+        .menu-bar {
+            background-color: #268bd2;
+            color: #fdf6e3;
+            padding: 8px 12px;
+            border-bottom: 3px solid #93a1a1;
+            font-weight: bold;
+            letter-spacing: 2px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-bar::before {
+            content: '█ ';
+        }
+
+        .menu-bar::after {
+            content: ' [X]';
+            font-size: 0.9em;
+        }
+
+        .content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+
+        .ascii-art {
+            color: #b33a0f;
+            font-size: 0.7em;
+            line-height: 1.2;
+            margin-bottom: 16px;
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        h1 {
+            color: #2075c7;
+            font-size: 1.4em;
+            margin-bottom: 16px;
+            letter-spacing: 3px;
+        }
+
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+
+        .highlight {
+            color: #c42623;
+            font-weight: bold;
+        }
+
+        .cursor {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .footer {
+            border-top: 3px solid #93a1a1;
+            padding: 8px 12px;
+            background-color: #93a1a1;
+            color: #fdf6e3;
+            font-size: 0.8em;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .divider {
+            color: #6f8000;
+            margin: 16px 0;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                height: 80vh;
+            }
+            
+            .ascii-art {
+                font-size: 0.5em;
+            }
+            
+            h1 {
+                font-size: 1.2em;
+            }
+            
+            .content {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="menu-bar">
+            HOMEHOME.LOCAL
+        </div>
+        
+        <div class="content">
+            <div class="ascii-art">
+    ╔═══════════════════════════════════╗
+    ║   _    _  ___  __  __ _____       ║
+    ║  | |  | |/ _ \|  \/  | ____|      ║
+    ║  | |__| | | | | |\/| |  _|        ║
+    ║  |  __  | |_| | |  | | |___       ║
+    ║  |_|  |_|\___/|_|  |_|_____|      ║
+    ║                                   ║
+    ╚═══════════════════════════════════╝
+            </div>
+
+            <h1>Welcome homehome</h1>
+
+            <p>
+                <span class="highlight">NOTICE:</span> This website is served from 
+                <span class="highlight">Lewis' house</span>.
+            </p>
+
+            <p class="divider">
+                ════════════════════════════════════════
+            </p>
+
+            <p>
+                Who needs the cloud? We're going <span class="highlight">homehome</span>.
+            </p>
+
+            <p>
+                This server runs on physical hardware in a physical location. 
+                No virtualisation. Just a humble machine.
+            </p>
+
+            <p class="divider">
+                ════════════════════════════════════════
+            </p>
+
+            <p>
+                System Status: <span class="highlight">Online</span><span class="cursor">█</span>
+            </p>
+        </div>
+
+        <div class="footer">
+            EST. 2025
+        </div>
+    </div>
+</body>
+</html>
