@@ -450,7 +450,6 @@
         .note-text-area {
             flex: 1;
             background-color: var(--bg-base);
-            border: 3px solid var(--border-color);
             padding: 16px;
             font-family: 'Courier New', 'Courier', monospace;
             font-size: 1.6em;
@@ -475,18 +474,18 @@
         }
 
         .note-keyboard {
-            height: 33.33%;
+            height: 35%;
             background-color: var(--text-secondary);
-            padding: 8px;
+            padding: 6px 0;
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 2px;
             border-top: 3px solid var(--border-color);
         }
 
         .note-keyboard-row {
             display: flex;
-            gap: 3px;
+            gap: 2px;
             justify-content: space-between;
             flex: 1;
         }
@@ -498,7 +497,7 @@
 
         .note-key {
             flex: 0 0 auto;
-            width: calc((100% - (9 * 3px)) / 10);
+            width: calc((100% - (9 * 2px)) / 10);
             min-width: 40px;
             font-family: 'Courier New', 'Courier', monospace;
             font-size: 1em;
@@ -508,7 +507,6 @@
             color: var(--text-primary);
             cursor: pointer;
             transition: all 0.1s;
-            box-shadow: 2px 2px 0px var(--border-color);
             touch-action: manipulation;
             user-select: none;
             -webkit-user-select: none;
@@ -523,8 +521,7 @@
         }
 
         .note-key:active {
-            box-shadow: 0px 0px 0px var(--border-color);
-            transform: translate(2px, 2px);
+            background-color: var(--text-secondary);
         }
 
         .note-key.space {
