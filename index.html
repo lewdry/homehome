@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <title>Homehome :: Retro OS</title>
+    <title>Homehome OS :: Web 0.1</title>
     <style>
         * {
             margin: 0;
@@ -56,7 +56,8 @@
         }
 
         .menu-bar::before {
-            content: '█ ';
+            content: '▨';
+            font-size: 0.9em;
         }
 
         .menu-bar::after {
@@ -136,6 +137,11 @@
         }
 
         #draw-content {
+            padding: 0;
+            overflow: hidden;
+        }
+
+        #note-content {
             padding: 0;
             overflow: hidden;
         }
@@ -307,6 +313,107 @@
             grid-row: span 2;
         }
 
+        /* Note styles */
+        .note-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 0;
+        }
+
+        .note-text-area {
+            flex: 1;
+            background-color: #fdf6e3;
+            border: 3px solid #93a1a1;
+            padding: 16px;
+            font-family: 'Courier New', 'Courier', monospace;
+            font-size: 1.3em;
+            color: #586e75;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            overflow-y: auto;
+            box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.1);
+            line-height: 1.4;
+            user-select: none;
+            -webkit-user-select: none;
+            text-align: left;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+        }
+
+        #noteText {
+            word-break: break-word;
+        }
+
+        .note-keyboard {
+            height: 33.33%;
+            background-color: #93a1a1;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            border-top: 3px solid #93a1a1;
+        }
+
+        .note-keyboard-row {
+            display: flex;
+            gap: 6px;
+            justify-content: space-between;
+            flex: 1;
+        }
+        
+        .note-keyboard-row:nth-child(2) .note-key,
+        .note-keyboard-row:nth-child(3) .note-key {
+            flex: 1 1 auto;
+        }
+
+        .note-key {
+            flex: 0 0 auto;
+            width: calc((100% - (9 * 6px)) / 10);
+            min-width: 40px;
+            font-family: 'Courier New', 'Courier', monospace;
+            font-size: 1em;
+            font-weight: bold;
+            border: 3px solid #93a1a1;
+            background-color: #eee8d5;
+            color: #586e75;
+            cursor: pointer;
+            transition: all 0.1s;
+            box-shadow: 2px 2px 0px #657b83;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .note-key:hover {
+            background-color: #e5ddc4;
+        }
+
+        .note-key:active {
+            box-shadow: 0px 0px 0px #657b83;
+            transform: translate(2px, 2px);
+        }
+
+        .note-key.space {
+            flex: 8;
+        }
+
+        .note-key.backspace {
+            background-color: #dc322f;
+            color: #fdf6e3;
+            flex: 2;
+        }
+
+        .note-key.backspace:hover {
+            background-color: #cc221f;
+        }
+
         @media (max-width: 640px) {
             body {
                 padding: 10px;
@@ -341,13 +448,22 @@
             .calc-result {
                 font-size: 1.5em;
             }
+
+            .note-key {
+                font-size: 0.9em;
+                min-width: 30px;
+            }
+
+            .note-text-area {
+                font-size: 1.1em;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="menu-bar">
-            HOMEHOME.LOCAL
+            HOMEHOME.OS
         </div>
         
         <div class="tabs">
@@ -355,6 +471,7 @@
             <div class="tab" data-tab="bonk">BONK<span class="stop-btn" title="Stop game">■</span></div>
             <div class="tab" data-tab="calc">CALC</div>
             <div class="tab" data-tab="draw">DRAW</div>
+            <div class="tab" data-tab="note">NOTE</div>
         </div>
         
         <div id="home-content" class="content tab-content active">
@@ -432,6 +549,17 @@
             <canvas id="drawCanvas" aria-label="Drawing canvas"></canvas>
         </div>
 
+        <div id="note-content" class="content tab-content">
+            <div class="note-container">
+                <div class="note-text-area" id="noteTextArea">
+                    <div style="text-align: left; width: 100%;"><span id="noteText"></span><span class="cursor" id="noteCursor">█</span></div>
+                </div>
+                <div class="note-keyboard" id="noteKeyboard">
+                    <!-- Keyboard will be generated by note.js -->
+                </div>
+            </div>
+        </div>
+
         <div class="footer">
             Homehome by <a href="https://lewisdryburgh.com" target="_blank" style="color: #fdf6e3; text-decoration: underline;">Lewis Dryburgh</a>, 2025
         </div>
@@ -440,6 +568,7 @@
     <script src="bonk.js"></script>
     <script src="calc.js"></script>
     <script src="draw.js"></script>
+    <script src="note.js"></script>
     <script>
         // Tab switching functionality
         const tabs = document.querySelectorAll('.tab');
@@ -448,6 +577,7 @@
         const stopBtn = bonkTab.querySelector('.stop-btn');
         let bonkInitialized = false;
         let drawInitialized = false;
+        let noteInitialized = false;
 
         // Stop button functionality
         stopBtn.addEventListener('click', (e) => {
@@ -483,6 +613,14 @@
                     drawInitialized = true;
                     if (typeof initDrawing === 'function') {
                         initDrawing();
+                    }
+                }
+                
+                // Initialize note on first click
+                if (tabName === 'note' && !noteInitialized) {
+                    noteInitialized = true;
+                    if (typeof initNote === 'function') {
+                        initNote();
                     }
                 }
                 
