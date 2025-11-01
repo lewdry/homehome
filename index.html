@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homehome :: Local Server</title>
+    <title>homehome :: Local Server</title>
     <style>
         * {
             margin: 0;
@@ -55,11 +55,91 @@
             font-size: 0.9em;
         }
 
+        .tabs {
+            display: flex;
+            background-color: #93a1a1;
+            border-bottom: 3px solid #93a1a1;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            cursor: pointer;
+            background-color: #839496;
+            color: #fdf6e3;
+            border-right: 2px solid #93a1a1;
+            font-weight: bold;
+            letter-spacing: 1px;
+            transition: background-color 0.2s;
+            user-select: none;
+        }
+
+        .tab:hover {
+            background-color: #657b83;
+        }
+
+        .tab.active {
+            background-color: #eee8d5;
+            color: #586e75;
+        }
+
+        .stop-btn {
+            margin-left: 6px;
+            color: #dc322f;
+            font-weight: bold;
+            cursor: pointer;
+            display: none;
+        }
+
+        .tab:not(.active) .stop-btn.visible {
+            display: inline;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
         .content {
             flex: 1;
             padding: 24px;
             overflow-y: auto;
             line-height: 1.6;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+            background-color: #eee8d5;
+        }
+
+        #bonk-content {
+            padding: 0;
+            overflow: hidden;
+        }
+
+        #draw-content {
+            padding: 0;
+            overflow: hidden;
+        }
+
+        #drawCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+            background-color: #eee8d5;
         }
 
         .ascii-art {
@@ -112,6 +192,112 @@
             margin: 16px 0;
         }
 
+        /* Calculator styles */
+        .calculator {
+            max-width: 400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .calc-display {
+            background-color: #fdf6e3;
+            border: 3px solid #93a1a1;
+            padding: 12px;
+            min-height: 70px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .calc-equation {
+            font-size: 0.9em;
+            color: #93a1a1;
+            height: 20px;
+            text-align: right;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+
+        .calc-result {
+            font-size: 1.8em;
+            color: #586e75;
+            font-weight: bold;
+            text-align: right;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .calc-btn {
+            font-family: 'Courier New', 'Courier', monospace;
+            font-size: 1.2em;
+            font-weight: bold;
+            padding: 16px;
+            border: 3px solid #93a1a1;
+            background-color: #eee8d5;
+            color: #586e75;
+            cursor: pointer;
+            transition: all 0.1s;
+            box-shadow: 2px 2px 0px #93a1a1;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .calc-btn:hover {
+            background-color: #e5ddc4;
+        }
+
+        .calc-btn:active {
+            box-shadow: 0px 0px 0px #93a1a1;
+            transform: translate(2px, 2px);
+        }
+
+        .calc-operator {
+            background-color: #268bd2;
+            color: #fdf6e3;
+        }
+
+        .calc-operator:hover {
+            background-color: #1e7bb2;
+        }
+
+        .calc-equals {
+            background-color: #859900;
+            color: #fdf6e3;
+        }
+
+        .calc-equals:hover {
+            background-color: #719e07;
+        }
+
+        .calc-clear {
+            background-color: #dc322f;
+            color: #fdf6e3;
+        }
+
+        .calc-clear:hover {
+            background-color: #cc221f;
+        }
+
+        .calc-wide {
+            grid-column: span 2;
+        }
+
+        .calc-tall {
+            grid-row: span 2;
+        }
+
         @media (max-width: 640px) {
             .container {
                 height: 80vh;
@@ -128,6 +314,15 @@
             .content {
                 padding: 16px;
             }
+
+            .calc-btn {
+                padding: 16px;
+                font-size: 1.1em;
+            }
+
+            .calc-result {
+                font-size: 1.5em;
+            }
         }
     </style>
 </head>
@@ -137,7 +332,14 @@
             HOMEHOME.LOCAL
         </div>
         
-        <div class="content">
+        <div class="tabs">
+            <div class="tab active" data-tab="home">HOME</div>
+            <div class="tab" data-tab="bonk">BONK<span class="stop-btn" title="Stop game">■</span></div>
+            <div class="tab" data-tab="calc">CALC</div>
+            <div class="tab" data-tab="draw">DRAW</div>
+        </div>
+        
+        <div id="home-content" class="content tab-content active">
             <div class="ascii-art">
     ╔═══════════════════════════════════╗
     ║   _    _  ___  __  __ _____       ║
@@ -151,13 +353,8 @@
 
             <h1>Welcome homehome</h1>
 
-            <p>
-                <span class="highlight">NOTICE:</span> This website is served from 
-                <span class="highlight">Lewis' house</span>.
-            </p>
-
             <p class="divider">
-                ════════════════════════════════════════
+                ═══════════════════════════════════
             </p>
 
             <p>
@@ -165,22 +362,120 @@
             </p>
 
             <p>
-                This server runs on physical hardware in a physical location. 
-                No virtualisation. Just a humble machine.
+                Homehome is a fictictious, retro operating system, running on a physical machine in <span class="highlight">my house</span>.
             </p>
 
             <p class="divider">
-                ════════════════════════════════════════
+                ═══════════════════════════════════
             </p>
 
             <p>
-                System Status: <span class="highlight">Online</span><span class="cursor">█</span>
+                Status: <span class="highlight">Online</span><span class="cursor">█</span>
             </p>
+        </div>
+
+        <div id="bonk-content" class="content tab-content">
+            <canvas id="drawingCanvas" aria-label="Game canvas with bouncing balls"></canvas>
+        </div>
+
+        <div id="calc-content" class="content tab-content">
+            <div class="calculator">
+                <div class="calc-display">
+                    <div class="calc-equation" id="calc-equation"></div>
+                    <div class="calc-result" id="calc-result">0</div>
+                </div>
+                <div class="calc-buttons">
+                    <button class="calc-btn calc-clear" data-value="C">C</button>
+                    <button class="calc-btn calc-operator" data-value="/">÷</button>
+                    <button class="calc-btn calc-operator" data-value="*">×</button>
+                    <button class="calc-btn calc-operator" data-value="-">−</button>
+                    
+                    <button class="calc-btn calc-number" data-value="7">7</button>
+                    <button class="calc-btn calc-number" data-value="8">8</button>
+                    <button class="calc-btn calc-number" data-value="9">9</button>
+                    <button class="calc-btn calc-operator calc-tall" data-value="+">+</button>
+                    
+                    <button class="calc-btn calc-number" data-value="4">4</button>
+                    <button class="calc-btn calc-number" data-value="5">5</button>
+                    <button class="calc-btn calc-number" data-value="6">6</button>
+                    
+                    <button class="calc-btn calc-number" data-value="1">1</button>
+                    <button class="calc-btn calc-number" data-value="2">2</button>
+                    <button class="calc-btn calc-number" data-value="3">3</button>
+                    <button class="calc-btn calc-equals calc-tall" data-value="=">=</button>
+                    
+                    <button class="calc-btn calc-number calc-wide" data-value="0">0</button>
+                    <button class="calc-btn calc-decimal" data-value=".">.</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="draw-content" class="content tab-content">
+            <canvas id="drawCanvas" aria-label="Drawing canvas"></canvas>
         </div>
 
         <div class="footer">
             EST. 2025
         </div>
     </div>
+
+    <script src="bonk.js"></script>
+    <script src="calc.js"></script>
+    <script src="draw.js"></script>
+    <script>
+        // Tab switching functionality
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const bonkTab = document.querySelector('.tab[data-tab="bonk"]');
+        const stopBtn = bonkTab.querySelector('.stop-btn');
+        let bonkInitialized = false;
+        let drawInitialized = false;
+
+        // Stop button functionality
+        stopBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent tab switch
+            if (typeof gameRunning !== 'undefined') {
+                gameRunning = false;
+                stopBtn.classList.remove('visible');
+                bonkInitialized = false;
+            }
+        });
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.getAttribute('data-tab');
+                
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Update active content
+                tabContents.forEach(content => content.classList.remove('active'));
+                document.getElementById(`${tabName}-content`).classList.add('active');
+                
+                // Initialize bonk game on first click
+                if (tabName === 'bonk' && !bonkInitialized) {
+                    bonkInitialized = true;
+                    initGame();
+                    stopBtn.classList.add('visible');
+                }
+                
+                // Initialize drawing on first click
+                if (tabName === 'draw' && !drawInitialized) {
+                    drawInitialized = true;
+                    if (typeof initDrawing === 'function') {
+                        initDrawing();
+                    }
+                }
+                
+                // Show/hide stop button based on game state and active tab
+                if (tabName !== 'bonk' && bonkInitialized && typeof gameRunning !== 'undefined' && gameRunning) {
+                    stopBtn.classList.add('visible');
+                } else {
+                    stopBtn.classList.remove('visible');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
