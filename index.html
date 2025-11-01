@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>homehome :: Local Server</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Homehome :: Retro OS</title>
     <style>
         * {
             margin: 0;
@@ -21,6 +23,13 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+            /* Disable mobile gestures */
+            overscroll-behavior: none;
+            touch-action: pan-x pan-y;
+            -webkit-overflow-scrolling: auto;
+            position: fixed;
+            width: 100%;
+            height: 100%;
         }
 
         .container {
@@ -299,8 +308,15 @@
         }
 
         @media (max-width: 640px) {
+            body {
+                padding: 10px;
+            }
+            
             .container {
-                height: 90vh;
+                height: calc(100vh - 20px);
+                height: calc(100dvh - 20px); /* Use dynamic viewport height for mobile */
+                max-height: calc(100vh - 20px);
+                max-height: calc(100dvh - 20px);
             }
             
             .ascii-art {
@@ -351,18 +367,18 @@
     ╚═══════════════════════════════════╝
             </div>
 
-            <h1>Welcome homehome</h1>
+            <h1>Welcome Homehome</h1>
 
             <p class="divider">
                 ═══════════════════════════════════
             </p>
 
             <p>
-                Who needs the cloud? We're going <span class="highlight">homehome</span>.
+                Who needs the cloud? We're going <span class="highlight">Homehome</span>.
             </p>
 
             <p>
-                Homehome is a fictictious, retro operating system, running on a physical machine in <span class="highlight">my house</span>.
+                Homehome is an imagined retro Web 0.1 operating system, humming away on a physical computer in <span class="highlight">my house</span>.
             </p>
 
             <p class="divider">
@@ -415,7 +431,7 @@
         </div>
 
         <div class="footer">
-            EST. 2025
+            Homehome by <a href="https://lewisdryburgh.com" target="_blank" style="color: #fdf6e3; text-decoration: underline;">Lewis Dryburgh</a>, 2025
         </div>
     </div>
 
