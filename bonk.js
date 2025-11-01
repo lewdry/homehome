@@ -247,7 +247,8 @@ function ensureCanvasSize() {
         playCollisionSound(other) {
             const minSpeed = 0;
             const maxSpeed = 30;
-            const minVolume = 0.2;
+            const minVolume = 0.1;
+            const maxVolume = 0.4;
             
             const thisSpeed = this.getSpeed();
             const otherSpeed = other.getSpeed();
@@ -270,8 +271,8 @@ function ensureCanvasSize() {
                 
                 // Calculate volume based on collision speed
                 const normalizedSpeed = (collisionSpeed - minSpeed) / (maxSpeed - minSpeed);
-                const volume = minVolume + (1 - minVolume) * normalizedSpeed;
-                const clampedVolume = Math.min(Math.max(volume, minVolume), 1);
+                const volume = minVolume + (maxVolume - minVolume) * normalizedSpeed;
+                const clampedVolume = Math.min(Math.max(volume, minVolume), maxVolume);
                 
                 gainNode.gain.setValueAtTime(clampedVolume, audioContext.currentTime);
 
@@ -646,7 +647,7 @@ window.addEventListener('resize', () => {
         try {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-            const soundFiles = ['G2.mp3', 'B2.mp3', 'D3.mp3', 'G3.mp3', 'B3.mp3', 'D4.mp3', 'G4.mp3'];
+            const soundFiles = ['bonk.wav'];
 
             const loadAudioFile = async (file) => {
                 try {

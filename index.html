@@ -884,15 +884,29 @@
                         break;
                     case 'Enter':
                     case ' ':
-                        e.preventDefault();
-                        switchToTab(tab);
-                        return;
+                e.preventDefault();
+                // Play sound for keyboard activation
+                if (window.playRetroClick) try { window.playRetroClick(); } catch (err) {}
+                switchToTab(tab);
+                return;
                 }
                 
                 if (targetTab) {
                     switchToTab(targetTab);
                 }
             });
+        });
+
+        // Play retro click on pointer interactions with interactive elements
+        document.addEventListener('pointerdown', (e) => {
+            try {
+                const el = e.target.closest('button, .tab, .calc-btn, .note-key, [role="tab"]');
+                if (el && window.playRetroClick) {
+                    window.playRetroClick();
+                }
+            } catch (err) {
+                // ignore
+            }
         });
     </script>
 </body>
