@@ -13,10 +13,29 @@
             box-sizing: border-box;
         }
 
+        /* Solarized Light (default) */
+        :root {
+            --bg-base: #fdf6e3;
+            --bg-surface: #eee8d5;
+            --text-primary: #586e75;
+            --text-secondary: #93a1a1;
+            --border-color: #93a1a1;
+        }
+
+        /* Solarized Dark */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-base: #002b36;
+                --bg-surface: #073642;
+                --text-primary: #839496;
+                --text-secondary: #586e75;
+                --border-color: #586e75;
+            }
+        }
+
         body {
-            /* Solarized Light colors */
-            background-color: #fdf6e3;
-            color: #586e75;
+            background-color: var(--bg-base);
+            color: var(--text-primary);
             font-family: 'Courier New', 'Courier', monospace;
             display: flex;
             justify-content: center;
@@ -36,18 +55,25 @@
             width: min(600px, 100%);
             aspect-ratio: 2 / 3;
             height: min(80vh, 900px);
-            border: 3px solid #93a1a1;
-            background-color: #eee8d5;
+            border: 3px solid var(--border-color);
+            background-color: var(--bg-surface);
             display: flex;
             flex-direction: column;
-            box-shadow: 4px 4px 0px #93a1a1;
+            box-shadow: 4px 4px 0px var(--border-color);
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
         }
 
         .menu-bar {
             background-color: #268bd2;
-            color: #fdf6e3;
+            color: var(--bg-base);
             padding: 8px 12px;
-            border-bottom: 3px solid #93a1a1;
+            border-bottom: 3px solid var(--border-color);
             font-weight: bold;
             letter-spacing: 2px;
             display: flex;
@@ -67,41 +93,30 @@
 
         .tabs {
             display: flex;
-            background-color: #93a1a1;
-            border-bottom: 3px solid #93a1a1;
+            background-color: var(--text-secondary);
+            border-bottom: 3px solid var(--border-color);
         }
 
         .tab {
             padding: 8px 16px;
             cursor: pointer;
-            background-color: #839496;
-            color: #fdf6e3;
-            border-right: 2px solid #93a1a1;
+            background-color: var(--border-color);
+            color: var(--bg-base);
+            border-right: 2px solid var(--text-secondary);
             font-weight: bold;
             letter-spacing: 1px;
             transition: background-color 0.2s;
             user-select: none;
+            white-space: nowrap;
         }
 
         .tab:hover {
-            background-color: #657b83;
+            background-color: var(--text-primary);
         }
 
         .tab.active {
-            background-color: #eee8d5;
-            color: #586e75;
-        }
-
-        .stop-btn {
-            margin-left: 6px;
-            color: #dc322f;
-            font-weight: bold;
-            cursor: pointer;
-            display: none;
-        }
-
-        .tab:not(.active) .stop-btn.visible {
-            display: inline;
+            background-color: var(--bg-surface);
+            color: var(--text-primary);
         }
 
         .tab-content {
@@ -128,7 +143,7 @@
             touch-action: none;
             -webkit-user-select: none;
             user-select: none;
-            background-color: #eee8d5;
+            background-color: var(--bg-surface);
         }
 
         #bonk-content {
@@ -154,7 +169,7 @@
             touch-action: none;
             -webkit-user-select: none;
             user-select: none;
-            background-color: #eee8d5;
+            background-color: var(--bg-surface);
         }
 
         .ascii-art {
@@ -164,6 +179,7 @@
             margin-bottom: 16px;
             white-space: pre;
             overflow-x: auto;
+            text-align: left;
         }
 
         h1 {
@@ -180,8 +196,14 @@
         }
 
         .highlight {
-            color: #c42623;
+            color: #dc322f;
             font-weight: bold;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .highlight {
+                color: #cb4b16;
+            }
         }
 
         .cursor {
@@ -193,11 +215,113 @@
             51%, 100% { opacity: 0; }
         }
 
-        .footer {
-            border-top: 3px solid #93a1a1;
+        /* Respect reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            .cursor {
+                animation: none;
+                opacity: 1;
+            }
+        }
+
+        /* Focus indicators for accessibility */
+        .tab:focus-visible,
+        .calc-btn:focus-visible,
+        .note-key:focus-visible {
+            outline: 3px solid #268bd2;
+            outline-offset: 2px;
+        }
+
+        /* Skip link for keyboard navigation */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #268bd2;
+            color: var(--bg-base);
+            padding: 8px 16px;
+            text-decoration: none;
+            font-weight: bold;
+            z-index: 100;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* Visually hidden but accessible to screen readers */
+        .visually-hidden {
+            position: absolute;
+            left: -10000px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+
+        /* Instruction popup styles */
+        .instruction-popup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--bg-surface);
+            border: 3px solid var(--border-color);
+            box-shadow: 4px 4px 0px var(--border-color);
+            max-width: 400px;
+            width: 80%;
+            z-index: 50;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .instruction-popup-title {
+            background-color: #268bd2;
+            color: var(--bg-base);
             padding: 8px 12px;
-            background-color: #93a1a1;
-            color: #fdf6e3;
+            border-bottom: 3px solid var(--border-color);
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        .instruction-popup-content {
+            padding: 24px;
+        }
+
+        .instruction-popup-content p {
+            margin-bottom: 12px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .instruction-popup button {
+            font-family: 'Courier New', 'Courier', monospace;
+            font-size: 1.2em;
+            font-weight: bold;
+            padding: 12px 32px;
+            border: 3px solid var(--border-color);
+            background-color: #859900;
+            color: var(--bg-base);
+            cursor: pointer;
+            box-shadow: 2px 2px 0px var(--border-color);
+            margin-top: 16px;
+            letter-spacing: 1px;
+        }
+
+        .instruction-popup button:hover {
+            background-color: #719e07;
+        }
+
+        .instruction-popup button:active {
+            box-shadow: 0px 0px 0px var(--border-color);
+            transform: translate(2px, 2px);
+        }
+
+        .footer {
+            border-top: 3px solid var(--border-color);
+            padding: 8px 12px;
+            background-color: var(--text-secondary);
+            color: var(--bg-base);
             font-size: 0.8em;
             font-weight: 500;
             text-align: center;
@@ -219,8 +343,8 @@
         }
 
         .calc-display {
-            background-color: #fdf6e3;
-            border: 3px solid #93a1a1;
+            background-color: var(--bg-base);
+            border: 3px solid var(--border-color);
             padding: 12px;
             min-height: 70px;
             display: flex;
@@ -232,7 +356,7 @@
 
         .calc-equation {
             font-size: 0.9em;
-            color: #93a1a1;
+            color: var(--text-secondary);
             height: 20px;
             text-align: right;
             word-wrap: break-word;
@@ -241,7 +365,7 @@
 
         .calc-result {
             font-size: 1.8em;
-            color: #586e75;
+            color: var(--text-primary);
             font-weight: bold;
             text-align: right;
             word-wrap: break-word;
@@ -259,12 +383,12 @@
             font-size: 1.5em;
             font-weight: bold;
             padding: 16px 32px;
-            border: 3px solid #93a1a1;
-            background-color: #eee8d5;
-            color: #586e75;
+            border: 3px solid var(--border-color);
+            background-color: var(--bg-surface);
+            color: var(--text-primary);
             cursor: pointer;
             transition: all 0.1s;
-            box-shadow: 2px 2px 0px #93a1a1;
+            box-shadow: 2px 2px 0px var(--border-color);
             touch-action: manipulation;
             user-select: none;
             -webkit-user-select: none;
@@ -272,17 +396,17 @@
         }
 
         .calc-btn:hover {
-            background-color: #e5ddc4;
+            background-color: var(--bg-base);
         }
 
         .calc-btn:active {
-            box-shadow: 0px 0px 0px #93a1a1;
+            box-shadow: 0px 0px 0px var(--border-color);
             transform: translate(2px, 2px);
         }
 
         .calc-operator {
             background-color: #268bd2;
-            color: #fdf6e3;
+            color: var(--bg-base);
         }
 
         .calc-operator:hover {
@@ -291,7 +415,7 @@
 
         .calc-equals {
             background-color: #859900;
-            color: #fdf6e3;
+            color: var(--bg-base);
         }
 
         .calc-equals:hover {
@@ -300,7 +424,7 @@
 
         .calc-clear {
             background-color: #dc322f;
-            color: #fdf6e3;
+            color: var(--bg-base);
         }
 
         .calc-clear:hover {
@@ -325,13 +449,13 @@
 
         .note-text-area {
             flex: 1;
-            background-color: #fdf6e3;
-            border: 3px solid #93a1a1;
+            background-color: var(--bg-base);
+            border: 3px solid var(--border-color);
             padding: 16px;
             font-family: 'Courier New', 'Courier', monospace;
             font-size: 1.6em;
             font-weight: bold;
-            color: #586e75;
+            color: var(--text-primary);
             overflow-wrap: break-word;
             word-wrap: break-word;
             white-space: pre-wrap;
@@ -352,12 +476,12 @@
 
         .note-keyboard {
             height: 33.33%;
-            background-color: #93a1a1;
+            background-color: var(--text-secondary);
             padding: 8px;
             display: flex;
             flex-direction: column;
             gap: 3px;
-            border-top: 3px solid #93a1a1;
+            border-top: 3px solid var(--border-color);
         }
 
         .note-keyboard-row {
@@ -379,12 +503,12 @@
             font-family: 'Courier New', 'Courier', monospace;
             font-size: 1em;
             font-weight: bold;
-            border: 3px solid #93a1a1;
-            background-color: #eee8d5;
-            color: #586e75;
+            border: 3px solid var(--border-color);
+            background-color: var(--bg-surface);
+            color: var(--text-primary);
             cursor: pointer;
             transition: all 0.1s;
-            box-shadow: 2px 2px 0px #657b83;
+            box-shadow: 2px 2px 0px var(--border-color);
             touch-action: manipulation;
             user-select: none;
             -webkit-user-select: none;
@@ -395,11 +519,11 @@
         }
 
         .note-key:hover {
-            background-color: #e5ddc4;
+            background-color: var(--bg-base);
         }
 
         .note-key:active {
-            box-shadow: 0px 0px 0px #657b83;
+            box-shadow: 0px 0px 0px var(--border-color);
             transform: translate(2px, 2px);
         }
 
@@ -409,7 +533,7 @@
 
         .note-key.backspace {
             background-color: #dc322f;
-            color: #fdf6e3;
+            color: var(--bg-base);
             flex: 2;
             font-size: 1.3em;
         }
@@ -444,6 +568,12 @@
                 padding: 16px;
             }
 
+            .tab {
+                padding: 8px 12px;
+                letter-spacing: 0.5px;
+                font-size: 0.95em;
+            }
+
             .calc-btn {
                 padding: 16px 32px;
                 font-size: 1.1em;
@@ -462,32 +592,52 @@
                 font-size: 1.4em;
             }
         }
+        
+        @media (max-width: 400px) {
+            .tab {
+                padding: 8px 10px;
+                letter-spacing: 0.3px;
+                font-size: 0.9em;
+            }
+        }
+        
+        @media (max-width: 350px) {
+            .tab {
+                padding: 8px 8px;
+                letter-spacing: 0px;
+                font-size: 0.85em;
+            }
+        }
     </style>
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <div class="container">
         <div class="menu-bar">
             HOMEHOME.OS
         </div>
         
-        <div class="tabs">
-            <div class="tab active" data-tab="home">HOME</div>
-            <div class="tab" data-tab="bonk">BONK<span class="stop-btn" title="Stop game">■</span></div>
-            <div class="tab" data-tab="calc">CALC</div>
-            <div class="tab" data-tab="draw">DRAW</div>
-            <div class="tab" data-tab="note">NOTE</div>
+        <nav aria-label="Application tabs">
+        <div class="tabs" role="tablist">
+            <div class="tab active" data-tab="home" role="tab" aria-selected="true" aria-controls="home-content" tabindex="0">HOME</div>
+            <div class="tab" data-tab="bonk" role="tab" aria-selected="false" aria-controls="bonk-content" tabindex="-1">BONK</div>
+            <div class="tab" data-tab="calc" role="tab" aria-selected="false" aria-controls="calc-content" tabindex="-1">CALC</div>
+            <div class="tab" data-tab="draw" role="tab" aria-selected="false" aria-controls="draw-content" tabindex="-1">DRAW</div>
+            <div class="tab" data-tab="note" role="tab" aria-selected="false" aria-controls="note-content" tabindex="-1">NOTE</div>
         </div>
+        </nav>
         
-        <div id="home-content" class="content tab-content active">
-            <div class="ascii-art">
-    ╔═══════════════════════════════════╗
-    ║   _    _  ___  __  __ _____       ║
-    ║  | |  | |/ _ \|  \/  | ____|      ║
-    ║  | |__| | | | | |\/| |  _|        ║
-    ║  |  __  | |_| | |  | | |___       ║
-    ║  |_|  |_|\___/|_|  |_|_____|      ║
-    ║                                   ║
-    ╚═══════════════════════════════════╝
+        <main id="main-content">
+        <div id="home-content" class="content tab-content active" role="tabpanel" aria-labelledby="home-tab">
+            <div class="ascii-art" aria-hidden="true">
+╔═══════════════════════════════╗
+║   _    _  ___  __  __ _____   ║
+║  | |  | |/ _ \|  \/  | ____|  ║
+║  | |__| | | | | |\/| |  _|    ║
+║  |  __  | |_| | |  | | |___   ║
+║  |_|  |_|\___/|_|  |_|_____|  ║
+║                               ║
+╚═══════════════════════════════╝
             </div>
 
             <h1>Welcome Homehome</h1>
@@ -513,47 +663,66 @@
             </p>
         </div>
 
-        <div id="bonk-content" class="content tab-content">
+        <div id="bonk-content" class="content tab-content" role="tabpanel" aria-labelledby="bonk-tab">
+            <div class="instruction-popup" id="bonk-popup" style="display: none;" role="dialog" aria-labelledby="bonk-popup-title" aria-modal="true">
+                <div class="instruction-popup-title" id="bonk-popup-title">BONK.EXE</div>
+                <div class="instruction-popup-content">
+                    <p>Bouncing balls.</p>
+                    <p>Drag a ball to throw.</p>
+                    <p>Double-tap to reset.</p>
+                    <button id="bonk-start">START</button>
+                </div>
+            </div>
+            <div aria-live="polite" aria-atomic="true" class="visually-hidden" id="bonk-status"></div>
             <canvas id="drawingCanvas" aria-label="Game canvas with bouncing balls"></canvas>
         </div>
 
-        <div id="calc-content" class="content tab-content">
+        <div id="calc-content" class="content tab-content" role="tabpanel" aria-labelledby="calc-tab">
             <div class="calculator">
                 <div class="calc-display">
-                    <div class="calc-equation" id="calc-equation"></div>
-                    <div class="calc-result" id="calc-result">0</div>
+                    <div class="calc-equation" id="calc-equation" aria-live="polite" aria-atomic="false"></div>
+                    <div class="calc-result" id="calc-result" aria-live="polite" aria-atomic="true">0</div>
                 </div>
                 <div class="calc-buttons">
-                    <button class="calc-btn calc-clear" data-value="C">C</button>
-                    <button class="calc-btn calc-operator" data-value="/">÷</button>
-                    <button class="calc-btn calc-operator" data-value="*">×</button>
-                    <button class="calc-btn calc-operator" data-value="-">−</button>
+                    <button class="calc-btn calc-clear" data-value="C" aria-label="Clear">C</button>
+                    <button class="calc-btn calc-operator" data-value="/" aria-label="Divide">÷</button>
+                    <button class="calc-btn calc-operator" data-value="*" aria-label="Multiply">×</button>
+                    <button class="calc-btn calc-operator" data-value="-" aria-label="Subtract">−</button>
                     
-                    <button class="calc-btn calc-number" data-value="7">7</button>
-                    <button class="calc-btn calc-number" data-value="8">8</button>
-                    <button class="calc-btn calc-number" data-value="9">9</button>
-                    <button class="calc-btn calc-operator calc-tall" data-value="+">+</button>
+                    <button class="calc-btn calc-number" data-value="7" aria-label="7">7</button>
+                    <button class="calc-btn calc-number" data-value="8" aria-label="8">8</button>
+                    <button class="calc-btn calc-number" data-value="9" aria-label="9">9</button>
+                    <button class="calc-btn calc-operator calc-tall" data-value="+" aria-label="Add">+</button>
                     
-                    <button class="calc-btn calc-number" data-value="4">4</button>
-                    <button class="calc-btn calc-number" data-value="5">5</button>
-                    <button class="calc-btn calc-number" data-value="6">6</button>
+                    <button class="calc-btn calc-number" data-value="4" aria-label="4">4</button>
+                    <button class="calc-btn calc-number" data-value="5" aria-label="5">5</button>
+                    <button class="calc-btn calc-number" data-value="6" aria-label="6">6</button>
                     
-                    <button class="calc-btn calc-number" data-value="1">1</button>
-                    <button class="calc-btn calc-number" data-value="2">2</button>
-                    <button class="calc-btn calc-number" data-value="3">3</button>
-                    <button class="calc-btn calc-equals calc-tall" data-value="=">=</button>
+                    <button class="calc-btn calc-number" data-value="1" aria-label="1">1</button>
+                    <button class="calc-btn calc-number" data-value="2" aria-label="2">2</button>
+                    <button class="calc-btn calc-number" data-value="3" aria-label="3">3</button>
+                    <button class="calc-btn calc-equals calc-tall" data-value="=" aria-label="Equals">=</button>
                     
-                    <button class="calc-btn calc-number calc-wide" data-value="0">0</button>
-                    <button class="calc-btn calc-decimal" data-value=".">.</button>
+                    <button class="calc-btn calc-number calc-wide" data-value="0" aria-label="0">0</button>
+                    <button class="calc-btn calc-decimal" data-value="." aria-label="Decimal point">.</button>
                 </div>
             </div>
         </div>
 
-        <div id="draw-content" class="content tab-content">
+        <div id="draw-content" class="content tab-content" role="tabpanel" aria-labelledby="draw-tab">
+            <div class="instruction-popup" id="draw-popup" style="display: none;" role="dialog" aria-labelledby="draw-popup-title" aria-modal="true">
+                <div class="instruction-popup-title" id="draw-popup-title">DRAWSTRING.EXE</div>
+                <div class="instruction-popup-content">
+                    <p>A simple sketchpad.</p>
+                    <p>Touch or click to draw.</p>
+                    <p>Double-tap to clear.</p>
+                    <button id="draw-start">START</button>
+                </div>
+            </div>
             <canvas id="drawCanvas" aria-label="Drawing canvas"></canvas>
         </div>
 
-        <div id="note-content" class="content tab-content">
+        <div id="note-content" class="content tab-content" role="tabpanel" aria-labelledby="note-tab">
             <div class="note-container">
                 <div class="note-text-area" id="noteTextArea">
                     <div style="text-align: left; width: 100%;"><span id="noteText"></span><span class="cursor" id="noteCursor">█</span></div>
@@ -563,12 +732,14 @@
                 </div>
             </div>
         </div>
+        </main>
 
         <div class="footer">
             Homehome by Lewis Dryburgh, 2025
         </div>
     </div>
 
+    <script src="utils.js"></script>
     <script src="bonk.js"></script>
     <script src="calc.js"></script>
     <script src="draw.js"></script>
@@ -578,61 +749,151 @@
         const tabs = document.querySelectorAll('.tab');
         const tabContents = document.querySelectorAll('.tab-content');
         const bonkTab = document.querySelector('.tab[data-tab="bonk"]');
-        const stopBtn = bonkTab.querySelector('.stop-btn');
         let bonkInitialized = false;
         let drawInitialized = false;
         let noteInitialized = false;
+        let bonkStarted = false;
+        let drawStarted = false;
+        let bonkEverStarted = false; // Track if bonk has ever been started
 
-        // Stop button functionality
-        stopBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent tab switch
-            if (typeof gameRunning !== 'undefined') {
-                gameRunning = false;
-                stopBtn.classList.remove('visible');
-                bonkInitialized = false;
+        // Popup elements
+        const bonkPopup = document.getElementById('bonk-popup');
+        const bonkStartBtn = document.getElementById('bonk-start');
+        const drawPopup = document.getElementById('draw-popup');
+        const drawStartBtn = document.getElementById('draw-start');
+
+        // Handle BONK start button
+        bonkStartBtn.addEventListener('click', () => {
+            bonkPopup.style.display = 'none';
+            bonkStarted = true;
+            bonkEverStarted = true; // Mark that bonk has been started at least once
+            if (bonkInitialized && window.BonkGame) {
+                window.BonkGame.start();
             }
+            // Return focus to the tab after closing popup
+            bonkTab.focus();
         });
 
+        // Handle DRAW start button
+        drawStartBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            drawPopup.style.display = 'none';
+            drawStarted = true;
+            // Return focus to the tab after closing popup
+            document.querySelector('.tab[data-tab="draw"]').focus();
+        });
+
+        // Function to switch to a specific tab
+        function switchToTab(tab) {
+            const tabName = tab.getAttribute('data-tab');
+            
+            // Stop bonk game when leaving bonk tab
+            if (bonkInitialized && window.BonkGame && window.BonkGame.isRunning()) {
+                const currentTab = document.querySelector('.tab.active');
+                if (currentTab && currentTab.getAttribute('data-tab') === 'bonk' && tabName !== 'bonk') {
+                    window.BonkGame.stop();
+                    bonkInitialized = false;
+                    bonkStarted = false;
+                }
+            }
+            
+            // Update active tab
+            tabs.forEach(t => {
+                t.classList.remove('active');
+                t.setAttribute('aria-selected', 'false');
+                t.setAttribute('tabindex', '-1');
+            });
+            tab.classList.add('active');
+            tab.setAttribute('aria-selected', 'true');
+            tab.setAttribute('tabindex', '0');
+            
+            // Update active content
+            tabContents.forEach(content => content.classList.remove('active'));
+            const activeContent = document.getElementById(`${tabName}-content`);
+            activeContent.classList.add('active');
+            
+            // Focus the tab for screen reader announcement
+            tab.focus();
+            
+            // Initialize bonk game on first click
+            if (tabName === 'bonk' && !bonkInitialized) {
+                bonkInitialized = true;
+                // Only show popup if bonk has never been started before
+                if (!bonkEverStarted) {
+                    bonkPopup.style.display = 'flex';
+                    // Focus the START button for keyboard users
+                    setTimeout(() => bonkStartBtn.focus(), 100);
+                } else {
+                    bonkStarted = true; // Allow interaction immediately
+                    if (window.BonkGame) {
+                        window.BonkGame.start();
+                    }
+                }
+                if (window.BonkGame) {
+                    window.BonkGame.init();
+                }
+            }
+            
+            // Initialize drawing on first click
+            if (tabName === 'draw' && !drawInitialized) {
+                drawInitialized = true;
+                drawPopup.style.display = 'flex';
+                // Focus the START button for keyboard users
+                setTimeout(() => drawStartBtn.focus(), 100);
+                if (typeof initDrawing === 'function') {
+                    initDrawing();
+                }
+            }
+            
+            // Initialize note on first click
+            if (tabName === 'note' && !noteInitialized) {
+                noteInitialized = true;
+                if (typeof initNote === 'function') {
+                    initNote();
+                }
+            }
+        }
+
+        // Click event for tabs
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
-                const tabName = tab.getAttribute('data-tab');
+                switchToTab(tab);
+            });
+            
+            // Keyboard navigation for tabs
+            tab.addEventListener('keydown', (e) => {
+                let targetTab = null;
+                const currentIndex = Array.from(tabs).indexOf(tab);
                 
-                // Update active tab
-                tabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                
-                // Update active content
-                tabContents.forEach(content => content.classList.remove('active'));
-                document.getElementById(`${tabName}-content`).classList.add('active');
-                
-                // Initialize bonk game on first click
-                if (tabName === 'bonk' && !bonkInitialized) {
-                    bonkInitialized = true;
-                    initGame();
-                    stopBtn.classList.add('visible');
+                switch(e.key) {
+                    case 'ArrowRight':
+                    case 'ArrowDown':
+                        e.preventDefault();
+                        targetTab = tabs[currentIndex + 1] || tabs[0];
+                        break;
+                    case 'ArrowLeft':
+                    case 'ArrowUp':
+                        e.preventDefault();
+                        targetTab = tabs[currentIndex - 1] || tabs[tabs.length - 1];
+                        break;
+                    case 'Home':
+                        e.preventDefault();
+                        targetTab = tabs[0];
+                        break;
+                    case 'End':
+                        e.preventDefault();
+                        targetTab = tabs[tabs.length - 1];
+                        break;
+                    case 'Enter':
+                    case ' ':
+                        e.preventDefault();
+                        switchToTab(tab);
+                        return;
                 }
                 
-                // Initialize drawing on first click
-                if (tabName === 'draw' && !drawInitialized) {
-                    drawInitialized = true;
-                    if (typeof initDrawing === 'function') {
-                        initDrawing();
-                    }
-                }
-                
-                // Initialize note on first click
-                if (tabName === 'note' && !noteInitialized) {
-                    noteInitialized = true;
-                    if (typeof initNote === 'function') {
-                        initNote();
-                    }
-                }
-                
-                // Show/hide stop button based on game state and active tab
-                if (tabName !== 'bonk' && bonkInitialized && typeof gameRunning !== 'undefined' && gameRunning) {
-                    stopBtn.classList.add('visible');
-                } else {
-                    stopBtn.classList.remove('visible');
+                if (targetTab) {
+                    switchToTab(targetTab);
                 }
             });
         });

@@ -113,6 +113,7 @@ function buildKeyboard() {
             } else {
                 keyButton.textContent = key;
                 keyButton.setAttribute('data-key', key);
+                keyButton.setAttribute('aria-label', `Letter ${key}`);
                 keyButton.addEventListener('click', () => handleKeyPress(key));
                 keyButton.addEventListener('touchstart', (e) => {
                     e.preventDefault();
@@ -169,8 +170,4 @@ function handleDesktopKeyboard(e) {
 function updateNoteDisplay() {
     const noteTextElement = document.getElementById('noteText');
     noteTextElement.textContent = noteText;
-}
-
-function cleanupNote() {
-    document.removeEventListener('keydown', handleDesktopKeyboard);
 }

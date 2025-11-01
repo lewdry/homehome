@@ -37,13 +37,11 @@
     // Constants
     const DEVICE_PIXEL_RATIO = window.devicePixelRatio || 1;
     const LINE_WIDTH = 2;
-    const DOUBLE_TAP_TIMEOUT = 300;
-    const DOUBLE_TAP_DISTANCE_THRESHOLD = 20;
 
     // Drawing state
     const ongoingTouches = [];
+    const doubleTapDetector = createDoubleTapDetector({ timeout: 300, distanceThreshold: 20 });
     let drawing = false;
-    let lastTapTime = 0;
     let isDoubleTap = false;
     let drawInitialized = false;
     let drawCanvas = null;
@@ -98,6 +96,8 @@ function initDrawing() {
 }
 
 function handleDrawTouchStart(evt) {
+    if (!drawStarted) return; // Don't allow interaction until popup is dismissed
+    
     // Handle double tap for touch
     handleDrawDoubleTap(evt);
     
@@ -111,6 +111,8 @@ function handleDrawTouchStart(evt) {
 }
 
 function handleDrawStart(evt) {
+    if (!drawStarted) return; // Don't allow interaction until popup is dismissed
+    
     evt.preventDefault();
     evt.stopPropagation();
     
@@ -147,6 +149,8 @@ function handleDrawStart(evt) {
 }
 
 function handleDrawMove(evt) {
+    if (!drawStarted) return; // Don't allow interaction until popup is dismissed
+    
     evt.preventDefault();
     evt.stopPropagation();
     
@@ -174,6 +178,8 @@ function handleDrawMove(evt) {
 }
 
 function handleDrawEnd(evt) {
+    if (!drawStarted) return; // Don't allow interaction until popup is dismissed
+    
     evt.preventDefault();
     evt.stopPropagation();
 
@@ -195,6 +201,8 @@ function handleDrawEnd(evt) {
 }
 
 function handleDrawCancel(evt) {
+    if (!drawStarted) return; // Don't allow interaction until popup is dismissed
+    
     evt.preventDefault();
     evt.stopPropagation();
 
@@ -215,10 +223,9 @@ function handleDrawCancel(evt) {
 }
 
 function handleDrawDoubleTap(evt) {
-    if (!drawCanvas || !drawCtx) return;
+    if (!drawStarted) return; // Don't allow interaction until popup is dismissed
     
-    const now = new Date().getTime();
-    const timeSinceLastTap = now - lastTapTime;
+    if (!drawCanvas || !drawCtx) return;
 
     if (evt.touches && evt.touches.length === 1) {
         // Get the current tap location
@@ -226,31 +233,18 @@ function handleDrawDoubleTap(evt) {
         const x = evt.touches[0].clientX - rect.left;
         const y = evt.touches[0].clientY - rect.top;
 
-        // Get the last tap location
-        const lastX = parseFloat(drawCanvas.dataset.lastTapX || 0);
-        const lastY = parseFloat(drawCanvas.dataset.lastTapY || 0);
-
-        // Calculate the distance between the current and last tap
-        const distance = Math.sqrt(Math.pow(x - lastX, 2) + Math.pow(y - lastY, 2));
-
-        if (timeSinceLastTap < DOUBLE_TAP_TIMEOUT && distance < DOUBLE_TAP_DISTANCE_THRESHOLD) {
+        if (doubleTapDetector.isDoubleTap(x, y)) {
             drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
             evt.preventDefault();
             evt.stopPropagation();
             isDoubleTap = true;
-            setTimeout(() => { isDoubleTap = false; }, DOUBLE_TAP_TIMEOUT);
+            setTimeout(() => { isDoubleTap = false; }, 300);
         }
-
-        // Store the current tap location
-        drawCanvas.dataset.lastTapX = x;
-        drawCanvas.dataset.lastTapY = y;
     } else if (evt.type === 'dblclick') {
         drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
         evt.preventDefault();
         evt.stopPropagation();
     }
-
-    lastTapTime = now;
 }
 
 function drawLine(x1, y1, x2, y2, colour) {
