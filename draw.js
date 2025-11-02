@@ -316,9 +316,26 @@ function cleanupTouches() {
     
     // Expose cleanup function for when leaving draw tab
     window.cleanupDrawing = function() {
+        // Remove resize listener
         if (resizeHandler) {
             window.removeEventListener('resize', resizeHandler);
             resizeHandler = null;
         }
+        
+        // Remove canvas event listeners
+        if (drawCanvas) {
+            drawCanvas.removeEventListener('mousedown', handleDrawStart);
+            drawCanvas.removeEventListener('mousemove', handleDrawMove);
+            drawCanvas.removeEventListener('mouseup', handleDrawEnd);
+            drawCanvas.removeEventListener('dblclick', handleDrawDoubleTap);
+            drawCanvas.removeEventListener('touchstart', handleDrawTouchStart);
+            drawCanvas.removeEventListener('touchmove', handleDrawMove);
+            drawCanvas.removeEventListener('touchend', handleDrawEnd);
+            drawCanvas.removeEventListener('touchcancel', handleDrawCancel);
+        }
+        
+        // Reset state
+        drawing = false;
+        ongoingTouches.length = 0;
     };
 })();

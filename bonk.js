@@ -524,8 +524,8 @@ function ensureCanvasSize() {
     }
 
         function gameLoop(currentTime) {
+        // Early exit if game is not running - don't request next frame
         if (!gameRunning || !bonkStarted) {
-            requestAnimationFrame(gameLoop);
             return;
         }
         
@@ -723,7 +723,19 @@ function ensureCanvasSize() {
             return bonkStarted;
         },
         cleanup: function() {
-            // Remove event listeners
+            // Stop game
+            gameRunning = false;
+            gamePaused = true;
+            
+            // Remove canvas event listeners
+            if (canvas) {
+                canvas.removeEventListener('pointerdown', handleStart);
+                canvas.removeEventListener('pointermove', handleMove);
+                canvas.removeEventListener('pointerup', handleEnd);
+                canvas.removeEventListener('pointercancel', handleEnd);
+            }
+            
+            // Remove window event listeners
             if (resizeHandler && window.bonkResizeListenerAdded) {
                 window.removeEventListener('resize', resizeHandler);
                 window.bonkResizeListenerAdded = false;
@@ -732,11 +744,13 @@ function ensureCanvasSize() {
                 document.removeEventListener('visibilitychange', visibilityHandler);
                 window.bonkVisibilityListenerAdded = false;
             }
+            
             // Clean up timers
             if (pauseResumeTimeout) {
                 clearTimeout(pauseResumeTimeout);
                 pauseResumeTimeout = null;
             }
+            
             // Stop all active audio sources
             activeSources.forEach(({ source, gainNode }) => {
                 try {
@@ -748,6 +762,17 @@ function ensureCanvasSize() {
                 }
             });
             activeSources = [];
+            
+            // Close AudioContext
+            if (audioContext) {
+                try {
+                    audioContext.close();
+                } catch (e) {
+                    console.error('Error closing AudioContext:', e);
+                }
+                audioContext = null;
+                collisionBuffers = {};
+            }
         }
     };
 

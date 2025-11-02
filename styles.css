@@ -1172,6 +1172,9 @@ body.force-dark .thks-content-area a {
     justify-content: center;
     gap: 4px;
     box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.1);
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .calc-equation {

@@ -472,6 +472,7 @@
 
     // Game loop
     function gameLoop(currentTime) {
+        // Early exit if game is not running - don't request next frame
         if (!gameState.gameRunning) {
             return;
         }
@@ -950,30 +951,44 @@
             return CONFIG;
         },
         cleanup: function() {
+            // Stop game
+            gameState.gameRunning = false;
+            gameState.gamePaused = true;
+            
             // Remove event listeners
             if (keyDownHandler) {
                 document.removeEventListener('keydown', keyDownHandler);
+                keyDownHandler = null;
             }
             if (keyUpHandler) {
                 document.removeEventListener('keyup', keyUpHandler);
+                keyUpHandler = null;
             }
-            if (mouseMoveHandler) {
-                canvas.removeEventListener('mousemove', mouseMoveHandler);
-            }
-            if (touchMoveHandler) {
-                canvas.removeEventListener('touchmove', touchMoveHandler);
-            }
-            if (pointerDownHandler) {
-                canvas.removeEventListener('pointerdown', pointerDownHandler);
+            if (canvas) {
+                if (mouseMoveHandler) {
+                    canvas.removeEventListener('mousemove', mouseMoveHandler);
+                    mouseMoveHandler = null;
+                }
+                if (touchMoveHandler) {
+                    canvas.removeEventListener('touchmove', touchMoveHandler);
+                    touchMoveHandler = null;
+                }
+                if (pointerDownHandler) {
+                    canvas.removeEventListener('pointerdown', pointerDownHandler);
+                    pointerDownHandler = null;
+                }
             }
             if (resizeHandler) {
                 window.removeEventListener('resize', resizeHandler);
+                resizeHandler = null;
             }
+            
             // Clean up timers
             if (gameState.pauseResumeTimeout) {
                 clearTimeout(gameState.pauseResumeTimeout);
                 gameState.pauseResumeTimeout = null;
             }
+            
             // Stop all active audio sources
             activeSources.forEach(({ source, gainNode }) => {
                 try {
@@ -985,6 +1000,17 @@
                 }
             });
             activeSources = [];
+            
+            // Close AudioContext
+            if (audioContext) {
+                try {
+                    audioContext.close();
+                } catch (e) {
+                    console.error('Error closing AudioContext:', e);
+                }
+                audioContext = null;
+                collisionBuffers = {};
+            }
         }
     };
 })();
