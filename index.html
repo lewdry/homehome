@@ -297,6 +297,7 @@
         #bump-content {
             padding: 0;
             overflow: hidden;
+            position: relative;
         }
 
         #draw-content {
@@ -344,21 +345,66 @@
             white-space: pre;
             overflow: hidden;
             text-align: left;
+            transition: text-shadow 0.3s ease;
+        }
+        
+        .ascii-art.glow {
+            animation: ascii-glow 0.5s ease-out;
+        }
+        
+        @keyframes ascii-glow {
+            0% {
+                text-shadow: 0 0 2px #dc322f, 0 0 4px #dc322f;
+            }
+            50% {
+                text-shadow: 0 0 4px #dc322f, 0 0 8px #dc322f;
+            }
+            100% {
+                text-shadow: none;
+            }
         }
 
         @media (prefers-color-scheme: dark) {
             .ascii-art {
                 color: #db5b26;
             }
+            
+            @keyframes ascii-glow {
+                0% {
+                    text-shadow: 0 0 2px #db5b26, 0 0 4px #db5b26;
+                }
+                50% {
+                    text-shadow: 0 0 4px #db5b26, 0 0 8px #db5b26;
+                }
+                100% {
+                    text-shadow: none;
+                }
+            }
         }
 
         body.force-dark .ascii-art {
             color: #db5b26;
         }
+        
+        body.force-dark .ascii-art.glow {
+            animation: ascii-glow-dark 2s ease-out;
+        }
+        
+        @keyframes ascii-glow-dark {
+            0% {
+                text-shadow: 0 0 2px #db5b26, 0 0 4px #db5b26;
+            }
+            50% {
+                text-shadow: 0 0 4px #db5b26, 0 0 8px #db5b26;
+            }
+            100% {
+                text-shadow: none;
+            }
+        }
 
         h1 {
             font-size: 1.4em;
-            margin-bottom: 16px;
+            margin-bottom: 10px;
             letter-spacing: 3px;
             background-color: #1e7bb2;
             background-image: 
@@ -427,7 +473,7 @@
 
         p {
             margin-bottom: 16px;
-            text-align: justify;
+            text-align: left;
             font-weight: 500;
         }
 
@@ -704,6 +750,194 @@
             transform: translate(2px, 2px);
         }
 
+        /* Clock popup styles */
+        .clock-popup {
+            max-width: 500px;
+            z-index: 1000;
+        }
+
+        .clock-popup-content {
+            padding: 32px 24px 24px 24px;
+        }
+        
+        /* Overlay for blocking interactions when clock is open */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-surface);
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.04) 2px,
+                    rgba(0, 0, 0, 0.04) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.04) 2px,
+                    rgba(0, 0, 0, 0.04) 4px
+                );
+            background-size: 4px 4px;
+            opacity: 0.95;
+            z-index: 999;
+            display: none;
+        }
+
+        #ascii-clock-display {
+            font-family: 'Courier New', 'Courier', monospace;
+            font-size: 0.7em;
+            line-height: 1.1;
+            white-space: pre;
+            text-align: center;
+            margin-bottom: 24px;
+            user-select: none;
+            background-color: var(--text-primary);
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.12) 2px,
+                    rgba(0, 0, 0, 0.12) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.12) 2px,
+                    rgba(0, 0, 0, 0.12) 4px
+                );
+            background-size: 4px 4px;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: var(--text-primary);
+        }
+        
+        /* Allow colored spans in clock to override the dithering */
+        #ascii-clock-display span[style*="color"] {
+            background: none !important;
+            -webkit-background-clip: initial !important;
+            background-clip: initial !important;
+            -webkit-text-fill-color: initial !important;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            #ascii-clock-display {
+                background-image: 
+                    repeating-linear-gradient(
+                        0deg,
+                        transparent,
+                        transparent 2px,
+                        rgba(0, 0, 0, 0.08) 2px,
+                        rgba(0, 0, 0, 0.08) 4px
+                    ),
+                    repeating-linear-gradient(
+                        90deg,
+                        transparent,
+                        transparent 2px,
+                        rgba(0, 0, 0, 0.08) 2px,
+                        rgba(0, 0, 0, 0.08) 4px
+                    );
+            }
+        }
+        
+        body.force-dark #ascii-clock-display {
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.08) 2px,
+                    rgba(0, 0, 0, 0.08) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.08) 2px,
+                    rgba(0, 0, 0, 0.08) 4px
+                );
+        }
+
+        #clock-date-display {
+            font-family: 'Courier New', 'Courier', monospace;
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 24px;
+            letter-spacing: 1px;
+            background-color: var(--text-primary);
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.12) 2px,
+                    rgba(0, 0, 0, 0.12) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.12) 2px,
+                    rgba(0, 0, 0, 0.12) 4px
+                );
+            background-size: 4px 4px;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: var(--text-primary);
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            #clock-date-display {
+                background-image: 
+                    repeating-linear-gradient(
+                        0deg,
+                        transparent,
+                        transparent 2px,
+                        rgba(0, 0, 0, 0.08) 2px,
+                        rgba(0, 0, 0, 0.08) 4px
+                    ),
+                    repeating-linear-gradient(
+                        90deg,
+                        transparent,
+                        transparent 2px,
+                        rgba(0, 0, 0, 0.08) 2px,
+                        rgba(0, 0, 0, 0.08) 4px
+                    );
+            }
+        }
+        
+        body.force-dark #clock-date-display {
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.08) 2px,
+                    rgba(0, 0, 0, 0.08) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.08) 2px,
+                    rgba(0, 0, 0, 0.08) 4px
+                );
+        }
+
+        #clock-home-btn {
+            margin-top: 0;
+        }
+
         .footer {
             border-top: 3px solid var(--border-color);
             padding: 8px 12px;
@@ -750,8 +984,7 @@
 
         /* Credits tab styles */
         #thks-content {
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
+            overflow: hidden;
         }
 
         #thks-content.active {
@@ -787,7 +1020,10 @@
         }
 
         .thks-content-area {
-            padding: 24px;
+                /* Match the `.content` formatting: let the outer `.content` container
+                    provide the 24px padding, keep this area unpadded so text lines up.
+                    Also ensure list spacing matches paragraph spacing in HOME. */
+                padding: 0;
         }
 
         .thks-content-area a {
@@ -864,21 +1100,21 @@
 
         .thks-content-area ul {
             list-style-type: none;
-            margin: 8px 0 16px 0;
+            /* Remove the small top gap so lists align with surrounding content */
+            margin: 0 0 16px 0;
             padding: 0;
         }
 
         .thks-content-area li {
-            margin-bottom: 8px;
-            padding-left: 16px;
-            position: relative;
+            /* Match paragraph spacing in `.content` (16px bottom) so the
+               credits read like normal paragraphs in HOME */
+            margin-bottom: 16px;
+            padding-left: 0;
         }
 
         .thks-content-area li:before {
-            content: "•";
-            position: absolute;
-            left: 0;
-            color: var(--text-primary);
+            /* Hide default bullets and any pseudo-element markers so list items are not indented */
+            display: none;
         }
 
         .clock {
@@ -891,6 +1127,7 @@
             border: 2px solid var(--border-color);
             letter-spacing: 1px;
             user-select: none;
+            cursor: pointer;
         }
 
         .clock-colon {
@@ -899,7 +1136,7 @@
 
         .divider {
             color: #6f8000;
-            margin: 16px 0;
+            margin: 10px 0;
         }
 
         /* Calculator styles */
@@ -939,6 +1176,9 @@
             text-align: right;
             word-wrap: break-word;
             word-break: break-all;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
             background-color: var(--text-primary);
             background-image: 
                 repeating-linear-gradient(
@@ -1010,7 +1250,7 @@
             font-family: 'Courier New', 'Courier', monospace;
             font-size: 1.5em;
             font-weight: bold;
-            padding: 16px 32px;
+            padding: 20px;
             border: 3px solid var(--border-color);
             background-color: var(--bg-surface);
             background-image: 
@@ -1037,6 +1277,10 @@
             user-select: none;
             -webkit-user-select: none;
             -webkit-tap-highlight-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 0;
         }
 
         .calc-btn:hover {
@@ -1357,8 +1601,8 @@
             }
 
             .calc-btn {
-                padding: 16px 32px;
-                font-size: 1.1em;
+                padding: 12px;
+                font-size: 1.3em;
             }
 
             .calc-result {
@@ -1389,6 +1633,113 @@
                 letter-spacing: 0px;
                 font-size: 0.85em;
             }
+        }
+        
+        /* Very short screens - reduce calculator button padding further */
+        @media (max-height: 600px) {
+            .calc-btn {
+                padding: 10px;
+                font-size: 1.2em;
+            }
+            
+            .calc-display {
+                min-height: 50px;
+            }
+            
+            .calc-result {
+                font-size: 1.4em;
+            }
+        }
+        
+        /* Extra short screens - minimal padding */
+        @media (max-height: 500px) {
+            .calc-btn {
+                padding: 6px;
+                font-size: 1em;
+            }
+            
+            .calc-display {
+                min-height: 45px;
+                padding: 6px 10px;
+            }
+            
+            .calc-result {
+                font-size: 1.2em;
+            }
+            
+            .calc-equation {
+                font-size: 0.8em;
+            }
+        }
+        
+        /* Small screens - adjust speed slider */
+        @media (max-width: 400px) {
+            .bump-speed-slider {
+                font-size: 12px;
+                gap: 3px;
+            }
+            
+            .bump-speed-slider .speed-step {
+                padding: 1px 4px;
+                min-width: 20px;
+            }
+        }
+        
+        /* Bump speed slider styles */
+        .bump-speed-slider {
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-family: 'Courier New', 'Courier', monospace;
+            font-size: 14px;
+            font-weight: bold;
+            user-select: none;
+            z-index: 10;
+        }
+        
+        .bump-speed-slider .speed-label {
+            color: var(--text-primary);
+        }
+        
+        .bump-speed-slider .speed-step {
+            cursor: pointer;
+            padding: 2px 6px;
+            border: 2px solid var(--border-color);
+            background-color: var(--bg-surface);
+            color: var(--text-primary);
+            transition: all 0.2s;
+            min-width: 24px;
+            text-align: center;
+        }
+        
+        .bump-speed-slider .speed-step:hover {
+            background-color: var(--bg-base);
+        }
+        
+        .bump-speed-slider .speed-step.active {
+            background-color: #268bd2;
+            background-image: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.15) 2px,
+                    rgba(0, 0, 0, 0.15) 4px
+                ),
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.15) 2px,
+                    rgba(0, 0, 0, 0.15) 4px
+                );
+            background-size: 4px 4px;
+            color: var(--bg-base);
+            border-color: #268bd2;
         }
     </style>
 </head>
@@ -1482,7 +1833,24 @@
                     <button id="bump-endgame-ok">OK</button>
                 </div>
             </div>
+            <div class="bump-speed-slider" id="bump-speed-slider" style="display: none;">
+                <span class="speed-label">SPD:</span>
+                <button class="speed-step active" data-speed="1" aria-label="Speed 1">►</button>
+                <button class="speed-step" data-speed="1.5" aria-label="Speed 1.5">►►</button>
+                <button class="speed-step" data-speed="2" aria-label="Speed 2">►►►</button>
+            </div>
             <canvas id="bumpCanvas" aria-label="Breakout game canvas"></canvas>
+        </div>
+
+        <!-- Clock popup -->
+        <div class="popup-overlay" id="clock-overlay" style="display: none;"></div>
+        <div class="instruction-popup clock-popup" id="clock-popup" style="display: none;" role="dialog" aria-labelledby="clock-popup-title" aria-modal="true">
+            <div class="instruction-popup-title" id="clock-popup-title">CLOCK.EXE</div>
+            <div class="instruction-popup-content clock-popup-content">
+                <div id="ascii-clock-display" aria-live="polite" aria-atomic="true"></div>
+                <div id="clock-date-display"></div>
+                <button id="clock-home-btn">Back</button>
+            </div>
         </div>
 
         <div id="calc-content" class="content tab-content" role="tabpanel" aria-labelledby="calc-tab">
@@ -1553,9 +1921,9 @@
 
                 <p class="highlight">Inspirations</p>
                 <ul>
-                    <li>Ethos and image style: <a href="https://solar.lowtechmagazine.com" target="_blank" rel="noopener noreferrer">Low Tech Magazine</a></li>
-                    <li>The best fictious OS: <a href="https://www.windows93.net" target="_blank" rel="noopener noreferrer">Windows93.net</a></li>
                     <li>Colours and theme: <a href="https://ethanschoonover.com/solarized/" target="_blank" rel="noopener noreferrer">Solarized by Ethan Schoonover</a></li>
+                    <li>Fictious Operating System: <a href="https://www.windows93.net" target="_blank" rel="noopener noreferrer">Windows93.net</a></li>
+                    <li>Ethos and image style: <a href="https://solar.lowtechmagazine.com" target="_blank" rel="noopener noreferrer">Low Tech Magazine</a></li>
                 </ul>
 
                 <p class="highlight">Content</p>
@@ -1603,31 +1971,35 @@
             // null means no override - CSS media query handles it
         }
         
-        function toggleTheme() {
-            // First click: override to opposite of current display
-            // Second click: override to original system preference opposite
-            // Third click: back to system preference (null)
-            
-            if (themeOverride === null) {
-                // Currently using system preference, toggle to opposite
-                themeOverride = isDarkMode ? 'light' : 'dark';
-            } else if ((themeOverride === 'light' && isDarkMode) || (themeOverride === 'dark' && !isDarkMode)) {
-                // Currently showing opposite of system, go to same as system
-                themeOverride = isDarkMode ? 'dark' : 'light';
+        function getCurrentTheme() {
+            // Determine what theme is currently displayed
+            if (themeOverride === 'dark') {
+                return 'dark';
+            } else if (themeOverride === 'light') {
+                return 'light';
             } else {
-                // Currently showing same as system, go back to auto
-                themeOverride = null;
+                // Using system preference
+                return isDarkMode ? 'dark' : 'light';
             }
+        }
+        
+        function toggleTheme() {
+            // Simply toggle between light and dark
+            const currentTheme = getCurrentTheme();
+            themeOverride = currentTheme === 'dark' ? 'light' : 'dark';
             
             applyTheme();
             
-            // Announce theme change for screen readers
-            let announcement;
-            if (themeOverride === null) {
-                announcement = 'Theme set to automatic';
-            } else {
-                announcement = `${themeOverride.charAt(0).toUpperCase() + themeOverride.slice(1)} mode enabled`;
+            // Trigger ASCII glow if on HOME tab
+            const currentTab = document.querySelector('.tab.active');
+            if (currentTab && currentTab.getAttribute('data-tab') === 'home') {
+                if (typeof triggerAsciiGlow === 'function') {
+                    triggerAsciiGlow();
+                }
             }
+            
+            // Announce theme change for screen readers
+            const announcement = `${themeOverride.charAt(0).toUpperCase() + themeOverride.slice(1)} mode enabled`;
             
             // Create temporary announcement element
             const announcer = document.createElement('div');
@@ -1818,6 +2190,11 @@
             const activeContent = document.getElementById(`${tabName}-content`);
             activeContent.classList.add('active');
             
+            // Trigger ASCII glow when returning to HOME tab
+            if (tabName === 'home' && typeof triggerAsciiGlow === 'function') {
+                triggerAsciiGlow();
+            }
+            
             // Focus the tab for screen reader announcement
             tab.focus();
             
@@ -1879,12 +2256,25 @@
 
         // Click event for tabs
         tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
+            tab.addEventListener('click', (e) => {
+                // Prevent tab switching if clock popup is visible
+                if (clockPopupVisible) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                }
                 switchToTab(tab);
             });
             
             // Keyboard navigation for tabs
             tab.addEventListener('keydown', (e) => {
+                // Prevent tab switching if clock popup is visible
+                if (clockPopupVisible && (e.key === 'Enter' || e.key === ' ' || e.key.startsWith('Arrow') || e.key === 'Home' || e.key === 'End')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return;
+                }
+                
                 let targetTab = null;
                 const currentIndex = Array.from(tabs).indexOf(tab);
                 
@@ -1987,10 +2377,19 @@
         }
 
         function toggleCredits() {
-            if (window.playRetroClick) {
-                try { 
-                    window.playRetroClick(); 
-                } catch (err) {}
+            // Prevent credits toggle if clock popup is visible
+            if (clockPopupVisible) {
+                return;
+            }
+            
+            // Only play the retro click here for keyboard-triggered activation.
+            // Pointer interactions are handled globally by the pointerdown listener
+            // (which already plays the click), so avoid playing twice.
+            const event = arguments[0];
+            if (event && (event.type === 'keydown' || event.type === 'keypress')) {
+                if (window.playRetroClick) {
+                    try { window.playRetroClick(); } catch (err) {}
+                }
             }
 
             if (thksVisible) {
@@ -2000,11 +2399,23 @@
             }
         }
 
-        footerText.addEventListener('click', toggleCredits);
+        footerText.addEventListener('click', (e) => {
+            // Prevent footer text interaction if clock popup is visible
+            if (clockPopupVisible) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+            toggleCredits(e);
+        });
         footerText.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                toggleCredits();
+                // Prevent footer text interaction if clock popup is visible
+                if (clockPopupVisible) {
+                    return;
+                }
+                toggleCredits(e);
             }
         });
 
@@ -2052,10 +2463,237 @@
             'blockchain',
             'generative AI',
             'quantum computing',
-            '6G networking'
+            '6G networks',
+            'edge computing',
+            'virtual reality',
+            'robotics',
+            'the metaverse',
+            'crypto',
+            'virtual assistants'
         ];
-        const randomTerm = modernTechTerms[Math.floor(Math.random() * modernTechTerms.length)];
+        
+        // Get a random term that's different from the default "the cloud"
+        const defaultTerm = 'the cloud';
+        let randomTerm;
+        do {
+            randomTerm = modernTechTerms[Math.floor(Math.random() * modernTechTerms.length)];
+        } while (randomTerm === defaultTerm);
+        
         document.getElementById('modernTech').textContent = randomTerm;
+        
+        // ASCII art glow effect
+        function triggerAsciiGlow() {
+            const asciiArt = document.querySelector('.ascii-art');
+            if (asciiArt) {
+                asciiArt.classList.remove('glow');
+                // Force reflow to restart animation
+                void asciiArt.offsetWidth;
+                asciiArt.classList.add('glow');
+                
+                // Remove class after animation completes
+                setTimeout(() => {
+                    asciiArt.classList.remove('glow');
+                }, 500);
+            }
+        }
+        
+        // Trigger glow on page load
+        window.addEventListener('load', () => {
+            triggerAsciiGlow();
+        });
+
+        // Clock popup functionality
+        const clockPopup = document.getElementById('clock-popup');
+        const clockHomeBtn = document.getElementById('clock-home-btn');
+        const footerClock = document.getElementById('clock');
+        let clockInterval = null;
+        let clockPopupVisible = false;
+
+        // ASCII clock drawing function
+        function drawAsciiClock(hours, minutes, seconds) {
+            const centerX = 20;
+            const centerY = 10;
+            const radius = 9;
+            
+            // Create 2D array for the clock face with character and color info
+            const grid = Array(21).fill(null).map(() => Array(41).fill(null).map(() => ({ char: ' ', color: null })));
+            
+            // Draw circle
+            for (let angle = 0; angle < 360; angle += 3) {
+                const rad = angle * Math.PI / 180;
+                const x = Math.round(centerX + radius * 1.8 * Math.cos(rad));
+                const y = Math.round(centerY + radius * Math.sin(rad));
+                if (y >= 0 && y < 21 && x >= 0 && x < 41) {
+                    grid[y][x] = { char: '○', color: null };
+                }
+            }
+            
+            // Draw hour markers
+            for (let i = 0; i < 12; i++) {
+                const angle = (i * 30 - 90) * Math.PI / 180;
+                const x = Math.round(centerX + (radius - 1) * 1.8 * Math.cos(angle));
+                const y = Math.round(centerY + (radius - 1) * Math.sin(angle));
+                if (y >= 0 && y < 21 && x >= 0 && x < 41) {
+                    grid[y][x] = { char: '•', color: null };
+                }
+            }
+            
+            // Draw center
+            grid[centerY][centerX] = { char: '●', color: null };
+            
+            // Draw hour hand (blue - #268bd2)
+            const hourAngle = ((hours % 12) * 30 + minutes * 0.5 - 90) * Math.PI / 180;
+            for (let i = 1; i <= 5; i++) {
+                const x = Math.round(centerX + i * 1.8 * 0.6 * Math.cos(hourAngle));
+                const y = Math.round(centerY + i * 0.6 * Math.sin(hourAngle));
+                if (y >= 0 && y < 21 && x >= 0 && x < 41) {
+                    grid[y][x] = { char: '█', color: '#268bd2' };
+                }
+            }
+            
+            // Draw minute hand (green - #719e07)
+            const minuteAngle = (minutes * 6 - 90) * Math.PI / 180;
+            for (let i = 1; i <= 7; i++) {
+                const x = Math.round(centerX + i * 1.8 * 0.8 * Math.cos(minuteAngle));
+                const y = Math.round(centerY + i * 0.8 * Math.sin(minuteAngle));
+                if (y >= 0 && y < 21 && x >= 0 && x < 41) {
+                    grid[y][x] = { char: '║', color: '#719e07' };
+                }
+            }
+            
+            // Draw second hand (red - #ec423f)
+            const secondAngle = (seconds * 6 - 90) * Math.PI / 180;
+            for (let i = 1; i <= 8; i++) {
+                const x = Math.round(centerX + i * 1.8 * 0.9 * Math.cos(secondAngle));
+                const y = Math.round(centerY + i * 0.9 * Math.sin(secondAngle));
+                if (y >= 0 && y < 21 && x >= 0 && x < 41) {
+                    grid[y][x] = { char: '│', color: '#ec423f' };
+                }
+            }
+            
+            // Convert grid to HTML string with colored spans
+            return grid.map(row => {
+                return row.map(cell => {
+                    if (cell.color) {
+                        return `<span style="color: ${cell.color}">${cell.char}</span>`;
+                    }
+                    return cell.char;
+                }).join('');
+            }).join('\n');
+        }
+
+        // Update clock display
+        function updateClockPopup() {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+            
+            // Update ASCII clock
+            const asciiClockDisplay = document.getElementById('ascii-clock-display');
+            if (asciiClockDisplay) {
+                asciiClockDisplay.innerHTML = drawAsciiClock(hours, minutes, seconds);
+            }
+            
+            // Update date display
+            const dateDisplay = document.getElementById('clock-date-display');
+            if (dateDisplay) {
+                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                               'July', 'August', 'September', 'October', 'November', 'December'];
+                
+                const dayName = days[now.getDay()];
+                const day = now.getDate();
+                const monthName = months[now.getMonth()];
+                const year = now.getFullYear();
+                
+                dateDisplay.textContent = `${dayName}, ${day} ${monthName} ${year}`;
+            }
+        }
+
+        // Show clock popup
+        function showClockPopup() {
+            clockPopupVisible = true;
+            const clockOverlay = document.getElementById('clock-overlay');
+            clockPopup.style.display = 'flex';
+            if (clockOverlay) clockOverlay.style.display = 'block';
+            
+            // Stop bonk game if running (but keep bonkStarted and bonkInitialized)
+            if (bonkInitialized && window.BonkGame && window.BonkGame.isRunning()) {
+                window.BonkGame.stop();
+            }
+            
+            // Stop bump game if running
+            if (bumpInitialized && window.BumpGame && window.BumpGame.isRunning()) {
+                window.BumpGame.stop();
+            }
+            
+            // Update clock immediately and start interval
+            updateClockPopup();
+            clockInterval = setInterval(updateClockPopup, 1000);
+            
+            // Focus the Home button for keyboard users
+            setTimeout(() => clockHomeBtn.focus(), 100);
+        }
+
+        // Hide clock popup
+        function hideClockPopup() {
+            clockPopupVisible = false;
+            const clockOverlay = document.getElementById('clock-overlay');
+            clockPopup.style.display = 'none';
+            if (clockOverlay) clockOverlay.style.display = 'none';
+            
+            // Clear interval
+            if (clockInterval) {
+                clearInterval(clockInterval);
+                clockInterval = null;
+            }
+            
+            // Resume games if they were on their respective tabs
+            const currentTab = document.querySelector('.tab.active');
+            
+            // Resume bonk game if it was on the bonk tab
+            if (currentTab && currentTab.getAttribute('data-tab') === 'bonk' && bonkInitialized && window.BonkGame) {
+                window.BonkGame.resume();
+            }
+            
+            // Resume bump game if it was on the bump tab
+            if (currentTab && currentTab.getAttribute('data-tab') === 'bump' && bumpInitialized && window.BumpGame) {
+                window.BumpGame.resume();
+            }
+            
+            // Return focus to the footer clock
+            footerClock.focus();
+        }
+
+        // Clock home button click handler
+        clockHomeBtn.addEventListener('click', hideClockPopup);
+
+        // Footer clock click handler
+        footerClock.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!clockPopupVisible) {
+                showClockPopup();
+            }
+        });
+
+        // Make footer clock keyboard accessible
+        footerClock.setAttribute('role', 'button');
+        footerClock.setAttribute('tabindex', '0');
+        footerClock.setAttribute('aria-label', 'Open clock application');
+        
+        footerClock.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                if (!clockPopupVisible) {
+                    if (window.playRetroClick) {
+                        try { window.playRetroClick(); } catch (err) {}
+                    }
+                    showClockPopup();
+                }
+            }
+        });
     </script>
 </body>
 </html>

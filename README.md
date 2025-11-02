@@ -62,7 +62,7 @@ Simply open `index.html` in a web browser. No build process or dependencies requ
 ## File Structure
 
 ```
-homehome/
+homehomehome/
 ├── index.html          # Main HTML with embedded CSS
 ├── bonk.js            # Bouncing balls physics game
 ├── bump.js            # Breakout/brick-breaker game

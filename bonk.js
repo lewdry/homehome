@@ -325,6 +325,11 @@ function ensureCanvasSize() {
                 return;
             }
 
+            // Resume AudioContext if suspended (required for browsers)
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+
             try {
                 const soundFiles = Object.keys(collisionBuffers);
                 const randomIndex = Math.floor(Math.random() * soundFiles.length);
@@ -421,6 +426,8 @@ function ensureCanvasSize() {
     let lastCursorTime = 0;
     let gameRunning = false;
     let bonkStarted = false;
+    let gamePaused = false;
+    let pauseResumeTimeout = null;
     let stoppedFor = 0;
     let allBallsStopped = false;
     let lastStopTime = 0;
@@ -431,6 +438,7 @@ function ensureCanvasSize() {
     let lastTime = 0;
     let lastGrabbedPos = null;
     const doubleTapDetector = createDoubleTapDetector({ timeout: 300 });
+    const PAUSE_RESUME_DELAY = 500; // 0.5s delay when resuming
 
     function initGame() {
         if (!canvas) {
@@ -547,6 +555,11 @@ window.addEventListener('resize', () => {
             requestAnimationFrame(gameLoop);
             return;
         }
+        
+        if (gamePaused) {
+            requestAnimationFrame(gameLoop);
+            return;
+        }
 
         if (currentTime - lastTime >= FIXED_TIME_STEP) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -587,7 +600,7 @@ window.addEventListener('resize', () => {
             const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             ctx.fillStyle = isDarkMode ? '#839496' : '#586e75';
             // Use a monospaced Courier font for score text to match site theme
-            ctx.font = '16px "Courier New", Courier, monospace';
+            ctx.font = 'bold 16px "Courier New", Courier, monospace';
             
             const counterText = `${collisionCount} Bonks`;
             const textWidth = ctx.measureText(counterText).width;
@@ -699,7 +712,19 @@ window.addEventListener('resize', () => {
         },
         stop: function() {
             gameRunning = false;
-            bonkStarted = false;
+            gamePaused = true;
+        },
+        resume: function() {
+            if (bonkStarted && !gameRunning) {
+                // Resume with delay
+                clearTimeout(pauseResumeTimeout);
+                pauseResumeTimeout = setTimeout(() => {
+                    gameRunning = true;
+                    gamePaused = false;
+                    lastTime = performance.now();
+                    requestAnimationFrame(gameLoop);
+                }, PAUSE_RESUME_DELAY);
+            }
         },
         isRunning: function() {
             return gameRunning;

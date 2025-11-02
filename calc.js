@@ -91,8 +91,9 @@ function handleNumber(num) {
         if (calculatorState.currentValue === '0') {
             calculatorState.currentValue = num;
         } else {
-            // Limit display length to prevent overflow
-            if (calculatorState.currentValue.length < 12) {
+            // Limit to 8 characters (excluding decimal point)
+            const digitsOnly = calculatorState.currentValue.replace('.', '');
+            if (digitsOnly.length < 8) {
                 calculatorState.currentValue += num;
             }
         }
@@ -163,12 +164,21 @@ function handleEquals() {
     // Format result to avoid floating point errors and limit decimals
     result = Math.round(result * 100000000) / 100000000;
     
-    // Limit result length
+    // Convert to string and limit to 8 significant digits
     let resultStr = result.toString();
-    if (resultStr.length > 12) {
+    
+    // If result has more than 8 digits (excluding decimal point and minus sign)
+    const digitsOnly = resultStr.replace(/[.\-]/g, '');
+    if (digitsOnly.length > 8) {
         // Use exponential notation for very large/small numbers
-        result = parseFloat(result.toExponential(6));
+        result = parseFloat(result.toPrecision(8));
         resultStr = result.toString();
+        
+        // If still too long, use exponential
+        const stillTooLong = resultStr.replace(/[.\-]/g, '').length > 8;
+        if (stillTooLong) {
+            resultStr = result.toExponential(2);
+        }
     }
 
     // Update equation to show full calculation

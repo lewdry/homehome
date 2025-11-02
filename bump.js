@@ -31,6 +31,7 @@
         BALL_SPEED_INITIAL: 3,
         BALL_SPEED_INCREMENT: 0.0002, // Very slight speed increase per frame
         BALL_SPEED_MAX: 5,
+        SPEED_MULTIPLIER: 1, // Current speed multiplier (1, 1.5, or 2)
         PADDLE_HEIGHT: 12,
         PADDLE_WIDTH: 80,
         PADDLE_SPEED: 8,
@@ -300,6 +301,9 @@
         
         window.addEventListener('resize', handleResize);
         
+        // Set up speed slider
+        initSpeedSlider();
+        
         console.log('BRKR game initialized');
     }
 
@@ -362,6 +366,12 @@
         gameState.score = 0;
         gameState.colorsAreRainbow = true; // Reset to rainbow order
         
+        // Show speed slider
+        const speedSlider = document.getElementById('bump-speed-slider');
+        if (speedSlider) {
+            speedSlider.style.display = 'flex';
+        }
+        
         // Initialize bricks
         gameState.bricks = initBricks();
         
@@ -371,12 +381,16 @@
         
         const allColors = RAINBOW_COLORS.flat();
         const ballColor = allColors[Math.floor(Math.random() * allColors.length)];
+        
+        // Apply speed multiplier to initial ball speed
+        const adjustedSpeed = CONFIG.BALL_SPEED_INITIAL * CONFIG.SPEED_MULTIPLIER;
+        
         gameState.ball = {
             x: canvasWidth / 2,
             y: canvasHeight - 100,
-            dx: CONFIG.BALL_SPEED_INITIAL * (Math.random() > 0.5 ? 1 : -1),
-            dy: -CONFIG.BALL_SPEED_INITIAL,
-            speed: CONFIG.BALL_SPEED_INITIAL,
+            dx: adjustedSpeed * (Math.random() > 0.5 ? 1 : -1),
+            dy: -adjustedSpeed,
+            speed: adjustedSpeed,
             color: ballColor,
             pattern: generateCirclePattern(CONFIG.BALL_RADIUS, ballColor)
         };
@@ -399,11 +413,14 @@
         const canvasWidth = canvas.width / (window.devicePixelRatio || 1);
         const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
         
+        // Apply speed multiplier to reset ball speed
+        const adjustedSpeed = CONFIG.BALL_SPEED_INITIAL * CONFIG.SPEED_MULTIPLIER;
+        
         gameState.ball.x = canvasWidth / 2;
         gameState.ball.y = canvasHeight - 100;
-        gameState.ball.dx = CONFIG.BALL_SPEED_INITIAL * (Math.random() > 0.5 ? 1 : -1);
-        gameState.ball.dy = -CONFIG.BALL_SPEED_INITIAL;
-        gameState.ball.speed = CONFIG.BALL_SPEED_INITIAL;
+        gameState.ball.dx = adjustedSpeed * (Math.random() > 0.5 ? 1 : -1);
+        gameState.ball.dy = -adjustedSpeed;
+        gameState.ball.speed = adjustedSpeed;
         
         // Brief pause before resuming
         gameState.gamePaused = true;
@@ -456,8 +473,9 @@
         }
         
         // Gradually increase ball speed
-        if (gameState.ball.speed < CONFIG.BALL_SPEED_MAX) {
-            gameState.ball.speed += CONFIG.BALL_SPEED_INCREMENT;
+        const maxSpeed = CONFIG.BALL_SPEED_MAX * CONFIG.SPEED_MULTIPLIER;
+        if (gameState.ball.speed < maxSpeed) {
+            gameState.ball.speed += CONFIG.BALL_SPEED_INCREMENT * CONFIG.SPEED_MULTIPLIER;
             const speedRatio = gameState.ball.speed / Math.sqrt(gameState.ball.dx ** 2 + gameState.ball.dy ** 2);
             gameState.ball.dx *= speedRatio;
             gameState.ball.dy *= speedRatio;
@@ -623,7 +641,7 @@
                           (!document.body.classList.contains('force-light') && 
                            window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
         ctx.fillStyle = isDarkMode ? '#839496' : '#586e75';
-        ctx.font = '16px "Courier New", Courier, monospace';
+        ctx.font = 'bold 16px "Courier New", Courier, monospace';
         
         // Lives
         ctx.fillText(`Lives: ${gameState.lives}`, 6, 20);
@@ -759,6 +777,11 @@
             return;
         }
         
+        // Resume AudioContext if suspended (required for browsers)
+        if (audioContext.state === 'suspended') {
+            audioContext.resume();
+        }
+        
         try {
             const soundFiles = Object.keys(collisionBuffers);
             const randomIndex = Math.floor(Math.random() * soundFiles.length);
@@ -785,6 +808,50 @@
         } catch (error) {
             console.error("Error playing sound:", error);
         }
+    }
+
+    // Initialize speed slider
+    function initSpeedSlider() {
+        const speedSlider = document.getElementById('bump-speed-slider');
+        if (!speedSlider) return;
+        
+        const speedButtons = speedSlider.querySelectorAll('.speed-step');
+        
+        speedButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const speed = parseFloat(button.getAttribute('data-speed'));
+                
+                // Update active state
+                speedButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                // Update config
+                const oldMultiplier = CONFIG.SPEED_MULTIPLIER;
+                CONFIG.SPEED_MULTIPLIER = speed;
+                
+                // Adjust current ball speed if game is running
+                if (gameState.gameStarted && gameState.ball) {
+                    const speedRatio = speed / oldMultiplier;
+                    gameState.ball.dx *= speedRatio;
+                    gameState.ball.dy *= speedRatio;
+                    gameState.ball.speed *= speedRatio;
+                }
+                
+                // Play click sound
+                if (window.playRetroClick) {
+                    try { window.playRetroClick(); } catch (err) {}
+                }
+            });
+            
+            // Touch support
+            button.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                button.click();
+            }, { passive: false });
+        });
     }
 
     // Public API

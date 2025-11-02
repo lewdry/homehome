@@ -125,7 +125,7 @@ function createDoubleTapDetector(options = {}) {
     }
 
     // Primary play function - prefer external buffer, fall back to synth -------
-    function playRetroClick() {
+    async function playRetroClick() {
         // Check global mute state
         if (window.isMuted) return;
         
@@ -134,7 +134,11 @@ function createDoubleTapDetector(options = {}) {
         
         // Resume AudioContext if suspended (required for mobile browsers)
         if (ctx.state === 'suspended') {
-            ctx.resume().catch(() => {});
+            try {
+                await ctx.resume();
+            } catch (e) {
+                // Resume failed, try to play anyway
+            }
         }
         
         if (externalBuffer) {
@@ -144,24 +148,8 @@ function createDoubleTapDetector(options = {}) {
             } catch (e) {
                 // fall through to synth
             }
-        } else if (loadingPromise) {
-            // If still loading, wait for it to complete then play
-            loadingPromise.then(() => {
-                if (externalBuffer) {
-                    try {
-                        if (playBufferClick()) return;
-                    } catch (e) {
-                        playSynthClick();
-                    }
-                } else {
-                    playSynthClick();
-                }
-            }).catch(() => {
-                playSynthClick();
-            });
-            return;
         }
-        // fallback
+        // If still loading or not available, play synth immediately (no waiting)
         playSynthClick();
     }
 
