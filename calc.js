@@ -13,6 +13,10 @@ let equationDisplay;
 let resultDisplay;
 let calcButtons;
 
+// Key mapping for randomization easter egg
+let calcKeysRandomized = false;
+const originalCalcNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
 // Initialize calculator when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     equationDisplay = document.getElementById('calc-equation');
@@ -31,6 +35,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { passive: false });
     });
 
+    // Double-tap detector for randomization easter egg
+    const doubleTapDetector = createDoubleTapDetector();
+    const calcContent = document.getElementById('calc-content');
+    
+    calcContent.addEventListener('pointerdown', (e) => {
+        // Only trigger on blank space (not on buttons)
+        if (e.target.classList.contains('calc-btn') || e.target.closest('.calc-btn')) {
+            return;
+        }
+        
+        if (doubleTapDetector.isDoubleTap(e.clientX, e.clientY)) {
+            randomizeCalcKeys();
+            if (window.playRetroClick) {
+                try { window.playRetroClick(); } catch (err) {}
+            }
+        }
+    });
+
     // Update display on load
     updateDisplay();
 });
@@ -39,7 +61,12 @@ function handleButtonClick(event) {
     const button = event.target.closest('.calc-btn');
     if (!button) return;
 
-    const value = button.dataset.value;
+    let value = button.dataset.value;
+    
+    // If keys are randomized and this is a number, use the displayed text as the value
+    if (calcKeysRandomized && button.classList.contains('calc-number')) {
+        value = button.textContent;
+    }
 
     if (button.classList.contains('calc-number')) {
         handleNumber(value);
@@ -178,5 +205,39 @@ function updateDisplay() {
     }
     if (equationDisplay) {
         equationDisplay.textContent = calculatorState.equation;
+    }
+}
+
+// Easter egg: Randomize calculator number keys
+function randomizeCalcKeys() {
+    const numberButtons = document.querySelectorAll('.calc-btn.calc-number');
+    
+    if (calcKeysRandomized) {
+        // Restore original layout
+        numberButtons.forEach((button) => {
+            const originalNumber = button.dataset.value;
+            button.textContent = originalNumber;
+            button.setAttribute('aria-label', originalNumber);
+        });
+        calcKeysRandomized = false;
+    } else {
+        // Randomize
+        const numbers = Array.from(numberButtons).map(btn => btn.dataset.value);
+        
+        // Fisher-Yates shuffle
+        const shuffled = [...numbers];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        
+        // Update button text - the displayed text becomes the new value
+        numberButtons.forEach((button, index) => {
+            const newNumber = shuffled[index];
+            button.textContent = newNumber;
+            button.setAttribute('aria-label', newNumber);
+        });
+        
+        calcKeysRandomized = true;
     }
 }

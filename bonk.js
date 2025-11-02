@@ -88,6 +88,51 @@ function ensureCanvasSize() {
         this.grabbed = false;
         this.collisionCooldown = 0;
         this.lastCollidedWith = null;
+        
+        // Pre-calculate dithered color
+        const rgb = this.hexToRgb(this.colour);
+        this.ditherColor = this.getDarkerShade(rgb, 0.7);
+        
+        // Generate static pixelated circle pattern
+        this.generatePixelPattern();
+    }
+    
+    generatePixelPattern() {
+        const pixelSize = 2;
+        const drawRadius = this.radius;
+        
+        // Calculate the bounding box for the circle in pixels
+        const minX = Math.floor(-drawRadius / pixelSize);
+        const minY = Math.floor(-drawRadius / pixelSize);
+        const maxX = Math.ceil(drawRadius / pixelSize);
+        const maxY = Math.ceil(drawRadius / pixelSize);
+        
+        // Generate static pixel pattern with dithering
+        this.pixelPattern = [];
+        
+        for (let gridX = minX; gridX <= maxX; gridX++) {
+            for (let gridY = minY; gridY <= maxY; gridY++) {
+                const px = gridX * pixelSize;
+                const py = gridY * pixelSize;
+                
+                // Calculate distance from pixel center to ball center (0, 0)
+                const dx = px + pixelSize / 2;
+                const dy = py + pixelSize / 2;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance <= drawRadius) {
+                    // Determine if this pixel should be dithered
+                    // Use a checkerboard dithering pattern based on grid position
+                    const isDithered = (gridX + gridY) % 2 === 0;
+                    
+                    this.pixelPattern.push({
+                        offsetX: px,
+                        offsetY: py,
+                        isDithered: isDithered
+                    });
+                }
+            }
+        }
     }
 
     move() {
@@ -132,31 +177,33 @@ function ensureCanvasSize() {
     }
 
     draw() {
-        const drawRadius = this.grabbed ? this.radius * GRABBED_BALL_SCALE : this.radius;
-
-        // Draw pixelated circle for retro look
-        const pixelSize = 2; // Size of each "pixel" - larger for more stable appearance
+        const pixelSize = 2;
+        const scale = this.grabbed ? GRABBED_BALL_SCALE : 1;
+        
+        // Draw static pixel pattern - batch by color to minimize fillStyle changes
+        // First draw all base color pixels
         ctx.fillStyle = this.colour;
+        for (let i = 0; i < this.pixelPattern.length; i++) {
+            const pixel = this.pixelPattern[i];
+            if (!pixel.isDithered) {
+                const scaledOffsetX = pixel.offsetX * scale;
+                const scaledOffsetY = pixel.offsetY * scale;
+                const px = this.x + scaledOffsetX;
+                const py = this.y + scaledOffsetY;
+                ctx.fillRect(px, py, pixelSize, pixelSize);
+            }
+        }
         
-        // Snap to fixed canvas grid at origin (0, 0)
-        const minX = Math.floor((this.x - drawRadius) / pixelSize);
-        const minY = Math.floor((this.y - drawRadius) / pixelSize);
-        const maxX = Math.ceil((this.x + drawRadius) / pixelSize);
-        const maxY = Math.ceil((this.y + drawRadius) / pixelSize);
-        
-        for (let gridX = minX; gridX <= maxX; gridX++) {
-            for (let gridY = minY; gridY <= maxY; gridY++) {
-                const px = gridX * pixelSize;
-                const py = gridY * pixelSize;
-                
-                // Calculate distance from pixel center to ball center
-                const dx = px + pixelSize / 2 - this.x;
-                const dy = py + pixelSize / 2 - this.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                
-                if (distance <= drawRadius) {
-                    ctx.fillRect(px, py, pixelSize, pixelSize);
-                }
+        // Then draw all dithered pixels
+        ctx.fillStyle = this.ditherColor;
+        for (let i = 0; i < this.pixelPattern.length; i++) {
+            const pixel = this.pixelPattern[i];
+            if (pixel.isDithered) {
+                const scaledOffsetX = pixel.offsetX * scale;
+                const scaledOffsetY = pixel.offsetY * scale;
+                const px = this.x + scaledOffsetX;
+                const py = this.y + scaledOffsetY;
+                ctx.fillRect(px, py, pixelSize, pixelSize);
             }
         }
 
@@ -165,21 +212,38 @@ function ensureCanvasSize() {
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
             ctx.lineWidth = 1;
             
-            for (let gridX = minX - 1; gridX <= maxX + 1; gridX++) {
-                for (let gridY = minY - 1; gridY <= maxY + 1; gridY++) {
-                    const px = gridX * pixelSize;
-                    const py = gridY * pixelSize;
-                    
-                    const dx = px + pixelSize / 2 - this.x;
-                    const dy = py + pixelSize / 2 - this.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (distance > drawRadius && distance <= drawRadius + 3) {
-                        ctx.strokeRect(px, py, pixelSize, pixelSize);
-                    }
+            // Draw glow around the pattern
+            const glowRadius = this.radius * scale;
+            for (let i = 0; i < this.pixelPattern.length; i++) {
+                const pixel = this.pixelPattern[i];
+                const scaledOffsetX = pixel.offsetX * scale;
+                const scaledOffsetY = pixel.offsetY * scale;
+                
+                // Check if this pixel is on the edge
+                const distance = Math.sqrt(scaledOffsetX * scaledOffsetX + scaledOffsetY * scaledOffsetY);
+                if (distance > glowRadius - 3 && distance <= glowRadius + 1) {
+                    const px = this.x + scaledOffsetX;
+                    const py = this.y + scaledOffsetY;
+                    ctx.strokeRect(px, py, pixelSize, pixelSize);
                 }
             }
         }
+    }
+    
+    hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : { r: 0, g: 0, b: 0 };
+    }
+    
+    getDarkerShade(rgb, factor) {
+        const r = Math.floor(rgb.r * factor);
+        const g = Math.floor(rgb.g * factor);
+        const b = Math.floor(rgb.b * factor);
+        return `rgb(${r}, ${g}, ${b})`;
     }
 
     checkCollision(other) {
@@ -245,6 +309,9 @@ function ensureCanvasSize() {
         }
 
         playCollisionSound(other) {
+            // Check global mute state
+            if (window.isMuted) return;
+            
             const minSpeed = 0;
             const maxSpeed = 30;
             const minVolume = 0.1;

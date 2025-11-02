@@ -125,6 +125,9 @@ function createDoubleTapDetector(options = {}) {
 
     // Primary play function - prefer external buffer, fall back to synth -------
     function playRetroClick() {
+        // Check global mute state
+        if (window.isMuted) return;
+        
         if (externalBuffer) {
             // If buffer has been loaded, play it
             try {

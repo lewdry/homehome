@@ -1,6 +1,7 @@
 // Note App Logic
 let noteText = '';
 let maxCharacters = 0;
+let cursorPosition = 0; // Track cursor position for editing
 
 // QWERTY keyboard layout (uppercase only)
 const keyboardLayout = [
@@ -9,6 +10,20 @@ const keyboardLayout = [
     ['Z', 'X', 'C', 'V', 'B', 'N', 'M', '.'],
     ['SPACE', '⌫']
 ];
+
+// Key mapping for randomization easter egg
+let noteKeysRandomized = false;
+const originalNoteLayout = [
+    ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+    ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+    ['Z', 'X', 'C', 'V', 'B', 'N', 'M', '.'],
+    ['SPACE', '⌫']
+];
+
+// Backspace hold-to-delete state
+let backspaceHoldTimer = null;
+let backspaceHoldInterval = null;
+let backspaceDeleteSpeed = 150; // Start speed in ms
 
 function initNote() {
     const noteTextArea = document.getElementById('noteTextArea');
@@ -33,13 +48,25 @@ function initNote() {
     noteTextArea.setAttribute('readonly', 'readonly');
     noteTextArea.setAttribute('contenteditable', 'false');
     
-    // Add event listeners to prevent mobile keyboard
-    noteTextArea.addEventListener('touchstart', (e) => {
-        e.preventDefault();
+    // Click/touch on text area to move cursor
+    noteTextArea.addEventListener('click', handleTextAreaClick);
+    noteTextArea.addEventListener('touchend', (e) => {
+        if (e.cancelable) {
+            e.preventDefault();
+        }
+        handleTextAreaClick(e);
     });
     
-    noteTextArea.addEventListener('click', (e) => {
-        e.preventDefault();
+    // Double-tap detector for randomization easter egg
+    const doubleTapDetector = createDoubleTapDetector();
+    
+    noteTextArea.addEventListener('pointerdown', (e) => {
+        if (doubleTapDetector.isDoubleTap(e.clientX, e.clientY)) {
+            randomizeNoteKeys();
+            if (window.playRetroClick) {
+                try { window.playRetroClick(); } catch (err) {}
+            }
+        }
     });
     
     // Allow desktop keyboard input
@@ -95,29 +122,37 @@ function buildKeyboard() {
                 keyButton.textContent = 'SPACE';
                 keyButton.setAttribute('data-key', ' ');
                 keyButton.setAttribute('aria-label', 'Space');
-                keyButton.addEventListener('click', () => handleKeyPress(' '));
+                keyButton.addEventListener('click', (e) => handleKeyPress(e.target.getAttribute('data-key')));
                 keyButton.addEventListener('touchstart', (e) => {
                     e.preventDefault();
-                    handleKeyPress(' ');
+                    handleKeyPress(e.target.getAttribute('data-key'));
                 });
             } else if (key === '⌫') {
                 keyButton.classList.add('backspace');
                 keyButton.textContent = key;
                 keyButton.setAttribute('data-key', key);
                 keyButton.setAttribute('aria-label', 'Backspace');
-                keyButton.addEventListener('click', () => handleKeyPress(key));
+                
+                // Add hold-to-delete functionality
+                keyButton.addEventListener('mousedown', startBackspaceHold);
                 keyButton.addEventListener('touchstart', (e) => {
                     e.preventDefault();
-                    handleKeyPress(key);
+                    startBackspaceHold(e);
                 });
+                keyButton.addEventListener('mouseup', stopBackspaceHold);
+                keyButton.addEventListener('mouseleave', stopBackspaceHold);
+                keyButton.addEventListener('touchend', stopBackspaceHold);
+                keyButton.addEventListener('touchcancel', stopBackspaceHold);
+                
+                keyButton.addEventListener('click', (e) => handleKeyPress(e.target.getAttribute('data-key')));
             } else {
                 keyButton.textContent = key;
                 keyButton.setAttribute('data-key', key);
                 keyButton.setAttribute('aria-label', `Letter ${key}`);
-                keyButton.addEventListener('click', () => handleKeyPress(key));
+                keyButton.addEventListener('click', (e) => handleKeyPress(e.target.getAttribute('data-key')));
                 keyButton.addEventListener('touchstart', (e) => {
                     e.preventDefault();
-                    handleKeyPress(key);
+                    handleKeyPress(e.target.getAttribute('data-key'));
                 });
             }
             
@@ -128,17 +163,19 @@ function buildKeyboard() {
     });
 }
 
-function handleKeyPress(key) {
+function handleKeyPress(key, button = null) {
     if (key === '⌫') {
-        // Backspace
-        if (noteText.length > 0) {
-            noteText = noteText.slice(0, -1);
+        // Backspace - delete at cursor position
+        if (cursorPosition > 0) {
+            noteText = noteText.slice(0, cursorPosition - 1) + noteText.slice(cursorPosition);
+            cursorPosition--;
             updateNoteDisplay();
         }
     } else {
-        // Add character if not full
+        // Insert character at cursor position if not full
         if (noteText.length < maxCharacters) {
-            noteText += key;
+            noteText = noteText.slice(0, cursorPosition) + key + noteText.slice(cursorPosition);
+            cursorPosition++;
             updateNoteDisplay();
         }
     }
@@ -169,5 +206,141 @@ function handleDesktopKeyboard(e) {
 
 function updateNoteDisplay() {
     const noteTextElement = document.getElementById('noteText');
-    noteTextElement.textContent = noteText;
+    const noteCursor = document.getElementById('noteCursor');
+    const container = noteTextElement.parentNode;
+    
+    // Clear the container
+    container.innerHTML = '';
+    
+    // Split text at cursor position
+    const beforeCursor = noteText.slice(0, cursorPosition);
+    const afterCursor = noteText.slice(cursorPosition);
+    
+    // Create and append text before cursor
+    const beforeSpan = document.createElement('span');
+    beforeSpan.id = 'noteText';
+    beforeSpan.textContent = beforeCursor;
+    container.appendChild(beforeSpan);
+    
+    // Append cursor
+    const cursorSpan = document.createElement('span');
+    cursorSpan.className = 'cursor';
+    cursorSpan.id = 'noteCursor';
+    cursorSpan.textContent = '█';
+    container.appendChild(cursorSpan);
+    
+    // Create and append text after cursor if exists
+    if (afterCursor) {
+        const afterSpan = document.createElement('span');
+        afterSpan.textContent = afterCursor;
+        container.appendChild(afterSpan);
+    }
+}
+
+// Handle clicking on text area to move cursor
+function handleTextAreaClick(e) {
+    const noteTextElement = document.getElementById('noteText');
+    const noteTextArea = document.getElementById('noteTextArea');
+    
+    // Get click position
+    const rect = noteTextArea.getBoundingClientRect();
+    const x = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : e.changedTouches[0].clientX);
+    const y = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : e.changedTouches[0].clientY);
+    
+    // Get computed style for measurements
+    const style = window.getComputedStyle(noteTextArea);
+    const fontSize = parseFloat(style.fontSize);
+    const lineHeight = parseFloat(style.lineHeight);
+    const charWidth = fontSize * 0.6; // Approximate width for monospace
+    
+    // Calculate position relative to text area
+    const relativeX = x - rect.left - parseFloat(style.paddingLeft);
+    const relativeY = y - rect.top - parseFloat(style.paddingTop);
+    
+    // Calculate which character was clicked
+    const charsPerLine = Math.floor((noteTextArea.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)) / charWidth);
+    const lineClicked = Math.floor(relativeY / lineHeight);
+    const charInLine = Math.floor(relativeX / charWidth);
+    
+    // Calculate cursor position
+    const estimatedPosition = (lineClicked * charsPerLine) + charInLine;
+    cursorPosition = Math.max(0, Math.min(noteText.length, estimatedPosition));
+    
+    updateNoteDisplay();
+}
+
+// Backspace hold-to-delete handlers
+function startBackspaceHold(e) {
+    // Immediate first delete
+    handleKeyPress('⌫');
+    
+    // Reset speed
+    backspaceDeleteSpeed = 150;
+    
+    // Start hold timer - after 300ms, start continuous deletion
+    backspaceHoldTimer = setTimeout(() => {
+        backspaceHoldInterval = setInterval(() => {
+            handleKeyPress('⌫');
+            
+            // Speed up deletion (decrease interval, minimum 20ms)
+            if (backspaceDeleteSpeed > 20) {
+                backspaceDeleteSpeed = Math.max(20, backspaceDeleteSpeed - 10);
+                clearInterval(backspaceHoldInterval);
+                backspaceHoldInterval = setInterval(() => {
+                    handleKeyPress('⌫');
+                }, backspaceDeleteSpeed);
+            }
+        }, backspaceDeleteSpeed);
+    }, 300);
+}
+
+function stopBackspaceHold() {
+    if (backspaceHoldTimer) {
+        clearTimeout(backspaceHoldTimer);
+        backspaceHoldTimer = null;
+    }
+    if (backspaceHoldInterval) {
+        clearInterval(backspaceHoldInterval);
+        backspaceHoldInterval = null;
+    }
+    backspaceDeleteSpeed = 150; // Reset speed
+}
+
+// Easter egg: Randomize note keyboard letter keys
+function randomizeNoteKeys() {
+    // Get all letter keys (exclude SPACE and backspace)
+    const letterKeys = document.querySelectorAll('.note-key:not(.space):not(.backspace)');
+    
+    if (noteKeysRandomized) {
+        // Restore original layout
+        const originalLetters = originalNoteLayout.slice(0, 3).flat(); // Flatten first 3 rows (letters and period)
+        letterKeys.forEach((button, index) => {
+            const originalLetter = originalLetters[index];
+            button.textContent = originalLetter;
+            button.setAttribute('aria-label', originalLetter === '.' ? 'Period' : `Letter ${originalLetter}`);
+            button.setAttribute('data-key', originalLetter);
+        });
+        noteKeysRandomized = false;
+    } else {
+        // Randomize
+        const letters = Array.from(letterKeys).map(btn => btn.textContent);
+        
+        // Fisher-Yates shuffle
+        const shuffled = [...letters];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        
+        // Update button text - the displayed text becomes what gets typed
+        letterKeys.forEach((button, index) => {
+            const newLetter = shuffled[index];
+            button.textContent = newLetter;
+            button.setAttribute('aria-label', newLetter === '.' ? 'Period' : `Letter ${newLetter}`);
+            // Update data-key to match displayed text
+            button.setAttribute('data-key', newLetter);
+        });
+        
+        noteKeysRandomized = true;
+    }
 }

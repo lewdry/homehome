@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <title>Homehome OS :: Web 0.1</title>
+    <title>Homehomehome :: Web 0.1</title>
     <style>
         * {
             margin: 0;
@@ -79,16 +79,105 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            user-select: none;
+            overflow: hidden;
         }
 
-        .menu-bar::before {
-            content: '▨';
-            font-size: 0.9em;
+        .menu-bar > span:nth-child(2) {
+            flex: 1;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
-        .menu-bar::after {
-            content: ' [X]';
-            font-size: 0.9em;
+        .theme-toggle {
+            cursor: pointer;
+            padding: 4px 8px;
+            margin: -4px 0;
+            transition: opacity 0.2s;
+            user-select: none;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .theme-toggle:hover {
+            opacity: 0.7;
+        }
+
+        .theme-toggle:active {
+            opacity: 0.5;
+        }
+
+        .mute-toggle {
+            cursor: pointer;
+            padding: 4px 8px;
+            margin: -4px 0;
+            transition: opacity 0.2s;
+            user-select: none;
+            font-size: 1.2em;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .mute-toggle:hover {
+            opacity: 0.7;
+        }
+
+        .mute-toggle:active {
+            opacity: 0.5;
+        }
+
+        .reset-app {
+            cursor: pointer;
+            padding: 4px 8px;
+            margin: -4px 0;
+            transition: opacity 0.2s;
+            user-select: none;
+            font-size: 1.3em;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .reset-app:hover {
+            opacity: 0.7;
+        }
+
+        .reset-app:active {
+            opacity: 0.5;
+        }
+
+        .menu-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .menu-bar-right > span:last-child {
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        /* Force dark mode when class is applied */
+        body.force-dark {
+            --bg-base: #002b36;
+            --bg-surface: #073642;
+            --text-primary: #839496;
+            --text-secondary: #586e75;
+            --border-color: #586e75;
+        }
+        
+        /* Force light mode when class is applied */
+        body.force-light {
+            --bg-base: #fdf6e3;
+            --bg-surface: #eee8d5;
+            --text-primary: #586e75;
+            --text-secondary: #93a1a1;
+            --border-color: #93a1a1;
         }
 
         .tabs {
@@ -132,7 +221,7 @@
         .content {
             flex: 1;
             padding: 24px;
-            overflow-y: auto;
+            overflow: hidden;
             line-height: 1.6;
         }
 
@@ -178,7 +267,7 @@
             line-height: 1.2;
             margin-bottom: 16px;
             white-space: pre;
-            overflow-x: auto;
+            overflow: hidden;
             text-align: left;
         }
 
@@ -218,6 +307,10 @@
         /* Respect reduced motion preferences */
         @media (prefers-reduced-motion: reduce) {
             .cursor {
+                animation: none;
+                opacity: 1;
+            }
+            .clock-colon {
                 animation: none;
                 opacity: 1;
             }
@@ -322,10 +415,29 @@
             padding: 8px 12px;
             background-color: var(--text-secondary);
             color: var(--bg-base);
-            font-size: 0.8em;
+            font-size: 0.9em;
             font-weight: 500;
-            text-align: center;
+            text-align: left;
             letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .clock {
+            font-family: 'Courier New', 'Courier', monospace;
+            font-size: 0.9em;
+            font-weight: 600;
+            padding: 4px 8px;
+            background-color: var(--bg-surface);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            letter-spacing: 1px;
+            user-select: none;
+        }
+
+        .clock-colon {
+            animation: blink 1s infinite;
         }
 
         .divider {
@@ -345,12 +457,12 @@
         .calc-display {
             background-color: var(--bg-base);
             border: 3px solid var(--border-color);
-            padding: 12px;
-            min-height: 70px;
+            padding: 8px 12px;
+            min-height: 60px;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            gap: 6px;
+            gap: 4px;
             box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
 
@@ -611,7 +723,12 @@
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <div class="container">
         <div class="menu-bar">
-            HOMEHOME.OS
+            <span class="theme-toggle" role="button" tabindex="0" aria-label="Toggle dark mode and light mode">▨</span>
+            <span>HOMEHOMEHOME</span>
+            <div class="menu-bar-right">
+                <span class="mute-toggle" role="button" tabindex="0" aria-label="Toggle sound on and off">♫</span>
+                <span class="reset-app" role="button" tabindex="0" aria-label="Reset application to initial state">☒</span>
+            </div>
         </div>
         
         <nav aria-label="Application tabs">
@@ -637,18 +754,18 @@
 ╚═══════════════════════════════╝
             </div>
 
-            <h1>Welcome Homehome</h1>
+            <h1>Welcome Homehomehome ⌂</h1>
 
             <p class="divider">
                 ═══════════════════════════════════
             </p>
 
             <p>
-                Who needs the cloud? We're going <span class="highlight">Homehome</span>.
+                Who needs <span id="modernTech">the cloud</span>? We're going <span class="highlight">Homehomehome</span>.
             </p>
 
             <p>
-                Homehome is an imagined Web 0.1 operating system, humming away on a physical computer <span class="highlight">in my house</span>.
+                Homehomehome is an imagined Web 0.1 operating system, from a time before the <span class="highlight">world wide web</span> was born.
             </p>
 
             <p class="divider">
@@ -732,7 +849,8 @@
         </main>
 
         <div class="footer">
-            Homehome by Lewis Dryburgh, 2025
+            <span>Homehomehome, 1988</span>
+            <span class="clock" id="clock">00:00</span>
         </div>
     </div>
 
@@ -742,6 +860,149 @@
     <script src="draw.js"></script>
     <script src="note.js"></script>
     <script>
+        // Global mute state
+        window.isMuted = false;
+        
+        // Theme toggle functionality
+        const themeToggle = document.querySelector('.theme-toggle');
+        const muteToggle = document.querySelector('.mute-toggle');
+        const resetApp = document.querySelector('.reset-app');
+        const body = document.body;
+        
+        // Determine initial theme based on system preference
+        let isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        let themeOverride = null; // null means use system preference, 'light' or 'dark' for override
+        
+        function applyTheme() {
+            body.classList.remove('force-dark', 'force-light');
+            if (themeOverride === 'dark') {
+                body.classList.add('force-dark');
+            } else if (themeOverride === 'light') {
+                body.classList.add('force-light');
+            }
+            // null means no override - CSS media query handles it
+        }
+        
+        function toggleTheme() {
+            // First click: override to opposite of current display
+            // Second click: override to original system preference opposite
+            // Third click: back to system preference (null)
+            
+            if (themeOverride === null) {
+                // Currently using system preference, toggle to opposite
+                themeOverride = isDarkMode ? 'light' : 'dark';
+            } else if ((themeOverride === 'light' && isDarkMode) || (themeOverride === 'dark' && !isDarkMode)) {
+                // Currently showing opposite of system, go to same as system
+                themeOverride = isDarkMode ? 'dark' : 'light';
+            } else {
+                // Currently showing same as system, go back to auto
+                themeOverride = null;
+            }
+            
+            applyTheme();
+            
+            // Announce theme change for screen readers
+            let announcement;
+            if (themeOverride === null) {
+                announcement = 'Theme set to automatic';
+            } else {
+                announcement = `${themeOverride.charAt(0).toUpperCase() + themeOverride.slice(1)} mode enabled`;
+            }
+            
+            // Create temporary announcement element
+            const announcer = document.createElement('div');
+            announcer.setAttribute('role', 'status');
+            announcer.setAttribute('aria-live', 'polite');
+            announcer.className = 'visually-hidden';
+            announcer.textContent = announcement;
+            body.appendChild(announcer);
+            setTimeout(() => body.removeChild(announcer), 1000);
+        }
+        
+        function toggleMute() {
+            window.isMuted = !window.isMuted;
+            
+            if (window.isMuted) {
+                muteToggle.textContent = '∅';
+                muteToggle.setAttribute('aria-label', 'Sound is off. Click to unmute');
+            } else {
+                muteToggle.textContent = '♫';
+                muteToggle.setAttribute('aria-label', 'Sound is on. Click to mute');
+                // Play click sound when unmuting
+                if (window.playRetroClick) {
+                    try { 
+                        window.playRetroClick(); 
+                    } catch (err) {}
+                }
+            }
+            
+            // Don't save mute state to localStorage - only persist during session
+            
+            // Announce mute state change for screen readers
+            const announcement = window.isMuted ? 'Sound muted' : 'Sound unmuted';
+            const announcer = document.createElement('div');
+            announcer.setAttribute('role', 'status');
+            announcer.setAttribute('aria-live', 'polite');
+            announcer.className = 'visually-hidden';
+            announcer.textContent = announcement;
+            body.appendChild(announcer);
+            setTimeout(() => body.removeChild(announcer), 1000);
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            if (window.playRetroClick) {
+                try { 
+                    window.playRetroClick(); 
+                } catch (err) {}
+            }
+            toggleTheme();
+        });
+        themeToggle.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                if (window.playRetroClick) {
+                    try { 
+                        window.playRetroClick(); 
+                    } catch (err) {}
+                }
+                toggleTheme();
+            }
+        });
+        
+        muteToggle.addEventListener('click', toggleMute);
+        muteToggle.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleMute();
+            }
+        });
+        
+        // Reset app functionality
+        function handleResetApp() {
+            // Clear bonk ever-started flag
+            bonkEverStarted = false;
+            
+            // Play click sound before reload
+            if (window.playRetroClick) {
+                try { 
+                    window.playRetroClick(); 
+                } catch (err) {}
+            }
+            
+            // Brief delay to let sound play, then reload
+            setTimeout(() => {
+                window.location.reload();
+            }, 100);
+        }
+        
+        resetApp.addEventListener('click', handleResetApp);
+        resetApp.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleResetApp();
+            }
+        });
+        
         // Tab switching functionality
         const tabs = document.querySelectorAll('.tab');
         const tabContents = document.querySelectorAll('.tab-content');
@@ -908,6 +1169,33 @@
                 // ignore
             }
         });
+
+        // Clock functionality
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            
+            const clockElement = document.getElementById('clock');
+            if (clockElement) {
+                clockElement.innerHTML = `${hours}<span class="clock-colon">:</span>${minutes}`;
+            }
+        }
+
+        // Update clock immediately and then every second
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // Random modern tech term
+        const modernTechTerms = [
+            'the cloud',
+            'blockchain',
+            'generative AI',
+            'quantum computing',
+            '6G networking'
+        ];
+        const randomTerm = modernTechTerms[Math.floor(Math.random() * modernTechTerms.length)];
+        document.getElementById('modernTech').textContent = randomTerm;
     </script>
 </body>
 </html>
