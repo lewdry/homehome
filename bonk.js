@@ -2,44 +2,10 @@
 (function() {
     // Constants
     const canvas = document.getElementById('drawingCanvas');
-    const ctx = canvas.getContext('2d');
-
-    // Solarized color palette for balls
-    const SOLARIZED_COLORS = [
-    '#268bd2', // blue
-    '#2aa198', // cyan
-    '#859900', // green
-    '#b58900', // yellow
-    '#cb4b16', // orange
-    '#dc322f', // red
-    '#d33682', // magenta
-    '#6c71c4', // violet
-    '#268bd2', // blue (brighter variant)
-    '#2aa198', // cyan (brighter variant)
-    '#719e07', // green variant
-    '#b58900', // yellow variant
-    '#cb4b16', // orange variant
-    '#dc322f', // red variant
-    '#d33682', // magenta variant
-    '#6c71c4', // violet variant
-    '#3294c2', // lighter blue
-    '#35b1a8', // lighter cyan
-    '#95a900', // lighter green
-    '#c59900', // lighter yellow
-    '#db5b26', // lighter orange
-    '#ec423f', // lighter red
-    '#e34692', // lighter magenta
-    '#7c81d4', // lighter violet
-    '#1e7bb2', // darker blue
-    '#1a9188', // darker cyan
-    '#617900', // darker green
-    '#a57900', // darker yellow
-    '#bb3b06', // darker orange
-    '#cc221f', // darker red
-    ];
+    const ctx = canvas ? canvas.getContext('2d') : null;
 
     // Game Constants
-        const DRAG_COEFFICIENT = 0.999;
+    const DRAG_COEFFICIENT = 0.999;
     const NUM_BALLS = 15;
     const COLLISION_COOLDOWN_FRAMES = 5;
     const SEPARATION_ITERATIONS = 10;
@@ -51,18 +17,10 @@
     const GRABBED_BALL_SCALE = 1.1;
 
     // Set canvas size to match window and calculate scale factor
-    function resizeCanvas() {
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    canvas.style.width = `${rect.width}px`;
-    canvas.style.height = `${rect.height}px`;
-    ctx.scale(dpr, dpr);
-    
-    // Disable anti-aliasing for crisp pixel art (must be set after scale)
-    ctx.imageSmoothingEnabled = false;
-}
+    function resizeBonkCanvas() {
+        if (!canvas || !ctx) return;
+        resizeCanvas(canvas, ctx);
+    }
 
 // Initial canvas size
 // Ensure canvas has an initial bounding rect by sizing it to window
@@ -89,9 +47,9 @@ function ensureCanvasSize() {
         this.collisionCooldown = 0;
         this.lastCollidedWith = null;
         
-        // Pre-calculate dithered color
-        const rgb = this.hexToRgb(this.colour);
-        this.ditherColor = this.getDarkerShade(rgb, 0.7);
+        // Pre-calculate dithered color using shared utility
+        const rgb = hexToRgb(this.colour);
+        this.ditherColor = getDarkerShade(rgb, 0.7);
         
         // Generate static pixelated circle pattern
         this.generatePixelPattern();
@@ -230,21 +188,7 @@ function ensureCanvasSize() {
         }
     }
     
-    hexToRgb(hex) {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        } : { r: 0, g: 0, b: 0 };
-    }
-    
-    getDarkerShade(rgb, factor) {
-        const r = Math.floor(rgb.r * factor);
-        const g = Math.floor(rgb.g * factor);
-        const b = Math.floor(rgb.b * factor);
-        return `rgb(${r}, ${g}, ${b})`;
-    }
+    // Removed hexToRgb and getDarkerShade - now using shared utilities from utils.js
 
     checkCollision(other) {
         const dx = this.x - other.x;
@@ -353,20 +297,39 @@ function ensureCanvasSize() {
                 gainNode.connect(audioContext.destination);
                 source.start();
 
+                // Cleanup on end to prevent memory leak
+                source.onended = () => {
+                    try {
+                        source.disconnect();
+                        gainNode.disconnect();
+                        // Remove from active sources array
+                        const index = activeSources.findIndex(s => s.source === source);
+                        if (index !== -1) {
+                            activeSources.splice(index, 1);
+                        }
+                    } catch (e) {
+                        // Ignore disconnect errors
+                    }
+                };
+
                 // Track active sources
                 activeSources.push({ source, gainNode });
 
-                // Clean up old sources
+                // Clean up old sources if too many
                 if (activeSources.length > MAX_ACTIVE_SOUNDS) {
                     const oldest = activeSources.shift();
-                    oldest.source.stop();
-                    oldest.source.disconnect();
-                    oldest.gainNode.disconnect();
+                    try {
+                        oldest.source.stop();
+                        oldest.source.disconnect();
+                        oldest.gainNode.disconnect();
+                    } catch (e) {
+                        // Ignore stop/disconnect errors
+                    }
                 }
 
                 console.log(`Collision speed: ${collisionSpeed.toFixed(2)}, Volume: ${clampedVolume.toFixed(2)}`);
             } catch (error) {
-                console.error("Error playing sound:", error);
+                console.error("Error playing collision sound:", error);
             }
         }
 
@@ -437,6 +400,8 @@ function ensureCanvasSize() {
     let lastHiddenTime = 0;
     let lastTime = 0;
     let lastGrabbedPos = null;
+    let resizeHandler = null; // Store reference for cleanup
+    let visibilityHandler = null; // Store reference for cleanup
     const doubleTapDetector = createDoubleTapDetector({ timeout: 300 });
     const PAUSE_RESUME_DELAY = 500; // 0.5s delay when resuming
 
@@ -445,9 +410,14 @@ function ensureCanvasSize() {
             console.error('Canvas element not found');
             return;
         }
+        
+        if (!ctx) {
+            console.error('Could not get 2D context for bonk canvas');
+            return;
+        }
 
         ensureCanvasSize();
-        resizeCanvas();
+        resizeBonkCanvas();
 
         resetGame();
 
@@ -479,7 +449,7 @@ function ensureCanvasSize() {
         requestAnimationFrame(gameLoop);
     }
 
-        function resumeAudioContext() {
+    function resumeAudioContext() {
         if (audioContext && audioContext.state === 'suspended') {
             audioContext.resume().then(() => {
                 console.log('AudioContext resumed successfully');
@@ -491,26 +461,29 @@ function ensureCanvasSize() {
 
     // Handle window resizing
     function handleResize() {
-    const oldWidth = canvas.width;
-    const oldHeight = canvas.height;
-    
-    resizeCanvas();
-    
-    const widthRatio = canvas.width / oldWidth;
-    const heightRatio = canvas.height / oldHeight;
-    
-    balls.forEach(ball => {
-        ball.x *= widthRatio;
-        ball.y *= heightRatio;
-        ball.dx *= widthRatio;
-        ball.dy *= heightRatio;
-    });
-}
+        try {
+            const oldWidth = canvas.width;
+            const oldHeight = canvas.height;
+            
+            resizeBonkCanvas();
+            
+            const widthRatio = canvas.width / oldWidth;
+            const heightRatio = canvas.height / oldHeight;
+            
+            balls.forEach(ball => {
+                ball.x *= widthRatio;
+                ball.y *= heightRatio;
+                ball.dx *= widthRatio;
+                ball.dy *= heightRatio;
+            });
+        } catch (error) {
+            console.error('Error in bonk resize handler:', error);
+        }
+    }
 
-window.addEventListener('resize', () => {
-    handleResize();
-    separateOverlappingBalls();
-});
+    // Store handlers for cleanup
+    resizeHandler = handleResize;
+    visibilityHandler = handleVisibilityChange;
 
     function handleVisibilityChange() {
         if (document.hidden) {
@@ -709,15 +682,32 @@ window.addEventListener('resize', () => {
             if (!gameRunning) {
                 gameRunning = true;
             }
+            // Set up event listeners when game starts
+            if (resizeHandler && !window.bonkResizeListenerAdded) {
+                window.addEventListener('resize', resizeHandler);
+                window.bonkResizeListenerAdded = true;
+            }
+            if (visibilityHandler && !window.bonkVisibilityListenerAdded) {
+                document.addEventListener('visibilitychange', visibilityHandler);
+                window.bonkVisibilityListenerAdded = true;
+            }
         },
         stop: function() {
             gameRunning = false;
             gamePaused = true;
+            // Clean up timers
+            if (pauseResumeTimeout) {
+                clearTimeout(pauseResumeTimeout);
+                pauseResumeTimeout = null;
+            }
         },
         resume: function() {
             if (bonkStarted && !gameRunning) {
+                // Clear any existing timeout before setting new one
+                if (pauseResumeTimeout) {
+                    clearTimeout(pauseResumeTimeout);
+                }
                 // Resume with delay
-                clearTimeout(pauseResumeTimeout);
                 pauseResumeTimeout = setTimeout(() => {
                     gameRunning = true;
                     gamePaused = false;
@@ -731,6 +721,33 @@ window.addEventListener('resize', () => {
         },
         hasStarted: function() {
             return bonkStarted;
+        },
+        cleanup: function() {
+            // Remove event listeners
+            if (resizeHandler && window.bonkResizeListenerAdded) {
+                window.removeEventListener('resize', resizeHandler);
+                window.bonkResizeListenerAdded = false;
+            }
+            if (visibilityHandler && window.bonkVisibilityListenerAdded) {
+                document.removeEventListener('visibilitychange', visibilityHandler);
+                window.bonkVisibilityListenerAdded = false;
+            }
+            // Clean up timers
+            if (pauseResumeTimeout) {
+                clearTimeout(pauseResumeTimeout);
+                pauseResumeTimeout = null;
+            }
+            // Stop all active audio sources
+            activeSources.forEach(({ source, gainNode }) => {
+                try {
+                    source.stop();
+                    source.disconnect();
+                    gainNode.disconnect();
+                } catch (e) {
+                    // Ignore errors
+                }
+            });
+            activeSources = [];
         }
     };
 
@@ -758,8 +775,11 @@ window.addEventListener('resize', () => {
 
             await Promise.all(soundFiles.map(loadAudioFile));
 
-            // Add visibility change listener
-            document.addEventListener('visibilitychange', handleVisibilityChange);
+            // Set up visibility change listener after audio is loaded
+            if (visibilityHandler) {
+                document.addEventListener('visibilitychange', visibilityHandler);
+                window.bonkVisibilityListenerAdded = true;
+            }
 
         } catch (error) {
             console.error('Error initializing audio context:', error);

@@ -1,41 +1,6 @@
 // Drawing Logic
 (function() {
-    // Solarized color palette (shared with bonk.js)
-    const DRAW_COLORS = [
-        '#268bd2', // blue
-        '#2aa198', // cyan
-        '#859900', // green
-        '#b58900', // yellow
-        '#cb4b16', // orange
-        '#dc322f', // red
-        '#d33682', // magenta
-        '#6c71c4', // violet
-        '#268bd2', // blue (brighter variant)
-        '#2aa198', // cyan (brighter variant)
-        '#719e07', // green variant
-        '#b58900', // yellow variant
-        '#cb4b16', // orange variant
-        '#dc322f', // red variant
-        '#d33682', // magenta variant
-        '#6c71c4', // violet variant
-        '#3294c2', // lighter blue
-        '#35b1a8', // lighter cyan
-        '#95a900', // lighter green
-        '#c59900', // lighter yellow
-        '#db5b26', // lighter orange
-        '#ec423f', // lighter red
-        '#e34692', // lighter magenta
-        '#7c81d4', // lighter violet
-        '#1e7bb2', // darker blue
-        '#1a9188', // darker cyan
-        '#617900', // darker green
-        '#a57900', // darker yellow
-        '#bb3b06', // darker orange
-        '#cc221f', // darker red
-    ];
-
     // Constants
-    const DEVICE_PIXEL_RATIO = window.devicePixelRatio || 1;
     const LINE_WIDTH = 4;
     const PIXEL_SIZE = 2; // For dithered rendering
 
@@ -47,20 +12,16 @@
     let drawInitialized = false;
     let drawCanvas = null;
     let drawCtx = null;
+    let resizeHandler = null; // Store reference for cleanup
+
+// Helper to check if drawing is allowed
+function isDrawingAllowed() {
+    return window.drawStarted === true;
+}
 
 function resizeDrawCanvas() {
-    if (!drawCanvas) return;
-    
-    const rect = drawCanvas.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-
-    drawCanvas.width = width * DEVICE_PIXEL_RATIO;
-    drawCanvas.height = height * DEVICE_PIXEL_RATIO;
-    drawCanvas.style.width = `${width}px`;
-    drawCanvas.style.height = `${height}px`;
-
-    drawCtx.scale(DEVICE_PIXEL_RATIO, DEVICE_PIXEL_RATIO);
+    if (!drawCanvas || !drawCtx) return;
+    resizeCanvas(drawCanvas, drawCtx);
 }
 
 function initDrawing() {
@@ -73,13 +34,32 @@ function initDrawing() {
         console.error('Draw canvas not found');
         return;
     }
-    drawCtx = drawCanvas.getContext('2d');
+    
+    try {
+        drawCtx = drawCanvas.getContext('2d');
+        if (!drawCtx) {
+            console.error('Could not get 2D context for draw canvas');
+            return;
+        }
+    } catch (error) {
+        console.error('Error getting canvas context:', error);
+        return;
+    }
 
     // Initial canvas resize
     resizeDrawCanvas();
 
+    // Create resize handler and store reference for cleanup
+    resizeHandler = () => {
+        try {
+            resizeDrawCanvas();
+        } catch (error) {
+            console.error('Error in resize handler:', error);
+        }
+    };
+    
     // Resize canvas when the window is resized
-    window.addEventListener('resize', resizeDrawCanvas);
+    window.addEventListener('resize', resizeHandler);
 
     // Event listeners - mouse events
     drawCanvas.addEventListener('mousedown', handleDrawStart, { passive: false });
@@ -97,7 +77,7 @@ function initDrawing() {
 }
 
 function handleDrawTouchStart(evt) {
-    if (!drawStarted) return; // Don't allow interaction until popup is dismissed
+    if (!isDrawingAllowed()) return; // Don't allow interaction until popup is dismissed
     
     // Handle double tap for touch
     handleDrawDoubleTap(evt);
@@ -112,7 +92,7 @@ function handleDrawTouchStart(evt) {
 }
 
 function handleDrawStart(evt) {
-    if (!drawStarted) return; // Don't allow interaction until popup is dismissed
+    if (!isDrawingAllowed()) return; // Don't allow interaction until popup is dismissed
     
     evt.preventDefault();
     evt.stopPropagation();
@@ -136,7 +116,7 @@ function handleDrawStart(evt) {
         if (!isValidCoordinate(x) || !isValidCoordinate(y)) continue;
 
         // Select a random color from the solarized palette
-        const colour = DRAW_COLORS[Math.floor(Math.random() * DRAW_COLORS.length)];
+        const colour = SOLARIZED_COLORS[Math.floor(Math.random() * SOLARIZED_COLORS.length)];
         ongoingTouches.push({
             id: touch.identifier || 'mouse',
             x: x,
@@ -150,7 +130,7 @@ function handleDrawStart(evt) {
 }
 
 function handleDrawMove(evt) {
-    if (!drawStarted) return; // Don't allow interaction until popup is dismissed
+    if (!isDrawingAllowed()) return; // Don't allow interaction until popup is dismissed
     
     evt.preventDefault();
     evt.stopPropagation();
@@ -179,7 +159,7 @@ function handleDrawMove(evt) {
 }
 
 function handleDrawEnd(evt) {
-    if (!drawStarted) return; // Don't allow interaction until popup is dismissed
+    if (!isDrawingAllowed()) return; // Don't allow interaction until popup is dismissed
     
     evt.preventDefault();
     evt.stopPropagation();
@@ -202,7 +182,7 @@ function handleDrawEnd(evt) {
 }
 
 function handleDrawCancel(evt) {
-    if (!drawStarted) return; // Don't allow interaction until popup is dismissed
+    if (!isDrawingAllowed()) return; // Don't allow interaction until popup is dismissed
     
     evt.preventDefault();
     evt.stopPropagation();
@@ -224,7 +204,7 @@ function handleDrawCancel(evt) {
 }
 
 function handleDrawDoubleTap(evt) {
-    if (!drawStarted) return; // Don't allow interaction until popup is dismissed
+    if (!isDrawingAllowed()) return; // Don't allow interaction until popup is dismissed
     
     if (!drawCanvas || !drawCtx) return;
 
@@ -248,22 +228,7 @@ function handleDrawDoubleTap(evt) {
     }
 }
 
-// Helper functions for dithering (matching bump.js style)
-function hexToRgb(hex) {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : { r: 0, g: 0, b: 0 };
-}
-
-function getDarkerShade(rgb, factor) {
-    const r = Math.floor(rgb.r * factor);
-    const g = Math.floor(rgb.g * factor);
-    const b = Math.floor(rgb.b * factor);
-    return `rgb(${r}, ${g}, ${b})`;
-}
+// Helper functions removed - now using shared utilities from utils.js
 
 function drawLine(x1, y1, x2, y2, colour) {
     // Calculate the two colors for dithering
@@ -345,6 +310,15 @@ function cleanupTouches() {
     }
 }
 
+    
     // Expose initDrawing to global scope
     window.initDrawing = initDrawing;
+    
+    // Expose cleanup function for when leaving draw tab
+    window.cleanupDrawing = function() {
+        if (resizeHandler) {
+            window.removeEventListener('resize', resizeHandler);
+            resizeHandler = null;
+        }
+    };
 })();

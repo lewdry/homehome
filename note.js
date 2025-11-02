@@ -2,6 +2,7 @@
 let noteText = '';
 let maxCharacters = 0;
 let cursorPosition = 0; // Track cursor position for editing
+let desktopKeyboardHandler = null; // Store reference for cleanup
 
 // QWERTY keyboard layout (uppercase only)
 const keyboardLayout = [
@@ -69,8 +70,20 @@ function initNote() {
         }
     });
     
-    // Allow desktop keyboard input
-    document.addEventListener('keydown', handleDesktopKeyboard);
+    // Allow desktop keyboard input - create handler with error handling
+    desktopKeyboardHandler = (e) => {
+        // Only handle keyboard if note tab is active
+        const noteContent = document.getElementById('note-content');
+        if (!noteContent || !noteContent.classList.contains('active')) return;
+        
+        try {
+            handleDesktopKeyboard(e);
+        } catch (error) {
+            console.error('Error in desktop keyboard handler:', error);
+        }
+    };
+    
+    document.addEventListener('keydown', desktopKeyboardHandler);
     
     // Handle window resize
     window.addEventListener('resize', () => {
@@ -182,9 +195,7 @@ function handleKeyPress(key, button = null) {
 }
 
 function handleDesktopKeyboard(e) {
-    // Only handle keyboard if note tab is active
-    const noteContent = document.getElementById('note-content');
-    if (!noteContent.classList.contains('active')) return;
+    // Tab check is now done in the handler wrapper, so this is safe to call
     
     // Prevent default behavior
     e.preventDefault();
@@ -344,3 +355,11 @@ function randomizeNoteKeys() {
         noteKeysRandomized = true;
     }
 }
+
+// Cleanup function to remove event listener
+window.cleanupNote = function() {
+    if (desktopKeyboardHandler) {
+        document.removeEventListener('keydown', desktopKeyboardHandler);
+        desktopKeyboardHandler = null;
+    }
+};

@@ -1,0 +1,1975 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* Disable all mobile gestures globally */
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+/* Solarized Light (default) */
+:root {
+    --bg-base: #fdf6e3;
+    --bg-surface: #eee8d5;
+    --text-primary: #586e75;
+    --text-secondary: #93a1a1;
+    --border-color: #93a1a1;
+}
+
+/* Solarized Dark */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-base: #002b36;
+        --bg-surface: #073642;
+        --text-primary: #839496;
+        --text-secondary: #586e75;
+        --border-color: #586e75;
+    }
+}
+
+body {
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-family: 'Courier New', 'Courier', monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    /* Disable mobile gestures */
+    overscroll-behavior: none;
+    touch-action: manipulation;
+    -webkit-overflow-scrolling: auto;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
+}
+
+.container {
+    width: min(600px, 100%);
+    aspect-ratio: 2 / 3;
+    height: min(80vh, 900px);
+    border: 3px solid var(--border-color);
+    background-color: var(--bg-surface);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 4px 4px 0px var(--border-color);
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+.menu-bar {
+    background-color: #268bd2;
+    background-image: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.15) 2px,
+            rgba(0, 0, 0, 0.15) 4px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.15) 2px,
+            rgba(0, 0, 0, 0.15) 4px
+        );
+    background-size: 4px 4px;
+    color: var(--bg-base);
+    padding: 8px 12px;
+    border-bottom: 3px solid var(--border-color);
+    font-weight: bold;
+    letter-spacing: 2px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    overflow: hidden;
+}
+
+.menu-bar > span:nth-child(2) {
+    flex: 1;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.theme-toggle {
+    cursor: pointer;
+    padding: 4px 8px;
+    margin: -4px 0;
+    transition: opacity 0.2s;
+    user-select: none;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+}
+
+.theme-toggle:hover {
+    opacity: 0.7;
+}
+
+.theme-toggle:active {
+    opacity: 0.5;
+}
+
+.mute-toggle {
+    cursor: pointer;
+    padding: 4px 8px;
+    margin: -4px 0;
+    transition: opacity 0.2s;
+    user-select: none;
+    font-size: 1.2em;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+}
+
+.mute-toggle:hover {
+    opacity: 0.7;
+}
+
+.mute-toggle:active {
+    opacity: 0.5;
+}
+
+.reset-app {
+    cursor: pointer;
+    padding: 4px 8px;
+    margin: -4px 0;
+    transition: opacity 0.2s;
+    user-select: none;
+    font-size: 1.3em;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+}
+
+.reset-app:hover {
+    opacity: 0.7;
+}
+
+.reset-app:active {
+    opacity: 0.5;
+}
+
+.menu-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.menu-bar-right > span:last-child {
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Force dark mode when class is applied */
+body.force-dark {
+    --bg-base: #002b36;
+    --bg-surface: #073642;
+    --text-primary: #839496;
+    --text-secondary: #586e75;
+    --border-color: #586e75;
+}
+
+/* Force light mode when class is applied */
+body.force-light {
+    --bg-base: #fdf6e3;
+    --bg-surface: #eee8d5;
+    --text-primary: #586e75;
+    --text-secondary: #93a1a1;
+    --border-color: #93a1a1;
+}
+
+.tabs {
+    display: flex;
+    background-color: var(--text-secondary);
+    background-image: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.06) 2px,
+            rgba(0, 0, 0, 0.06) 4px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.06) 2px,
+            rgba(0, 0, 0, 0.06) 4px
+        );
+    background-size: 4px 4px;
+    border-bottom: 3px solid var(--border-color);
+}
+
+.tab {
+    padding: 8px 16px;
+    cursor: pointer;
+    background-color: var(--border-color);
+    background-image: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.04) 2px,
+            rgba(0, 0, 0, 0.04) 4px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.04) 2px,
+            rgba(0, 0, 0, 0.04) 4px
+        );
+    background-size: 4px 4px;
+    color: var(--bg-base);
+    border-right: 2px solid var(--text-secondary);
+    font-weight: bold;
+    letter-spacing: 1px;
+    transition: background-color 0.2s;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.tab:hover {
+    background-color: var(--text-primary);
+}
+
+.tab.active {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.content {
+    flex: 1;
+    padding: 24px;
+    overflow: hidden;
+    line-height: 1.6;
+}
+
+#home-content.active {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    background-color: var(--bg-surface);
+}
+
+#bonk-content {
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+#bump-content {
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+#draw-content {
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+#note-content {
+    padding: 0;
+    overflow: hidden;
+}
+
+#calc-content.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+#drawCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    background-color: var(--bg-surface);
+}
+
+#bumpCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    background-color: var(--bg-surface);
+}
+
+.ascii-art {
+    color: #dc322f;
+    font-size: 0.7em;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    white-space: pre;
+    overflow: hidden;
+    text-align: left;
+    transition: text-shadow 0.3s ease;
+}
+
+.ascii-art.glow {
+    animation: ascii-glow 0.5s ease-out;
+}
+
+@keyframes ascii-glow {
+    0% {
+        text-shadow: 0 0 2px #dc322f, 0 0 4px #dc322f;
+    }
+    50% {
+        text-shadow: 0 0 4px #dc322f, 0 0 8px #dc322f;
+    }
+    100% {
+        text-shadow: none;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .ascii-art {
+        color: #db5b26;
+    }
+    
+    @keyframes ascii-glow {
+        0% {
+            text-shadow: 0 0 2px #db5b26, 0 0 4px #db5b26;
+        }
+        50% {
+            text-shadow: 0 0 4px #db5b26, 0 0 8px #db5b26;
+        }
+        100% {
+            text-shadow: none;
+        }
+    }
+}
+
+body.force-dark .ascii-art {
+    color: #db5b26;
+}
+
+body.force-dark .ascii-art.glow {
+    animation: ascii-glow-dark 2s ease-out;
+}
+
+@keyframes ascii-glow-dark {
+    0% {
+        text-shadow: 0 0 2px #db5b26, 0 0 4px #db5b26;
+    }
+    50% {
+        text-shadow: 0 0 4px #db5b26, 0 0 8px #db5b26;
+    }
+    100% {
+        text-shadow: none;
+    }
+}
+
+h1 {
+    font-size: 1.4em;
+    margin-bottom: 2px;
+    letter-spacing: 3px;
+    background-color: #1e7bb2;
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.12) 2px,
+            rgba(0, 0, 0, 0.12) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.12) 2px,
+            rgba(0, 0, 0, 0.12) 4px
+        );
+    background-size: 4px 4px;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: #1e7bb2;
+}
+
+@media (prefers-color-scheme: dark) {
+    h1 {
+        background-color: #3294c2;
+        background-image: 
+            repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.08) 2px,
+                rgba(0, 0, 0, 0.08) 4px
+            ),
+            repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.08) 2px,
+                rgba(0, 0, 0, 0.08) 4px
+            );
+        color: #3294c2;
+    }
+}
+
+body.force-dark h1 {
+    background-color: #3294c2;
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.08) 2px,
+            rgba(0, 0, 0, 0.08) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.08) 2px,
+            rgba(0, 0, 0, 0.08) 4px
+        );
+    color: #3294c2;
+}
+
+p {
+    margin-bottom: 16px;
+    text-align: left;
+    font-weight: 500;
+}
+
+.highlight {
+    font-weight: bold;
+    background-color: #dc322f;
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.12) 2px,
+            rgba(0, 0, 0, 0.12) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.12) 2px,
+            rgba(0, 0, 0, 0.12) 4px
+        );
+    background-size: 4px 4px;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: #dc322f;
+}
+
+@media (prefers-color-scheme: dark) {
+    .highlight {
+        background-color: #db5b26;
+        background-image: 
+            repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.08) 2px,
+                rgba(0, 0, 0, 0.08) 4px
+            ),
+            repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.08) 2px,
+                rgba(0, 0, 0, 0.08) 4px
+            );
+        color: #db5b26;
+    }
+}
+
+body.force-dark .highlight {
+    background-color: #db5b26;
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.08) 2px,
+            rgba(0, 0, 0, 0.08) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.08) 2px,
+            rgba(0, 0, 0, 0.08) 4px
+        );
+    color: #db5b26;
+}
+
+.cursor {
+    animation: blink 1s infinite;
+    background-color: var(--text-primary);
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.12) 2px,
+            rgba(0, 0, 0, 0.12) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.12) 2px,
+            rgba(0, 0, 0, 0.12) 4px
+        );
+    background-size: 4px 4px;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: var(--text-primary);
+}
+
+@media (prefers-color-scheme: dark) {
+    .cursor {
+        background-image: 
+            repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.08) 2px,
+                rgba(0, 0, 0, 0.08) 4px
+            ),
+            repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.08) 2px,
+                rgba(0, 0, 0, 0.08) 4px
+            );
+    }
+}
+
+body.force-dark .cursor {
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.08) 2px,
+            rgba(0, 0, 0, 0.08) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.08) 2px,
+            rgba(0, 0, 0, 0.08) 4px
+        );
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .cursor {
+        animation: none;
+        opacity: 1;
+    }
+    .clock-colon {
+        animation: none;
+        opacity: 1;
+    }
+}
+
+/* Focus indicators for accessibility */
+.tab:focus-visible,
+.calc-btn:focus-visible,
+.note-key:focus-visible {
+    outline: 3px solid #268bd2;
+    outline-offset: 2px;
+}
+
+/* Skip link for keyboard navigation */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: #268bd2;
+    color: var(--bg-base);
+    padding: 8px 16px;
+    text-decoration: none;
+    font-weight: bold;
+    z-index: 100;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+/* Visually hidden but accessible to screen readers */
+.visually-hidden {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+/* Instruction popup styles */
+.instruction-popup {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--bg-surface);
+    border: 3px solid var(--border-color);
+    box-shadow: 4px 4px 0px var(--border-color);
+    max-width: 400px;
+    width: 80%;
+    z-index: 50;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.instruction-popup-title {
+    background-color: #268bd2;
+    background-image: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.15) 2px,
+            rgba(0, 0, 0, 0.15) 4px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.15) 2px,
+            rgba(0, 0, 0, 0.15) 4px
+        );
+    background-size: 4px 4px;
+    color: var(--bg-base);
+    padding: 8px 12px;
+    border-bottom: 3px solid var(--border-color);
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-align: center;
+}
+
+.instruction-popup-content {
+    padding: 24px;
+}
+
+.instruction-popup-content p {
+    margin-bottom: 12px;
+    text-align: center;
+    line-height: 1.6;
+}
+
+.instruction-popup button {
+    font-family: 'Courier New', 'Courier', monospace;
+    font-size: 1em;
+    font-weight: bold;
+    padding: 12px 32px;
+    border: 3px solid var(--border-color);
+    background-color: #859900;
+    background-image: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.15) 2px,
+            rgba(0, 0, 0, 0.15) 4px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.15) 2px,
+            rgba(0, 0, 0, 0.15) 4px
+        );
+    background-size: 4px 4px;
+    color: var(--bg-base);
+    cursor: pointer;
+    box-shadow: 2px 2px 0px var(--border-color);
+    margin-top: 16px;
+    letter-spacing: 2px;
+}
+
+.instruction-popup button:hover {
+    background-color: #719e07;
+}
+
+.instruction-popup button:active {
+    box-shadow: 0px 0px 0px var(--border-color);
+    transform: translate(2px, 2px);
+}
+
+/* Clock popup styles */
+.clock-popup {
+    max-width: 500px;
+    z-index: 1000;
+}
+
+.clock-popup-content {
+    padding: 32px 24px 24px 24px;
+}
+
+/* Overlay for blocking interactions when clock is open */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-surface);
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.04) 2px,
+            rgba(0, 0, 0, 0.04) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.04) 2px,
+            rgba(0, 0, 0, 0.04) 4px
+        );
+    background-size: 4px 4px;
+    opacity: 0.95;
+    z-index: 999;
+    display: none;
+}
+
+#ascii-clock-display {
+    font-family: 'Courier New', 'Courier', monospace;
+    font-size: 0.7em;
+    line-height: 1.1;
+    white-space: pre;
+    text-align: center;
+    margin-bottom: 12px;
+    user-select: none;
+    background-color: var(--text-primary);
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.12) 2px,
+            rgba(0, 0, 0, 0.12) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.12) 2px,
+            rgba(0, 0, 0, 0.12) 4px
+        );
+    background-size: 4px 4px;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: var(--text-primary);
+}
+
+/* Allow colored spans in clock to override the dithering */
+#ascii-clock-display span[style*="color"] {
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    background-clip: initial !important;
+    -webkit-text-fill-color: initial !important;
+}
+
+@media (prefers-color-scheme: dark) {
+    #ascii-clock-display {
+        background-image: 
+            repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.08) 2px,
+                rgba(0, 0, 0, 0.08) 4px
+            ),
+            repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.08) 2px,
+                rgba(0, 0, 0, 0.08) 4px
+            );
+    }
+}
+
+body.force-dark #ascii-clock-display {
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.08) 2px,
+            rgba(0, 0, 0, 0.08) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.08) 2px,
+            rgba(0, 0, 0, 0.08) 4px
+        );
+}
+
+#clock-date-display {
+    font-family: 'Courier New', 'Courier', monospace;
+    font-size: 1em;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+    background-color: var(--text-primary);
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.12) 2px,
+            rgba(0, 0, 0, 0.12) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.12) 2px,
+            rgba(0, 0, 0, 0.12) 4px
+        );
+    background-size: 4px 4px;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: var(--text-primary);
+}
+
+@media (prefers-color-scheme: dark) {
+    #clock-date-display {
+        background-image: 
+            repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.08) 2px,
+                rgba(0, 0, 0, 0.08) 4px
+            ),
+            repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.08) 2px,
+                rgba(0, 0, 0, 0.08) 4px
+            );
+    }
+}
+
+body.force-dark #clock-date-display {
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.08) 2px,
+            rgba(0, 0, 0, 0.08) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.08) 2px,
+            rgba(0, 0, 0, 0.08) 4px
+        );
+}
+
+#clock-digital-display {
+    font-family: 'Courier New', 'Courier', monospace;
+    font-size: 0.9em;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 12px;
+    letter-spacing: 2px;
+    color: var(--text-primary);
+}
+
+#clock-home-btn {
+    margin-top: 0;
+}
+
+.footer {
+    border-top: 3px solid var(--border-color);
+    padding: 8px 12px;
+    background-color: var(--text-secondary);
+    background-image: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.06) 2px,
+            rgba(0, 0, 0, 0.06) 4px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.06) 2px,
+            rgba(0, 0, 0, 0.06) 4px
+        );
+    background-size: 4px 4px;
+    color: var(--bg-base);
+    font-size: 0.9em;
+    font-weight: 500;
+    text-align: left;
+    letter-spacing: 1px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-text {
+    cursor: pointer;
+    transition: opacity 0.2s;
+    font-weight: bold;
+    user-select: none;
+}
+
+.footer-text:hover {
+    opacity: 0.7;
+}
+
+.footer-text:active {
+    opacity: 0.5;
+}
+
+/* Credits tab styles */
+#thks-content {
+    overflow: hidden;
+}
+
+#thks-content.active {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.thks-header {
+    background-color: var(--text-secondary);
+    background-image: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.06) 2px,
+            rgba(0, 0, 0, 0.06) 4px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.06) 2px,
+            rgba(0, 0, 0, 0.06) 4px
+        );
+    background-size: 4px 4px;
+    padding: 8px 16px;
+    color: var(--bg-base);
+    border-bottom: 3px solid var(--border-color);
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+.thks-content-area {
+    /* Match the `.content` formatting: let the outer `.content` container
+        provide the 24px padding, keep this area unpadded so text lines up.
+        Also ensure list spacing matches paragraph spacing in HOME. */
+    padding: 0;
+}
+
+.thks-content-area a {
+    color: #268bd2;
+    text-decoration: none;
+    font-weight: bold;
+    background-color: #268bd2;
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.12) 2px,
+            rgba(0, 0, 0, 0.12) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.12) 2px,
+            rgba(0, 0, 0, 0.12) 4px
+        );
+    background-size: 4px 4px;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+    .thks-content-area a {
+        color: #3294c2;
+        background-color: #3294c2;
+        background-image: 
+            repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.08) 2px,
+                rgba(0, 0, 0, 0.08) 4px
+            ),
+            repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.08) 2px,
+                rgba(0, 0, 0, 0.08) 4px
+            );
+    }
+}
+
+body.force-dark .thks-content-area a {
+    color: #3294c2;
+    background-color: #3294c2;
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.08) 2px,
+            rgba(0, 0, 0, 0.08) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.08) 2px,
+            rgba(0, 0, 0, 0.08) 4px
+        );
+}
+
+.thks-content-area a:hover {
+    opacity: 0.7;
+}
+
+.thks-content-area ul {
+    list-style-type: none;
+    /* Remove the small top gap so lists align with surrounding content */
+    margin: 0 0 16px 0;
+    padding: 0;
+}
+
+.thks-content-area li {
+    /* Match paragraph spacing in `.content` (16px bottom) so the
+       credits read like normal paragraphs in HOME */
+    margin-bottom: 16px;
+    padding-left: 0;
+}
+
+.thks-content-area li:before {
+    /* Hide default bullets and any pseudo-element markers so list items are not indented */
+    display: none;
+}
+
+.clock {
+    font-family: 'Courier New', 'Courier', monospace;
+    font-size: 0.9em;
+    font-weight: 600;
+    padding: 4px 8px;
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    letter-spacing: 1px;
+    user-select: none;
+    cursor: pointer;
+}
+
+.clock-colon {
+    animation: blink 1s infinite;
+}
+
+.divider {
+    color: #6f8000;
+    margin: 10px 0;
+}
+
+/* Calculator styles */
+.calculator {
+    max-width: 550px;
+    max-height: 600px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.calc-display {
+    background-color: var(--bg-base);
+    border: 3px solid var(--border-color);
+    padding: 24px 12px 8px 12px;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.calc-equation {
+    font-size: 0.9em;
+    color: var(--text-secondary);
+    height: 20px;
+    text-align: right;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+.calc-result {
+    font-size: 1.8em;
+    font-weight: bold;
+    text-align: right;
+    word-wrap: break-word;
+    word-break: break-all;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    background-color: var(--text-primary);
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.12) 2px,
+            rgba(0, 0, 0, 0.12) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.12) 2px,
+            rgba(0, 0, 0, 0.12) 4px
+        );
+    background-size: 4px 4px;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: var(--text-primary);
+}
+
+@media (prefers-color-scheme: dark) {
+    .calc-result {
+        background-image: 
+            repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.08) 2px,
+                rgba(0, 0, 0, 0.08) 4px
+            ),
+            repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.08) 2px,
+                rgba(0, 0, 0, 0.08) 4px
+            );
+    }
+}
+
+body.force-dark .calc-result {
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.08) 2px,
+            rgba(0, 0, 0, 0.08) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.08) 2px,
+            rgba(0, 0, 0, 0.08) 4px
+        );
+}
+
+.calc-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.calc-btn {
+    font-family: 'Courier New', 'Courier', monospace;
+    font-size: 1.5em;
+    font-weight: bold;
+    padding: 16px;
+    border: 3px solid var(--border-color);
+    background-color: var(--bg-surface);
+    background-image: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.08) 2px,
+            rgba(0, 0, 0, 0.08) 4px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.08) 2px,
+            rgba(0, 0, 0, 0.08) 4px
+        );
+    background-size: 4px 4px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.1s;
+    box-shadow: 2px 2px 0px var(--border-color);
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+}
+
+.calc-btn:hover {
+    background-color: var(--bg-base);
+}
+
+.calc-btn:active {
+    box-shadow: 0px 0px 0px var(--border-color);
+    transform: translate(2px, 2px);
+}
+
+.calc-operator {
+    background-color: #268bd2;
+    background-image: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.15) 2px,
+            rgba(0, 0, 0, 0.15) 4px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.15) 2px,
+            rgba(0, 0, 0, 0.15) 4px
+        );
+    background-size: 4px 4px;
+    color: var(--bg-base);
+}
+
+.calc-operator:hover {
+    background-color: #1e7bb2;
+}
+
+.calc-equals {
+    background-color: #859900;
+    background-image: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.15) 2px,
+            rgba(0, 0, 0, 0.15) 4px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.15) 2px,
+            rgba(0, 0, 0, 0.15) 4px
+        );
+    background-size: 4px 4px;
+    color: var(--bg-base);
+}
+
+.calc-equals:hover {
+    background-color: #719e07;
+}
+
+.calc-clear {
+    background-color: #dc322f;
+    background-image: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.15) 2px,
+            rgba(0, 0, 0, 0.15) 4px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.15) 2px,
+            rgba(0, 0, 0, 0.15) 4px
+        );
+    background-size: 4px 4px;
+    color: var(--bg-base);
+}
+
+.calc-clear:hover {
+    background-color: #cc221f;
+}
+
+.calc-wide {
+    grid-column: span 2;
+}
+
+.calc-tall {
+    grid-row: span 2;
+}
+
+/* Note styles */
+.note-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 0;
+}
+
+.note-text-area {
+    flex: 1;
+    background-color: var(--bg-base);
+    padding: 16px;
+    font-family: 'Courier New', 'Courier', monospace;
+    font-size: 1.6em;
+    font-weight: bold;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    overflow-y: auto;
+    box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.1);
+    line-height: 1.4;
+    user-select: none;
+    -webkit-user-select: none;
+    text-align: left;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.note-text-area > div {
+    background-color: var(--text-primary);
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.12) 2px,
+            rgba(0, 0, 0, 0.12) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.12) 2px,
+            rgba(0, 0, 0, 0.12) 4px
+        );
+    background-size: 4px 4px;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: var(--text-primary);
+}
+
+@media (prefers-color-scheme: dark) {
+    .note-text-area > div {
+        background-image: 
+            repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.08) 2px,
+                rgba(0, 0, 0, 0.08) 4px
+            ),
+            repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.08) 2px,
+                rgba(0, 0, 0, 0.08) 4px
+            );
+    }
+}
+
+body.force-dark .note-text-area > div {
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.08) 2px,
+            rgba(0, 0, 0, 0.08) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.08) 2px,
+            rgba(0, 0, 0, 0.08) 4px
+        );
+}
+
+#noteText {
+    word-break: break-word;
+}
+
+.note-keyboard {
+    height: 35%;
+    background-color: var(--text-secondary);
+    padding: 6px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    border-top: 3px solid var(--border-color);
+}
+
+.note-keyboard-row {
+    display: flex;
+    gap: 2px;
+    justify-content: space-between;
+    flex: 1;
+}
+
+.note-keyboard-row:nth-child(2) .note-key,
+.note-keyboard-row:nth-child(3) .note-key {
+    flex: 1 1 auto;
+}
+
+.note-key {
+    flex: 0 0 auto;
+    width: calc((100% - (9 * 2px)) / 10);
+    min-width: 40px;
+    font-family: 'Courier New', 'Courier', monospace;
+    font-size: 1em;
+    font-weight: bold;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-surface);
+    background-image: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.04) 2px,
+            rgba(0, 0, 0, 0.04) 4px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.04) 2px,
+            rgba(0, 0, 0, 0.04) 4px
+        );
+    background-size: 4px 4px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.1s;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.note-key:hover {
+    background-color: var(--bg-base);
+}
+
+.note-key:active {
+    background-color: var(--text-secondary);
+}
+
+.note-key.space {
+    flex: 8;
+}
+
+.note-key.backspace {
+    background-color: #dc322f;
+    background-image: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.15) 2px,
+            rgba(0, 0, 0, 0.15) 4px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.15) 2px,
+            rgba(0, 0, 0, 0.15) 4px
+        );
+    background-size: 4px 4px;
+    color: var(--bg-base);
+    flex: 2;
+    font-size: 1.3em;
+}
+
+.note-key.backspace:hover {
+    background-color: #cc221f;
+}
+
+/* Media queries for short displays - prioritize home page content */
+@media (max-height: 700px) {
+    .content {
+        padding: 16px;
+    }
+    
+    /* Reduce padding further for THKS tab on short screens */
+    #thks-content.content {
+        padding: 12px;
+    }
+    
+    .ascii-art {
+        font-size: 0.6em;
+        margin-bottom: 12px;
+    }
+    
+    h1 {
+        font-size: 1.3em;
+        margin-bottom: 1px;
+    }
+    
+    p {
+        margin-bottom: 12px;
+    }
+}
+
+@media (max-height: 600px) {
+    .content {
+        padding: 12px;
+    }
+    
+    /* Further reduce padding for THKS tab on very short screens */
+    #thks-content.content {
+        padding: 8px;
+    }
+    
+    .ascii-art {
+        font-size: 0.55em;
+        margin-bottom: 8px;
+        line-height: 1.1;
+    }
+    
+    h1 {
+        font-size: 1.2em;
+        margin-bottom: 0;
+    }
+    
+    p {
+        margin-bottom: 10px;
+        line-height: 1.5;
+    }
+    
+    .divider {
+        margin: 6px 0;
+    }
+}
+
+@media (max-height: 500px) {
+    .menu-bar {
+        padding: 6px 10px;
+        font-size: 0.95em;
+    }
+    
+    .tabs {
+        font-size: 0.95em;
+    }
+    
+    .tab {
+        padding: 6px 12px;
+    }
+    
+    .content {
+        padding: 8px 12px;
+    }
+    
+    /* Minimal padding for THKS tab on extra short screens */
+    #thks-content.content {
+        padding: 6px 8px;
+    }
+    
+    .ascii-art {
+        font-size: 0.5em;
+        margin-bottom: 6px;
+        line-height: 1.05;
+    }
+    
+    h1 {
+        font-size: 1.1em;
+        margin-bottom: 0;
+        letter-spacing: 2px;
+    }
+    
+    p {
+        margin-bottom: 8px;
+        line-height: 1.4;
+        font-size: 0.95em;
+    }
+    
+    .divider {
+        margin: 4px 0;
+    }
+    
+    .footer {
+        padding: 6px 10px;
+        font-size: 0.85em;
+    }
+}
+
+@media (max-height: 450px) {
+    .menu-bar {
+        padding: 4px 8px;
+        font-size: 0.9em;
+    }
+    
+    .tabs {
+        font-size: 0.9em;
+    }
+    
+    .tab {
+        padding: 4px 10px;
+    }
+    
+    .content {
+        padding: 6px 10px;
+    }
+    
+    /* Ultra-minimal padding for THKS tab on extremely short screens */
+    #thks-content.content {
+        padding: 4px 6px;
+    }
+    
+    .ascii-art {
+        font-size: 0.45em;
+        margin-bottom: 4px;
+        line-height: 1.0;
+    }
+    
+    h1 {
+        font-size: 1em;
+        margin-bottom: 0;
+        letter-spacing: 1.5px;
+    }
+    
+    p {
+        margin-bottom: 6px;
+        line-height: 1.3;
+        font-size: 0.9em;
+    }
+    
+    .divider {
+        margin: 3px 0;
+    }
+    
+    .footer {
+        padding: 4px 8px;
+        font-size: 0.8em;
+    }
+}
+
+@media (max-width: 640px) {
+    body {
+        padding: 10px;
+        align-items: flex-start;
+        padding-top: 10px;
+    }
+    
+    .container {
+        height: calc(100vh - 20px);
+        height: calc(100dvh - 20px); /* Use dynamic viewport height for mobile */
+        max-height: calc(100vh - 20px);
+        max-height: calc(100dvh - 20px);
+    }
+    
+    .ascii-art {
+        font-size: 0.5em;
+    }
+    
+    h1 {
+        font-size: 1.2em;
+    }
+    
+    .content {
+        padding: 16px;
+    }
+    
+    #calc-content.active {
+        padding: 24px 16px;
+    }
+
+    .tab {
+        padding: 8px 12px;
+        letter-spacing: 0.5px;
+        font-size: 0.95em;
+    }
+
+    .calc-btn {
+        padding: 12px;
+        font-size: 1.3em;
+    }
+
+    .calc-result {
+        font-size: 1.5em;
+    }
+
+    .note-key {
+        font-size: 0.9em;
+        min-width: 30px;
+    }
+
+    .note-text-area {
+        font-size: 1.4em;
+    }
+}
+
+/* Combined media queries for short AND narrow screens */
+@media (max-width: 640px) and (max-height: 600px) {
+    .content {
+        padding: 10px;
+    }
+    
+    .ascii-art {
+        font-size: 0.45em;
+        margin-bottom: 6px;
+    }
+    
+    h1 {
+        font-size: 1.1em;
+    }
+    
+    p {
+        margin-bottom: 8px;
+        font-size: 0.95em;
+    }
+}
+
+@media (max-width: 640px) and (max-height: 500px) {
+    .menu-bar {
+        padding: 5px 8px;
+    }
+    
+    .tab {
+        padding: 5px 10px;
+    }
+    
+    .content {
+        padding: 8px;
+    }
+    
+    .ascii-art {
+        font-size: 0.4em;
+        margin-bottom: 4px;
+        line-height: 1.05;
+    }
+    
+    h1 {
+        font-size: 1em;
+        letter-spacing: 2px;
+    }
+    
+    p {
+        margin-bottom: 6px;
+        font-size: 0.9em;
+        line-height: 1.3;
+    }
+    
+    .footer {
+        padding: 5px 8px;
+    }
+}
+
+@media (max-width: 400px) {
+    .tab {
+        padding: 8px 10px;
+        letter-spacing: 0.3px;
+        font-size: 0.9em;
+    }
+}
+
+@media (max-width: 350px) {
+    .tab {
+        padding: 8px 8px;
+        letter-spacing: 0px;
+        font-size: 0.85em;
+    }
+}
+
+/* Very short screens - reduce calculator button padding further */
+@media (max-height: 600px) {
+    .calc-btn {
+        padding: 10px;
+        font-size: 1.2em;
+    }
+    
+    .calc-display {
+        min-height: 50px;
+    }
+    
+    .calc-result {
+        font-size: 1.4em;
+    }
+}
+
+/* Extra short screens - minimal padding */
+@media (max-height: 500px) {
+    .calc-btn {
+        padding: 6px;
+        font-size: 1em;
+    }
+    
+    .calc-display {
+        min-height: 45px;
+        padding: 6px 10px;
+    }
+    
+    .calc-result {
+        font-size: 1.2em;
+    }
+    
+    .calc-equation {
+        font-size: 0.8em;
+    }
+}
+
+/* Small screens - adjust speed slider */
+@media (max-width: 400px) {
+    .bump-speed-slider {
+        font-size: 12px;
+        gap: 3px;
+    }
+    
+    .bump-speed-slider .speed-step {
+        padding: 1px 4px;
+        min-width: 20px;
+    }
+}
+
+/* Bump speed slider styles */
+.bump-speed-slider {
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'Courier New', 'Courier', monospace;
+    font-size: 14px;
+    font-weight: bold;
+    user-select: none;
+    z-index: 10;
+}
+
+.bump-speed-slider .speed-label {
+    color: var(--text-primary);
+}
+
+.bump-speed-slider .speed-step {
+    cursor: pointer;
+    padding: 2px 6px;
+    border: 2px solid var(--border-color);
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    transition: all 0.2s;
+    min-width: 24px;
+    text-align: center;
+}
+
+.bump-speed-slider .speed-step:hover {
+    background-color: var(--bg-base);
+}
+
+.bump-speed-slider .speed-step.active {
+    background-color: #268bd2;
+    background-image: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.15) 2px,
+            rgba(0, 0, 0, 0.15) 4px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.15) 2px,
+            rgba(0, 0, 0, 0.15) 4px
+        );
+    background-size: 4px 4px;
+    color: var(--bg-base);
+    border-color: #268bd2;
+}

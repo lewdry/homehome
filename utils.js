@@ -1,5 +1,82 @@
 // Shared utility functions
 
+// Solarized color palette (shared across bonk, bump, draw)
+const SOLARIZED_COLORS = [
+    '#268bd2', // blue
+    '#2aa198', // cyan
+    '#859900', // green
+    '#b58900', // yellow
+    '#cb4b16', // orange
+    '#dc322f', // red
+    '#d33682', // magenta
+    '#6c71c4', // violet
+    '#268bd2', // blue (brighter variant)
+    '#2aa198', // cyan (brighter variant)
+    '#719e07', // green variant
+    '#b58900', // yellow variant
+    '#cb4b16', // orange variant
+    '#dc322f', // red variant
+    '#d33682', // magenta variant
+    '#6c71c4', // violet variant
+    '#3294c2', // lighter blue
+    '#35b1a8', // lighter cyan
+    '#95a900', // lighter green
+    '#c59900', // lighter yellow
+    '#db5b26', // lighter orange
+    '#ec423f', // lighter red
+    '#e34692', // lighter magenta
+    '#7c81d4', // lighter violet
+    '#1e7bb2', // darker blue
+    '#1a9188', // darker cyan
+    '#617900', // darker green
+    '#a57900', // darker yellow
+    '#bb3b06', // darker orange
+    '#cc221f', // darker red
+];
+
+// Shared color utilities
+function hexToRgb(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : { r: 0, g: 0, b: 0 };
+}
+
+function getDarkerShade(rgb, factor) {
+    const r = Math.floor(rgb.r * factor);
+    const g = Math.floor(rgb.g * factor);
+    const b = Math.floor(rgb.b * factor);
+    return `rgb(${r}, ${g}, ${b})`;
+}
+
+// Shared canvas resize utility
+function resizeCanvas(canvas, ctx) {
+    if (!canvas || !ctx) {
+        console.error('Canvas or context not provided to resizeCanvas');
+        return;
+    }
+    
+    try {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        canvas.style.width = `${rect.width}px`;
+        canvas.style.height = `${rect.height}px`;
+        
+        // Reset transform before scaling to prevent accumulation
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(dpr, dpr);
+        
+        // Disable anti-aliasing for crisp pixel art
+        ctx.imageSmoothingEnabled = false;
+    } catch (error) {
+        console.error('Error resizing canvas:', error);
+    }
+}
+
 // Double-tap detector utility
 function createDoubleTapDetector(options = {}) {
     const timeout = options.timeout || 300;

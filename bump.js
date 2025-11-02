@@ -74,23 +74,16 @@
     let collisionBuffers = {};
     let activeSources = [];
     const MAX_ACTIVE_SOUNDS = 20;
+    
+    // Event listener references for cleanup
+    let keyDownHandler = null;
+    let keyUpHandler = null;
+    let mouseMoveHandler = null;
+    let touchMoveHandler = null;
+    let pointerDownHandler = null;
+    let resizeHandler = null;
 
-    // Dithering helper functions
-    function hexToRgb(hex) {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        } : { r: 0, g: 0, b: 0 };
-    }
-
-    function getDarkerShade(rgb, factor) {
-        const r = Math.floor(rgb.r * factor);
-        const g = Math.floor(rgb.g * factor);
-        const b = Math.floor(rgb.b * factor);
-        return `rgb(${r}, ${g}, ${b})`;
-    }
+    // Helper functions removed - now using shared utilities from utils.js
 
     // Generate pixel pattern for dithered rectangle
     function generateRectPattern(width, height, color) {
@@ -286,20 +279,79 @@
             return;
         }
 
-        ctx = canvas.getContext('2d');
-        resizeCanvas();
+        try {
+            ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.error('Could not get 2D context for bump canvas');
+                return;
+            }
+        } catch (error) {
+            console.error('Error getting canvas context:', error);
+            return;
+        }
+        
+        resizeBumpCanvas();
         
         // Initialize audio if not already done
         initAudio();
         
-        // Set up event listeners
-        document.addEventListener('keydown', handleKeyDown);
-        document.addEventListener('keyup', handleKeyUp);
-        canvas.addEventListener('mousemove', handleMouseMove);
-        canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
-        canvas.addEventListener('pointerdown', handlePointerDown, { passive: false });
+        // Create event handlers with error handling
+        keyDownHandler = (e) => {
+            try {
+                handleKeyDown(e);
+            } catch (error) {
+                console.error('Error in keydown handler:', error);
+            }
+        };
         
-        window.addEventListener('resize', handleResize);
+        keyUpHandler = (e) => {
+            try {
+                handleKeyUp(e);
+            } catch (error) {
+                console.error('Error in keyup handler:', error);
+            }
+        };
+        
+        mouseMoveHandler = (e) => {
+            try {
+                handleMouseMove(e);
+            } catch (error) {
+                console.error('Error in mousemove handler:', error);
+            }
+        };
+        
+        touchMoveHandler = (e) => {
+            try {
+                handleTouchMove(e);
+            } catch (error) {
+                console.error('Error in touchmove handler:', error);
+            }
+        };
+        
+        pointerDownHandler = (e) => {
+            try {
+                handlePointerDown(e);
+            } catch (error) {
+                console.error('Error in pointerdown handler:', error);
+            }
+        };
+        
+        resizeHandler = () => {
+            try {
+                handleResize();
+            } catch (error) {
+                console.error('Error in resize handler:', error);
+            }
+        };
+        
+        // Set up event listeners
+        document.addEventListener('keydown', keyDownHandler);
+        document.addEventListener('keyup', keyUpHandler);
+        canvas.addEventListener('mousemove', mouseMoveHandler);
+        canvas.addEventListener('touchmove', touchMoveHandler, { passive: false });
+        canvas.addEventListener('pointerdown', pointerDownHandler, { passive: false });
+        
+        window.addEventListener('resize', resizeHandler);
         
         // Set up speed slider
         initSpeedSlider();
@@ -308,26 +360,13 @@
     }
 
     // Resize canvas
-    function resizeCanvas() {
-        if (!canvas) return;
-        
-        const dpr = window.devicePixelRatio || 1;
-        const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
-        canvas.style.width = `${rect.width}px`;
-        canvas.style.height = `${rect.height}px`;
-        
-        // Reset transform before scaling to prevent accumulation
-        if (ctx) {
-            ctx.setTransform(1, 0, 0, 1, 0, 0);
-            ctx.scale(dpr, dpr);
-            ctx.imageSmoothingEnabled = false;
-        }
+    function resizeBumpCanvas() {
+        if (!canvas || !ctx) return;
+        resizeCanvas(canvas, ctx);
     }
 
     function handleResize() {
-        resizeCanvas();
+        resizeBumpCanvas();
         // Reposition paddle and ball if game is active
         if (gameState.gameStarted) {
             const canvasWidth = canvas.width / (window.devicePixelRatio || 1);
@@ -797,13 +836,32 @@
             gainNode.connect(audioContext.destination);
             source.start();
             
+            // Cleanup on end to prevent memory leak
+            source.onended = () => {
+                try {
+                    source.disconnect();
+                    gainNode.disconnect();
+                    // Remove from active sources array
+                    const index = activeSources.findIndex(s => s.source === source);
+                    if (index !== -1) {
+                        activeSources.splice(index, 1);
+                    }
+                } catch (e) {
+                    // Ignore disconnect errors
+                }
+            };
+            
             activeSources.push({ source, gainNode });
             
             if (activeSources.length > MAX_ACTIVE_SOUNDS) {
                 const oldest = activeSources.shift();
-                oldest.source.stop();
-                oldest.source.disconnect();
-                oldest.gainNode.disconnect();
+                try {
+                    oldest.source.stop();
+                    oldest.source.disconnect();
+                    oldest.gainNode.disconnect();
+                } catch (e) {
+                    // Ignore stop/disconnect errors
+                }
             }
         } catch (error) {
             console.error("Error playing sound:", error);
@@ -861,11 +919,19 @@
         stop: function() {
             gameState.gameRunning = false;
             gameState.gamePaused = true;
+            // Clean up timers
+            if (gameState.pauseResumeTimeout) {
+                clearTimeout(gameState.pauseResumeTimeout);
+                gameState.pauseResumeTimeout = null;
+            }
         },
         resume: function() {
             if (gameState.gameStarted && !gameState.gameRunning) {
+                // Clear any existing timeout before setting new one
+                if (gameState.pauseResumeTimeout) {
+                    clearTimeout(gameState.pauseResumeTimeout);
+                }
                 // Resume with delay
-                clearTimeout(gameState.pauseResumeTimeout);
                 gameState.pauseResumeTimeout = setTimeout(() => {
                     gameState.gameRunning = true;
                     gameState.gamePaused = false;
@@ -882,6 +948,43 @@
         },
         getConfig: function() {
             return CONFIG;
+        },
+        cleanup: function() {
+            // Remove event listeners
+            if (keyDownHandler) {
+                document.removeEventListener('keydown', keyDownHandler);
+            }
+            if (keyUpHandler) {
+                document.removeEventListener('keyup', keyUpHandler);
+            }
+            if (mouseMoveHandler) {
+                canvas.removeEventListener('mousemove', mouseMoveHandler);
+            }
+            if (touchMoveHandler) {
+                canvas.removeEventListener('touchmove', touchMoveHandler);
+            }
+            if (pointerDownHandler) {
+                canvas.removeEventListener('pointerdown', pointerDownHandler);
+            }
+            if (resizeHandler) {
+                window.removeEventListener('resize', resizeHandler);
+            }
+            // Clean up timers
+            if (gameState.pauseResumeTimeout) {
+                clearTimeout(gameState.pauseResumeTimeout);
+                gameState.pauseResumeTimeout = null;
+            }
+            // Stop all active audio sources
+            activeSources.forEach(({ source, gainNode }) => {
+                try {
+                    source.stop();
+                    source.disconnect();
+                    gainNode.disconnect();
+                } catch (e) {
+                    // Ignore errors
+                }
+            });
+            activeSources = [];
         }
     };
 })();
