@@ -52,6 +52,7 @@ function createDoubleTapDetector(options = {}) {
 ;(function() {
     let audioCtx = null;
     let externalBuffer = null; // AudioBuffer for sounds/click.wav if loaded
+    let loadingPromise = null; // Track the loading promise
 
     function getAudioContext() {
         if (!audioCtx) {
@@ -128,6 +129,14 @@ function createDoubleTapDetector(options = {}) {
         // Check global mute state
         if (window.isMuted) return;
         
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        
+        // Resume AudioContext if suspended (required for mobile browsers)
+        if (ctx.state === 'suspended') {
+            ctx.resume().catch(() => {});
+        }
+        
         if (externalBuffer) {
             // If buffer has been loaded, play it
             try {
@@ -135,6 +144,22 @@ function createDoubleTapDetector(options = {}) {
             } catch (e) {
                 // fall through to synth
             }
+        } else if (loadingPromise) {
+            // If still loading, wait for it to complete then play
+            loadingPromise.then(() => {
+                if (externalBuffer) {
+                    try {
+                        if (playBufferClick()) return;
+                    } catch (e) {
+                        playSynthClick();
+                    }
+                } else {
+                    playSynthClick();
+                }
+            }).catch(() => {
+                playSynthClick();
+            });
+            return;
         }
         // fallback
         playSynthClick();
@@ -149,14 +174,20 @@ function createDoubleTapDetector(options = {}) {
         if (!ctx) return;
 
         // Attempt fetch + decode. Fail quietly.
-        fetch(path, {cache: 'no-cache'}).then(resp => {
-            if (!resp.ok) throw new Error('failed to fetch');
-            return resp.arrayBuffer();
-        }).then(buf => ctx.decodeAudioData(buf)).then(decoded => {
-            externalBuffer = decoded;
-        }).catch(() => {
-            // ignore: external buffer not available, synth will be used
-        });
+        loadingPromise = fetch(path, {cache: 'no-cache'})
+            .then(resp => {
+                if (!resp.ok) throw new Error('failed to fetch');
+                return resp.arrayBuffer();
+            })
+            .then(buf => ctx.decodeAudioData(buf))
+            .then(decoded => {
+                externalBuffer = decoded;
+                loadingPromise = null; // Clear loading promise once loaded
+            })
+            .catch(() => {
+                // ignore: external buffer not available, synth will be used
+                loadingPromise = null;
+            });
     })();
 
     // Expose globally for the rest of the app (available after utils.js loads)

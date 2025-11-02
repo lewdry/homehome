@@ -36,7 +36,8 @@
 
     // Constants
     const DEVICE_PIXEL_RATIO = window.devicePixelRatio || 1;
-    const LINE_WIDTH = 2;
+    const LINE_WIDTH = 4;
+    const PIXEL_SIZE = 2; // For dithered rendering
 
     // Drawing state
     const ongoingTouches = [];
@@ -247,25 +248,78 @@ function handleDrawDoubleTap(evt) {
     }
 }
 
+// Helper functions for dithering (matching bump.js style)
+function hexToRgb(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : { r: 0, g: 0, b: 0 };
+}
+
+function getDarkerShade(rgb, factor) {
+    const r = Math.floor(rgb.r * factor);
+    const g = Math.floor(rgb.g * factor);
+    const b = Math.floor(rgb.b * factor);
+    return `rgb(${r}, ${g}, ${b})`;
+}
+
 function drawLine(x1, y1, x2, y2, colour) {
-    drawCtx.beginPath();
-    drawCtx.strokeStyle = colour;
-    drawCtx.lineWidth = LINE_WIDTH;
-    drawCtx.lineCap = "round";
+    // Calculate the two colors for dithering
+    const rgb = hexToRgb(colour);
+    const baseColor = colour;
+    const ditherColor = getDarkerShade(rgb, 0.7);
 
     if (x1 === x2 && y1 === y2) {
-        // Draw a dot
-        drawCtx.arc(x1, y1, LINE_WIDTH / 2, 0, 2 * Math.PI);
-        drawCtx.fillStyle = colour;
-        drawCtx.fill();
-    } else {
-        // Draw a line
-        drawCtx.moveTo(x1, y1);
-        drawCtx.lineTo(x2, y2);
-        drawCtx.stroke();
+        // Draw a dithered dot
+        drawDitheredCircle(x1, y1, LINE_WIDTH / 2, baseColor, ditherColor);
+        return;
     }
 
-    drawCtx.closePath();
+    // Dithered line drawing using Bresenham-like algorithm
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const steps = Math.max(Math.ceil(distance / PIXEL_SIZE), 1);
+
+    for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        const centerX = x1 + dx * t;
+        const centerY = y1 + dy * t;
+        
+        // Draw a small dithered circle at this point
+        drawDitheredCircle(centerX, centerY, LINE_WIDTH / 2, baseColor, ditherColor);
+    }
+}
+
+function drawDitheredCircle(centerX, centerY, radius, baseColor, ditherColor) {
+    // Calculate the bounding box in pixel grid
+    const minX = Math.floor((centerX - radius) / PIXEL_SIZE) * PIXEL_SIZE;
+    const minY = Math.floor((centerY - radius) / PIXEL_SIZE) * PIXEL_SIZE;
+    const maxX = Math.ceil((centerX + radius) / PIXEL_SIZE) * PIXEL_SIZE;
+    const maxY = Math.ceil((centerY + radius) / PIXEL_SIZE) * PIXEL_SIZE;
+    
+    // Draw pixels in a checkerboard pattern
+    for (let px = minX; px < maxX; px += PIXEL_SIZE) {
+        for (let py = minY; py < maxY; py += PIXEL_SIZE) {
+            // Check if this pixel is within the circle
+            const dx = (px + PIXEL_SIZE / 2) - centerX;
+            const dy = (py + PIXEL_SIZE / 2) - centerY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance <= radius) {
+                // Determine if this pixel should be base or dither color
+                // Using checkerboard pattern like bump.js: (gridX + gridY) % 2
+                const gridX = Math.floor(px / PIXEL_SIZE);
+                const gridY = Math.floor(py / PIXEL_SIZE);
+                const isDithered = (gridX + gridY) % 2 === 0;
+                
+                drawCtx.fillStyle = isDithered ? ditherColor : baseColor;
+                drawCtx.fillRect(px, py, PIXEL_SIZE, PIXEL_SIZE);
+            }
+        }
+    }
 }
 
 function isValidCoordinate(coord) {

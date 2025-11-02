@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <title>Homehomehome :: Web 0.1</title>
+    <title>Homehomehome ⌂ Web 0.1</title>
     <style>
         * {
             margin: 0;
@@ -71,6 +71,22 @@
 
         .menu-bar {
             background-color: #268bd2;
+            background-image: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.15) 2px,
+                    rgba(0, 0, 0, 0.15) 4px
+                ),
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.15) 2px,
+                    rgba(0, 0, 0, 0.15) 4px
+                );
+            background-size: 4px 4px;
             color: var(--bg-base);
             padding: 8px 12px;
             border-bottom: 3px solid var(--border-color);
@@ -183,6 +199,22 @@
         .tabs {
             display: flex;
             background-color: var(--text-secondary);
+            background-image: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.06) 2px,
+                    rgba(0, 0, 0, 0.06) 4px
+                ),
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.06) 2px,
+                    rgba(0, 0, 0, 0.06) 4px
+                );
+            background-size: 4px 4px;
             border-bottom: 3px solid var(--border-color);
         }
 
@@ -190,6 +222,22 @@
             padding: 8px 16px;
             cursor: pointer;
             background-color: var(--border-color);
+            background-image: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.04) 2px,
+                    rgba(0, 0, 0, 0.04) 4px
+                ),
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.04) 2px,
+                    rgba(0, 0, 0, 0.04) 4px
+                );
+            background-size: 4px 4px;
             color: var(--bg-base);
             border-right: 2px solid var(--text-secondary);
             font-weight: bold;
@@ -225,6 +273,12 @@
             line-height: 1.6;
         }
 
+        #home-content.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
         canvas {
             display: block;
             width: 100%;
@@ -240,6 +294,11 @@
             overflow: hidden;
         }
 
+        #bump-content {
+            padding: 0;
+            overflow: hidden;
+        }
+
         #draw-content {
             padding: 0;
             overflow: hidden;
@@ -248,6 +307,12 @@
         #note-content {
             padding: 0;
             overflow: hidden;
+        }
+
+        #calc-content.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         #drawCanvas {
@@ -261,8 +326,18 @@
             background-color: var(--bg-surface);
         }
 
+        #bumpCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+            background-color: var(--bg-surface);
+        }
+
         .ascii-art {
-            color: #b33a0f;
+            color: #dc322f;
             font-size: 0.7em;
             line-height: 1.2;
             margin-bottom: 16px;
@@ -271,11 +346,83 @@
             text-align: left;
         }
 
+        @media (prefers-color-scheme: dark) {
+            .ascii-art {
+                color: #db5b26;
+            }
+        }
+
+        body.force-dark .ascii-art {
+            color: #db5b26;
+        }
+
         h1 {
-            color: #2075c7;
             font-size: 1.4em;
             margin-bottom: 16px;
             letter-spacing: 3px;
+            background-color: #1e7bb2;
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.12) 2px,
+                    rgba(0, 0, 0, 0.12) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.12) 2px,
+                    rgba(0, 0, 0, 0.12) 4px
+                );
+            background-size: 4px 4px;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: #1e7bb2;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            h1 {
+                background-color: #3294c2;
+                background-image: 
+                    repeating-linear-gradient(
+                        0deg,
+                        transparent,
+                        transparent 2px,
+                        rgba(0, 0, 0, 0.08) 2px,
+                        rgba(0, 0, 0, 0.08) 4px
+                    ),
+                    repeating-linear-gradient(
+                        90deg,
+                        transparent,
+                        transparent 2px,
+                        rgba(0, 0, 0, 0.08) 2px,
+                        rgba(0, 0, 0, 0.08) 4px
+                    );
+                color: #3294c2;
+            }
+        }
+
+        body.force-dark h1 {
+            background-color: #3294c2;
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.08) 2px,
+                    rgba(0, 0, 0, 0.08) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.08) 2px,
+                    rgba(0, 0, 0, 0.08) 4px
+                );
+            color: #3294c2;
         }
 
         p {
@@ -285,18 +432,133 @@
         }
 
         .highlight {
-            color: #dc322f;
             font-weight: bold;
+            background-color: #dc322f;
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.12) 2px,
+                    rgba(0, 0, 0, 0.12) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.12) 2px,
+                    rgba(0, 0, 0, 0.12) 4px
+                );
+            background-size: 4px 4px;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: #dc322f;
         }
         
         @media (prefers-color-scheme: dark) {
             .highlight {
-                color: #cb4b16;
+                background-color: #db5b26;
+                background-image: 
+                    repeating-linear-gradient(
+                        0deg,
+                        transparent,
+                        transparent 2px,
+                        rgba(0, 0, 0, 0.08) 2px,
+                        rgba(0, 0, 0, 0.08) 4px
+                    ),
+                    repeating-linear-gradient(
+                        90deg,
+                        transparent,
+                        transparent 2px,
+                        rgba(0, 0, 0, 0.08) 2px,
+                        rgba(0, 0, 0, 0.08) 4px
+                    );
+                color: #db5b26;
             }
+        }
+
+              body.force-dark .highlight {
+            background-color: #db5b26;
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.08) 2px,
+                    rgba(0, 0, 0, 0.08) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.08) 2px,
+                    rgba(0, 0, 0, 0.08) 4px
+                );
+            color: #db5b26;
         }
 
         .cursor {
             animation: blink 1s infinite;
+            background-color: var(--text-primary);
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.12) 2px,
+                    rgba(0, 0, 0, 0.12) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.12) 2px,
+                    rgba(0, 0, 0, 0.12) 4px
+                );
+            background-size: 4px 4px;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: var(--text-primary);
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .cursor {
+                background-image: 
+                    repeating-linear-gradient(
+                        0deg,
+                        transparent,
+                        transparent 2px,
+                        rgba(0, 0, 0, 0.08) 2px,
+                        rgba(0, 0, 0, 0.08) 4px
+                    ),
+                    repeating-linear-gradient(
+                        90deg,
+                        transparent,
+                        transparent 2px,
+                        rgba(0, 0, 0, 0.08) 2px,
+                        rgba(0, 0, 0, 0.08) 4px
+                    );
+            }
+        }
+        
+        body.force-dark .cursor {
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.08) 2px,
+                    rgba(0, 0, 0, 0.08) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.08) 2px,
+                    rgba(0, 0, 0, 0.08) 4px
+                );
         }
 
         @keyframes blink {
@@ -369,6 +631,22 @@
 
         .instruction-popup-title {
             background-color: #268bd2;
+            background-image: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.15) 2px,
+                    rgba(0, 0, 0, 0.15) 4px
+                ),
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.15) 2px,
+                    rgba(0, 0, 0, 0.15) 4px
+                );
+            background-size: 4px 4px;
             color: var(--bg-base);
             padding: 8px 12px;
             border-bottom: 3px solid var(--border-color);
@@ -394,6 +672,22 @@
             padding: 12px 32px;
             border: 3px solid var(--border-color);
             background-color: #859900;
+            background-image: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.15) 2px,
+                    rgba(0, 0, 0, 0.15) 4px
+                ),
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.15) 2px,
+                    rgba(0, 0, 0, 0.15) 4px
+                );
+            background-size: 4px 4px;
             color: var(--bg-base);
             cursor: pointer;
             box-shadow: 2px 2px 0px var(--border-color);
@@ -414,6 +708,22 @@
             border-top: 3px solid var(--border-color);
             padding: 8px 12px;
             background-color: var(--text-secondary);
+            background-image: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.06) 2px,
+                    rgba(0, 0, 0, 0.06) 4px
+                ),
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.06) 2px,
+                    rgba(0, 0, 0, 0.06) 4px
+                );
+            background-size: 4px 4px;
             color: var(--bg-base);
             font-size: 0.9em;
             font-weight: 500;
@@ -422,6 +732,153 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+
+        .footer-text {
+            cursor: pointer;
+            transition: opacity 0.2s;
+            user-select: none;
+        }
+
+        .footer-text:hover {
+            opacity: 0.7;
+        }
+
+        .footer-text:active {
+            opacity: 0.5;
+        }
+
+        /* Credits tab styles */
+        #thks-content {
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #thks-content.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .thks-header {
+            background-color: var(--text-secondary);
+            background-image: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.06) 2px,
+                    rgba(0, 0, 0, 0.06) 4px
+                ),
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.06) 2px,
+                    rgba(0, 0, 0, 0.06) 4px
+                );
+            background-size: 4px 4px;
+            padding: 8px 16px;
+            color: var(--bg-base);
+            border-bottom: 3px solid var(--border-color);
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .thks-content-area {
+            padding: 24px;
+        }
+
+        .thks-content-area a {
+            color: #268bd2;
+            text-decoration: none;
+            font-weight: bold;
+            background-color: #268bd2;
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.12) 2px,
+                    rgba(0, 0, 0, 0.12) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.12) 2px,
+                    rgba(0, 0, 0, 0.12) 4px
+                );
+            background-size: 4px 4px;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .thks-content-area a {
+                color: #3294c2;
+                background-color: #3294c2;
+                background-image: 
+                    repeating-linear-gradient(
+                        0deg,
+                        transparent,
+                        transparent 2px,
+                        rgba(0, 0, 0, 0.08) 2px,
+                        rgba(0, 0, 0, 0.08) 4px
+                    ),
+                    repeating-linear-gradient(
+                        90deg,
+                        transparent,
+                        transparent 2px,
+                        rgba(0, 0, 0, 0.08) 2px,
+                        rgba(0, 0, 0, 0.08) 4px
+                    );
+            }
+        }
+
+        body.force-dark .thks-content-area a {
+            color: #3294c2;
+            background-color: #3294c2;
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.08) 2px,
+                    rgba(0, 0, 0, 0.08) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.08) 2px,
+                    rgba(0, 0, 0, 0.08) 4px
+                );
+        }
+
+        .thks-content-area a:hover {
+            opacity: 0.7;
+        }
+
+        .thks-content-area ul {
+            list-style-type: none;
+            margin: 8px 0 16px 0;
+            padding: 0;
+        }
+
+        .thks-content-area li {
+            margin-bottom: 8px;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .thks-content-area li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--text-primary);
         }
 
         .clock {
@@ -448,6 +905,7 @@
         /* Calculator styles */
         .calculator {
             max-width: 550px;
+            width: 100%;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
@@ -477,11 +935,69 @@
 
         .calc-result {
             font-size: 1.8em;
-            color: var(--text-primary);
             font-weight: bold;
             text-align: right;
             word-wrap: break-word;
             word-break: break-all;
+            background-color: var(--text-primary);
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.12) 2px,
+                    rgba(0, 0, 0, 0.12) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.12) 2px,
+                    rgba(0, 0, 0, 0.12) 4px
+                );
+            background-size: 4px 4px;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: var(--text-primary);
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .calc-result {
+                background-image: 
+                    repeating-linear-gradient(
+                        0deg,
+                        transparent,
+                        transparent 2px,
+                        rgba(0, 0, 0, 0.08) 2px,
+                        rgba(0, 0, 0, 0.08) 4px
+                    ),
+                    repeating-linear-gradient(
+                        90deg,
+                        transparent,
+                        transparent 2px,
+                        rgba(0, 0, 0, 0.08) 2px,
+                        rgba(0, 0, 0, 0.08) 4px
+                    );
+            }
+        }
+        
+        body.force-dark .calc-result {
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.08) 2px,
+                    rgba(0, 0, 0, 0.08) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.08) 2px,
+                    rgba(0, 0, 0, 0.08) 4px
+                );
         }
 
         .calc-buttons {
@@ -497,6 +1013,22 @@
             padding: 16px 32px;
             border: 3px solid var(--border-color);
             background-color: var(--bg-surface);
+            background-image: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.08) 2px,
+                    rgba(0, 0, 0, 0.08) 4px
+                ),
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.08) 2px,
+                    rgba(0, 0, 0, 0.08) 4px
+                );
+            background-size: 4px 4px;
             color: var(--text-primary);
             cursor: pointer;
             transition: all 0.1s;
@@ -518,6 +1050,22 @@
 
         .calc-operator {
             background-color: #268bd2;
+            background-image: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.15) 2px,
+                    rgba(0, 0, 0, 0.15) 4px
+                ),
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.15) 2px,
+                    rgba(0, 0, 0, 0.15) 4px
+                );
+            background-size: 4px 4px;
             color: var(--bg-base);
         }
 
@@ -527,6 +1075,22 @@
 
         .calc-equals {
             background-color: #859900;
+            background-image: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.15) 2px,
+                    rgba(0, 0, 0, 0.15) 4px
+                ),
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.15) 2px,
+                    rgba(0, 0, 0, 0.15) 4px
+                );
+            background-size: 4px 4px;
             color: var(--bg-base);
         }
 
@@ -536,6 +1100,22 @@
 
         .calc-clear {
             background-color: #dc322f;
+            background-image: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.15) 2px,
+                    rgba(0, 0, 0, 0.15) 4px
+                ),
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.15) 2px,
+                    rgba(0, 0, 0, 0.15) 4px
+                );
+            background-size: 4px 4px;
             color: var(--bg-base);
         }
 
@@ -566,7 +1146,6 @@
             font-family: 'Courier New', 'Courier', monospace;
             font-size: 1.6em;
             font-weight: bold;
-            color: var(--text-primary);
             overflow-wrap: break-word;
             word-wrap: break-word;
             white-space: pre-wrap;
@@ -579,6 +1158,68 @@
             display: flex;
             align-items: flex-start;
             justify-content: flex-start;
+        }
+        
+        .note-text-area > div {
+            background-color: var(--text-primary);
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.12) 2px,
+                    rgba(0, 0, 0, 0.12) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.12) 2px,
+                    rgba(0, 0, 0, 0.12) 4px
+                );
+            background-size: 4px 4px;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: var(--text-primary);
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .note-text-area > div {
+                background-image: 
+                    repeating-linear-gradient(
+                        0deg,
+                        transparent,
+                        transparent 2px,
+                        rgba(0, 0, 0, 0.08) 2px,
+                        rgba(0, 0, 0, 0.08) 4px
+                    ),
+                    repeating-linear-gradient(
+                        90deg,
+                        transparent,
+                        transparent 2px,
+                        rgba(0, 0, 0, 0.08) 2px,
+                        rgba(0, 0, 0, 0.08) 4px
+                    );
+            }
+        }
+        
+        body.force-dark .note-text-area > div {
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.08) 2px,
+                    rgba(0, 0, 0, 0.08) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.08) 2px,
+                    rgba(0, 0, 0, 0.08) 4px
+                );
         }
 
         #noteText {
@@ -616,6 +1257,22 @@
             font-weight: bold;
             border: 1px solid var(--border-color);
             background-color: var(--bg-surface);
+            background-image: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.04) 2px,
+                    rgba(0, 0, 0, 0.04) 4px
+                ),
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.04) 2px,
+                    rgba(0, 0, 0, 0.04) 4px
+                );
+            background-size: 4px 4px;
             color: var(--text-primary);
             cursor: pointer;
             transition: all 0.1s;
@@ -642,6 +1299,22 @@
 
         .note-key.backspace {
             background-color: #dc322f;
+            background-image: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.15) 2px,
+                    rgba(0, 0, 0, 0.15) 4px
+                ),
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.15) 2px,
+                    rgba(0, 0, 0, 0.15) 4px
+                );
+            background-size: 4px 4px;
             color: var(--bg-base);
             flex: 2;
             font-size: 1.3em;
@@ -735,6 +1408,7 @@
         <div class="tabs" role="tablist">
             <div class="tab active" data-tab="home" role="tab" aria-selected="true" aria-controls="home-content" tabindex="0">HOME</div>
             <div class="tab" data-tab="bonk" role="tab" aria-selected="false" aria-controls="bonk-content" tabindex="-1">BONK</div>
+            <div class="tab" data-tab="bump" role="tab" aria-selected="false" aria-controls="bump-content" tabindex="-1">BUMP</div>
             <div class="tab" data-tab="calc" role="tab" aria-selected="false" aria-controls="calc-content" tabindex="-1">CALC</div>
             <div class="tab" data-tab="draw" role="tab" aria-selected="false" aria-controls="draw-content" tabindex="-1">DRAW</div>
             <div class="tab" data-tab="note" role="tab" aria-selected="false" aria-controls="note-content" tabindex="-1">NOTE</div>
@@ -761,11 +1435,11 @@
             </p>
 
             <p>
-                Who needs <span id="modernTech">the cloud</span>? We're going <span class="highlight">Homehomehome</span>.
+                Who needs <span id="modernTech">the cloud</span>? We're staying <span class="highlight">Homehomehome</span>.
             </p>
 
             <p>
-                Homehomehome is an imagined Web 0.1 operating system, from a time before the <span class="highlight">world wide web</span> was born.
+                Homehomehome is an imagined Web 0.1 operating system, for a time before the <span class="highlight">world wide web</span> was born.
             </p>
 
             <p class="divider">
@@ -789,6 +1463,26 @@
             </div>
             <div aria-live="polite" aria-atomic="true" class="visually-hidden" id="bonk-status"></div>
             <canvas id="drawingCanvas" aria-label="Game canvas with bouncing balls"></canvas>
+        </div>
+
+        <div id="bump-content" class="content tab-content" role="tabpanel" aria-labelledby="bump-tab">
+            <div class="instruction-popup" id="bump-popup" style="display: none;" role="dialog" aria-labelledby="bump-popup-title" aria-modal="true">
+                <div class="instruction-popup-title" id="bump-popup-title">BLOCKBUMPER.EXE</div>
+                <div class="instruction-popup-content">
+                    <p>Break all bricks to win!</p>
+                    <p>Drag paddle to move.</p>
+                    <p>Double-tap to swap colours.</p>
+                    <button id="bump-start">START</button>
+                </div>
+            </div>
+            <div class="instruction-popup" id="bump-endgame-popup" style="display: none;" role="dialog" aria-labelledby="bump-endgame-title" aria-modal="true">
+                <div class="instruction-popup-title" id="bump-endgame-title">GAME OVER</div>
+                <div class="instruction-popup-content">
+                    <p id="bump-endgame-message">You won!</p>
+                    <button id="bump-endgame-ok">OK</button>
+                </div>
+            </div>
+            <canvas id="bumpCanvas" aria-label="Breakout game canvas"></canvas>
         </div>
 
         <div id="calc-content" class="content tab-content" role="tabpanel" aria-labelledby="calc-tab">
@@ -846,16 +1540,42 @@
                 </div>
             </div>
         </div>
+
+        <div id="thks-content" class="content tab-content" role="tabpanel" aria-labelledby="thks-tab">
+            <div class="thks-content-area">
+                <p>
+                    Homehomehome by <a href="https://lewisdryburgh.com" target="_blank" rel="noopener noreferrer">Lewis Dryburgh</a>, 2025.
+                </p>
+
+                <p class="divider">
+                    ═══════════════════════════════════
+                </p>
+
+                <p class="highlight">Inspirations</p>
+                <ul>
+                    <li>Ethos and image style: <a href="https://solar.lowtechmagazine.com" target="_blank" rel="noopener noreferrer">Low Tech Magazine</a></li>
+                    <li>The best fictious OS: <a href="https://www.windows93.net" target="_blank" rel="noopener noreferrer">Windows93.net</a></li>
+                    <li>Colours and theme: <a href="https://ethanschoonover.com/solarized/" target="_blank" rel="noopener noreferrer">Solarized by Ethan Schoonover</a></li>
+                </ul>
+
+                <p class="highlight">Content</p>
+                <ul>
+                    <li>BUMP adapted from: <a href="https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript" target="_blank" rel="noopener noreferrer">Mozilla's 2D breakout tutorial</a></li>
+                    <li>BONK and DRAW adapted from: <a href="https://playpip.games" target="_blank" rel="noopener noreferrer">Playpip Games</a></li>
+                </ul>
+            </div>
+        </div>
         </main>
 
         <div class="footer">
-            <span>Homehomehome, 1988</span>
+            <span class="footer-text" role="button" tabindex="0" aria-label="Toggle credits">Homehomehome, 2025</span>
             <span class="clock" id="clock">00:00</span>
         </div>
     </div>
 
     <script src="utils.js"></script>
     <script src="bonk.js"></script>
+    <script src="bump.js"></script>
     <script src="calc.js"></script>
     <script src="draw.js"></script>
     <script src="note.js"></script>
@@ -981,6 +1701,8 @@
         function handleResetApp() {
             // Clear bonk ever-started flag
             bonkEverStarted = false;
+            // Clear bump ever-started flag
+            bumpEverStarted = false;
             
             // Play click sound before reload
             if (window.playRetroClick) {
@@ -1008,15 +1730,20 @@
         const tabContents = document.querySelectorAll('.tab-content');
         const bonkTab = document.querySelector('.tab[data-tab="bonk"]');
         let bonkInitialized = false;
+        let bumpInitialized = false;
         let drawInitialized = false;
         let noteInitialized = false;
         let bonkStarted = false;
+        let bumpStarted = false;
         let drawStarted = false;
         let bonkEverStarted = false; // Track if bonk has ever been started
+        let bumpEverStarted = false; // Track if bump has ever been started
 
         // Popup elements
         const bonkPopup = document.getElementById('bonk-popup');
         const bonkStartBtn = document.getElementById('bonk-start');
+        const bumpPopup = document.getElementById('bump-popup');
+        const bumpStartBtn = document.getElementById('bump-start');
         const drawPopup = document.getElementById('draw-popup');
         const drawStartBtn = document.getElementById('draw-start');
 
@@ -1030,6 +1757,18 @@
             }
             // Return focus to the tab after closing popup
             bonkTab.focus();
+        });
+
+        // Handle BUMP start button
+        bumpStartBtn.addEventListener('click', () => {
+            bumpPopup.style.display = 'none';
+            bumpStarted = true;
+            bumpEverStarted = true; // Mark that bump has been started at least once
+            if (bumpInitialized && window.BumpGame) {
+                window.BumpGame.start();
+            }
+            // Return focus to the tab after closing popup
+            document.querySelector('.tab[data-tab="bump"]').focus();
         });
 
         // Handle DRAW start button
@@ -1053,6 +1792,14 @@
                     window.BonkGame.stop();
                     bonkInitialized = false;
                     bonkStarted = false;
+                }
+            }
+            
+            // Stop/pause bump game when leaving bump tab
+            if (bumpInitialized && window.BumpGame && window.BumpGame.isRunning()) {
+                const currentTab = document.querySelector('.tab.active');
+                if (currentTab && currentTab.getAttribute('data-tab') === 'bump' && tabName !== 'bump') {
+                    window.BumpGame.stop();
                 }
             }
             
@@ -1091,6 +1838,23 @@
                 if (window.BonkGame) {
                     window.BonkGame.init();
                 }
+            }
+            
+            // Initialize bump game on first click
+            if (tabName === 'bump' && !bumpInitialized) {
+                bumpInitialized = true;
+                // Only show popup if bump has never been started before
+                if (!bumpEverStarted) {
+                    bumpPopup.style.display = 'flex';
+                    // Focus the START button for keyboard users
+                    setTimeout(() => bumpStartBtn.focus(), 100);
+                }
+                if (window.BumpGame) {
+                    window.BumpGame.init();
+                }
+            } else if (tabName === 'bump' && bumpInitialized && window.BumpGame) {
+                // Resume game when returning to tab
+                window.BumpGame.resume();
             }
             
             // Initialize drawing on first click
@@ -1158,10 +1922,106 @@
             });
         });
 
+        // Footer click to toggle credits tab
+        const footerText = document.querySelector('.footer-text');
+        const thksContent = document.getElementById('thks-content');
+        let thksVisible = false;
+        let previousTab = null;
+
+        function showCredits() {
+            // Stop bonk game when leaving bonk tab
+            if (bonkInitialized && window.BonkGame && window.BonkGame.isRunning()) {
+                const currentTab = document.querySelector('.tab.active');
+                if (currentTab && currentTab.getAttribute('data-tab') === 'bonk') {
+                    window.BonkGame.stop();
+                    bonkInitialized = false;
+                    bonkStarted = false;
+                }
+            }
+            
+            // Stop/pause bump game when leaving bump tab
+            if (bumpInitialized && window.BumpGame && window.BumpGame.isRunning()) {
+                const currentTab = document.querySelector('.tab.active');
+                if (currentTab && currentTab.getAttribute('data-tab') === 'bump') {
+                    window.BumpGame.stop();
+                }
+            }
+
+            // Store current active tab (if not already showing credits)
+            if (!thksVisible) {
+                const activeTab = document.querySelector('.tab.active');
+                if (activeTab) {
+                    previousTab = activeTab;
+                }
+            }
+
+            // Hide all tabs
+            tabs.forEach(t => {
+                t.classList.remove('active');
+                t.setAttribute('aria-selected', 'false');
+            });
+
+            // Hide all content
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            // Show credits content
+            thksContent.classList.add('active');
+            thksVisible = true;
+        }
+
+        function hideCredits() {
+            // Hide credits
+            thksContent.classList.remove('active');
+            thksVisible = false;
+
+            // Restore previous tab
+            if (previousTab) {
+                switchToTab(previousTab);
+            } else {
+                // Default to home if no previous tab
+                const homeTab = document.querySelector('.tab[data-tab="home"]');
+                if (homeTab) {
+                    switchToTab(homeTab);
+                }
+            }
+        }
+
+        function toggleCredits() {
+            if (window.playRetroClick) {
+                try { 
+                    window.playRetroClick(); 
+                } catch (err) {}
+            }
+
+            if (thksVisible) {
+                hideCredits();
+            } else {
+                showCredits();
+            }
+        }
+
+        footerText.addEventListener('click', toggleCredits);
+        footerText.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleCredits();
+            }
+        });
+
+        // Override switchToTab to hide credits when any tab is clicked
+        const originalSwitchToTab = switchToTab;
+        switchToTab = function(tab) {
+            if (thksVisible) {
+                thksVisible = false;
+                thksContent.classList.remove('active');
+            }
+            originalSwitchToTab(tab);
+        };
+
         // Play retro click on pointer interactions with interactive elements
         document.addEventListener('pointerdown', (e) => {
             try {
-                const el = e.target.closest('button, .tab, .calc-btn, .note-key, [role="tab"]');
+                const el = e.target.closest('button, .tab, .calc-btn, .note-key, .footer-text, [role="tab"]');
                 if (el && window.playRetroClick) {
                     window.playRetroClick();
                 }
