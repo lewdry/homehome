@@ -1588,6 +1588,11 @@
                 padding: 16px;
             }
             
+            /* Reduce padding further for THKS tab on short screens */
+            #thks-content.content {
+                padding: 12px;
+            }
+            
             .ascii-art {
                 font-size: 0.6em;
                 margin-bottom: 12px;
@@ -1606,6 +1611,11 @@
         @media (max-height: 600px) {
             .content {
                 padding: 12px;
+            }
+            
+            /* Further reduce padding for THKS tab on very short screens */
+            #thks-content.content {
+                padding: 8px;
             }
             
             .ascii-art {
@@ -1645,6 +1655,11 @@
             
             .content {
                 padding: 8px 12px;
+            }
+            
+            /* Minimal padding for THKS tab on extra short screens */
+            #thks-content.content {
+                padding: 6px 8px;
             }
             
             .ascii-art {
@@ -1691,6 +1706,11 @@
             
             .content {
                 padding: 6px 10px;
+            }
+            
+            /* Ultra-minimal padding for THKS tab on extremely short screens */
+            #thks-content.content {
+                padding: 4px 6px;
             }
             
             .ascii-art {
