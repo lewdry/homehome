@@ -138,6 +138,9 @@ function handleResetApp() {
     if (window.cleanupNote) {
         try { window.cleanupNote(); } catch (e) {}
     }
+    if (window.cleanupCalculator) {
+        try { window.cleanupCalculator(); } catch (e) {}
+    }
     
     // Clear bonk ever-started flag
     bonkEverStarted = false;
@@ -227,6 +230,12 @@ function switchToTab(tab) {
     const currentTab = document.querySelector('.tab.active');
     const currentTabName = currentTab ? currentTab.getAttribute('data-tab') : null;
     
+    // Hide credits if visible
+    if (thksVisible) {
+        thksVisible = false;
+        thksContent.classList.remove('active');
+    }
+    
     // Cleanup when leaving tabs
     if (currentTabName === 'bonk' && bonkInitialized && window.BonkGame) {
         if (window.BonkGame.isRunning()) {
@@ -246,8 +255,13 @@ function switchToTab(tab) {
     }
     
     if (currentTabName === 'note' && window.cleanupNote) {
-        // Don't fully cleanup note, just ensure listener is managed
-        // The handler checks tab state internally
+        // Clean up note keyboard listener when leaving note tab
+        window.cleanupNote();
+    }
+    
+    if (currentTabName === 'calc' && window.cleanupCalculator) {
+        // Clean up calculator listeners when leaving calc tab
+        window.cleanupCalculator();
     }
     
     // Update active tab
@@ -328,6 +342,13 @@ function switchToTab(tab) {
         noteInitialized = true;
         if (typeof initNote === 'function') {
             initNote();
+        }
+    }
+    
+    // Initialize calculator on first click (listeners will be re-attached each time)
+    if (tabName === 'calc') {
+        if (typeof initCalculator === 'function') {
+            initCalculator();
         }
     }
 }
@@ -494,16 +515,6 @@ footerText.addEventListener('keydown', (e) => {
         toggleCredits(e);
     }
 });
-
-// Override switchToTab to hide credits when any tab is clicked
-const originalSwitchToTab = switchToTab;
-switchToTab = function(tab) {
-    if (thksVisible) {
-        thksVisible = false;
-        thksContent.classList.remove('active');
-    }
-    originalSwitchToTab(tab);
-};
 
 // Play retro click on pointer interactions with interactive elements
 document.addEventListener('pointerdown', async (e) => {

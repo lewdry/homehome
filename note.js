@@ -3,6 +3,14 @@ let noteText = '';
 let maxCharacters = 0;
 let cursorPosition = 0; // Track cursor position for editing
 let desktopKeyboardHandler = null; // Store reference for cleanup
+let noteListenersAttached = false; // Track if event listeners are attached
+let noteKeyboardBuilt = false; // Track if keyboard HTML has been built
+
+// Event handler references for cleanup
+let textAreaClickHandler = null;
+let textAreaTouchHandler = null;
+let textAreaPointerHandler = null;
+let resizeHandler = null;
 
 // QWERTY keyboard layout (uppercase only)
 const keyboardLayout = [
@@ -36,60 +44,87 @@ function initNote() {
         return;
     }
     
-    // Calculate max characters based on text area dimensions
-    calculateMaxCharacters();
+    // Only build keyboard and set attributes on first initialization
+    if (!noteKeyboardBuilt) {
+        // Calculate max characters based on text area dimensions
+        calculateMaxCharacters();
+        
+        // Build the keyboard
+        buildKeyboard();
+        
+        // Prevent mobile keyboard from showing
+        noteTextArea.setAttribute('readonly', 'readonly');
+        noteTextArea.setAttribute('contenteditable', 'false');
+        
+        noteKeyboardBuilt = true;
+    }
     
-    // Build the keyboard
-    buildKeyboard();
-    
-    // Update display
+    // Update display (always)
     updateNoteDisplay();
     
-    // Prevent mobile keyboard from showing
-    noteTextArea.setAttribute('readonly', 'readonly');
-    noteTextArea.setAttribute('contenteditable', 'false');
-    
-    // Click/touch on text area to move cursor
-    noteTextArea.addEventListener('click', handleTextAreaClick);
-    noteTextArea.addEventListener('touchend', (e) => {
-        if (e.cancelable) {
-            e.preventDefault();
-        }
-        handleTextAreaClick(e);
-    });
-    
-    // Double-tap detector for randomization easter egg
-    const doubleTapDetector = createDoubleTapDetector();
-    
-    noteTextArea.addEventListener('pointerdown', (e) => {
-        if (doubleTapDetector.isDoubleTap(e.clientX, e.clientY)) {
-            randomizeNoteKeys();
-            if (window.playRetroClick) {
-                try { window.playRetroClick(); } catch (err) {}
+    // Only attach listeners if not already attached
+    if (!noteListenersAttached) {
+        // Click/touch on text area to move cursor
+        textAreaClickHandler = handleTextAreaClick;
+        textAreaTouchHandler = (e) => {
+            if (e.cancelable) {
+                e.preventDefault();
             }
-        }
-    });
-    
-    // Allow desktop keyboard input - create handler with error handling
-    desktopKeyboardHandler = (e) => {
-        // Only handle keyboard if note tab is active
-        const noteContent = document.getElementById('note-content');
-        if (!noteContent || !noteContent.classList.contains('active')) return;
+            handleTextAreaClick(e);
+        };
         
-        try {
-            handleDesktopKeyboard(e);
-        } catch (error) {
-            console.error('Error in desktop keyboard handler:', error);
-        }
-    };
-    
-    document.addEventListener('keydown', desktopKeyboardHandler);
-    
-    // Handle window resize
-    window.addEventListener('resize', () => {
-        calculateMaxCharacters();
-        updateNoteDisplay();
-    });
+        noteTextArea.addEventListener('click', textAreaClickHandler);
+        noteTextArea.addEventListener('touchend', textAreaTouchHandler);
+        
+        // Double-tap detector for randomization easter egg
+        const doubleTapDetector = createDoubleTapDetector();
+        
+        textAreaPointerHandler = (e) => {
+            if (doubleTapDetector.isDoubleTap(e.clientX, e.clientY)) {
+                randomizeNoteKeys();
+                if (window.playRetroClick) {
+                    try { window.playRetroClick(); } catch (err) {}
+                }
+            }
+        };
+        
+        noteTextArea.addEventListener('pointerdown', textAreaPointerHandler);
+        
+        // Desktop keyboard input handler - use capture phase to catch events earlier
+        desktopKeyboardHandler = (e) => {
+            // Only handle keyboard if note tab is active
+            const noteContent = document.getElementById('note-content');
+            if (!noteContent || !noteContent.classList.contains('active')) {
+                return;
+            }
+            
+            // Blur any focused element to prevent spacebar from activating buttons
+            if (e.key === ' ' || e.key === 'Spacebar') {
+                if (document.activeElement && document.activeElement !== document.body) {
+                    document.activeElement.blur();
+                }
+            }
+            
+            try {
+                handleDesktopKeyboard(e);
+            } catch (error) {
+                console.error('Error in desktop keyboard handler:', error);
+            }
+        };
+        
+        // Use capture phase (true) to catch events before they can be stopped by other handlers
+        document.addEventListener('keydown', desktopKeyboardHandler, true);
+        
+        // Handle window resize
+        resizeHandler = () => {
+            calculateMaxCharacters();
+            updateNoteDisplay();
+        };
+        
+        window.addEventListener('resize', resizeHandler);
+        
+        noteListenersAttached = true;
+    }
 }
 
 function calculateMaxCharacters() {
@@ -195,21 +230,25 @@ function handleKeyPress(key, button = null) {
 }
 
 function handleDesktopKeyboard(e) {
-    // Tab check is now done in the handler wrapper, so this is safe to call
+    // Only handle keyboard if note tab is active
+    const noteContent = document.getElementById('note-content');
+    if (!noteContent || !noteContent.classList.contains('active')) return;
     
-    // Prevent default behavior
-    e.preventDefault();
+    // Only prevent default for keys we actually handle
+    const handledKeys = ['Backspace', 'Delete', ' ', 'Spacebar', '.'];
+    const isLetter = e.key.length === 1 && /^[A-Z]$/i.test(e.key);
     
-    if (e.key === 'Backspace' || e.key === 'Delete') {
-        handleKeyPress('⌫');
-    } else if (e.key === ' ' || e.key === 'Spacebar') {
-        handleKeyPress(' ');
-    } else if (e.key === '.') {
-        handleKeyPress('.');
-    } else if (e.key.length === 1) {
-        // Convert to uppercase and check if it's a letter
-        const upperKey = e.key.toUpperCase();
-        if (/^[A-Z]$/.test(upperKey)) {
+    if (handledKeys.includes(e.key) || isLetter) {
+        e.preventDefault();
+        
+        if (e.key === 'Backspace' || e.key === 'Delete') {
+            handleKeyPress('⌫');
+        } else if (e.key === ' ' || e.key === 'Spacebar') {
+            handleKeyPress(' ');
+        } else if (e.key === '.') {
+            handleKeyPress('.');
+        } else if (isLetter) {
+            const upperKey = e.key.toUpperCase();
             handleKeyPress(upperKey);
         }
     }
@@ -358,8 +397,36 @@ function randomizeNoteKeys() {
 
 // Cleanup function to remove event listener
 window.cleanupNote = function() {
+    const noteTextArea = document.getElementById('noteTextArea');
+    
+    // Remove all event listeners
     if (desktopKeyboardHandler) {
         document.removeEventListener('keydown', desktopKeyboardHandler);
         desktopKeyboardHandler = null;
     }
+    
+    if (noteTextArea) {
+        if (textAreaClickHandler) {
+            noteTextArea.removeEventListener('click', textAreaClickHandler);
+        }
+        if (textAreaTouchHandler) {
+            noteTextArea.removeEventListener('touchend', textAreaTouchHandler);
+        }
+        if (textAreaPointerHandler) {
+            noteTextArea.removeEventListener('pointerdown', textAreaPointerHandler);
+        }
+    }
+    
+    if (resizeHandler) {
+        window.removeEventListener('resize', resizeHandler);
+        resizeHandler = null;
+    }
+    
+    // Clear handler references
+    textAreaClickHandler = null;
+    textAreaTouchHandler = null;
+    textAreaPointerHandler = null;
+    
+    // Reset flag so listeners can be re-attached when returning to tab
+    noteListenersAttached = false;
 };

@@ -69,11 +69,14 @@
     // Double tap detector
     const doubleTapDetector = createDoubleTapDetector({ timeout: 300 });
 
-    // Audio context for sounds (shared with bonk)
-    let audioContext = null;
+    // Audio context for sounds (shared)
     let collisionBuffers = {};
     let activeSources = [];
     const MAX_ACTIVE_SOUNDS = 20;
+    
+    // Audio loading state
+    let audioLoaded = false;
+    let audioLoading = false;
     
     // Event listener references for cleanup
     let keyDownHandler = null;
@@ -81,9 +84,8 @@
     let mouseMoveHandler = null;
     let touchMoveHandler = null;
     let pointerDownHandler = null;
-    let resizeHandler = null;
-
-    // Helper functions removed - now using shared utilities from utils.js
+    let bumpResizeHandler = null; // Unique name to avoid conflicts
+    let listenersAttached = false; // Track if event listeners are currently attached
 
     // Generate pixel pattern for dithered rectangle
     function generateRectPattern(width, height, color) {
@@ -275,7 +277,7 @@
     // Initialize game
     function initGame() {
         if (!canvas) {
-            console.error('BRKR canvas element not found');
+            console.error('BUMP canvas element not found');
             return;
         }
 
@@ -336,7 +338,7 @@
             }
         };
         
-        resizeHandler = () => {
+        bumpResizeHandler = () => {
             try {
                 handleResize();
             } catch (error) {
@@ -351,12 +353,14 @@
         canvas.addEventListener('touchmove', touchMoveHandler, { passive: false });
         canvas.addEventListener('pointerdown', pointerDownHandler, { passive: false });
         
-        window.addEventListener('resize', resizeHandler);
+        window.addEventListener('resize', bumpResizeHandler);
+        
+        listenersAttached = true;
         
         // Set up speed slider
         initSpeedSlider();
         
-        console.log('BRKR game initialized');
+        console.log('BUMP game initialized');
     }
 
     // Resize canvas
@@ -485,7 +489,10 @@
             render();
         }
         
-        requestAnimationFrame(gameLoop);
+        // Only schedule next frame if still running
+        if (gameState.gameRunning) {
+            requestAnimationFrame(gameLoop);
+        }
     }
 
     // Update game state
@@ -785,83 +792,58 @@
 
     // Audio functions
     function initAudio() {
-        if (audioContext) return;
-        
-        try {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            
-            const soundFiles = ['bonk.wav'];
-            
-            const loadAudioFile = async (file) => {
-                try {
-                    const response = await fetch(`sounds/${file}`);
-                    if (!response.ok) {
-                        throw new Error(`Failed to fetch ${file}: ${response.statusText}`);
-                    }
-                    const arrayBuffer = await response.arrayBuffer();
-                    const audioData = await audioContext.decodeAudioData(arrayBuffer);
-                    collisionBuffers[file] = audioData;
-                } catch (error) {
-                    console.error(`Error loading audio file ${file}:`, error);
-                }
-            };
-            
-            Promise.all(soundFiles.map(loadAudioFile));
-        } catch (error) {
-            console.error('Error initializing audio context:', error);
-        }
+        // Audio loading will happen on demand when needed
+        // Using shared AudioContext from utils.js
     }
 
     function playCollisionSound() {
-        if (window.isMuted || !audioContext || Object.keys(collisionBuffers).length === 0) {
+        if (window.isMuted || Object.keys(collisionBuffers).length === 0) {
             return;
         }
         
         // Resume AudioContext if suspended (required for browsers)
-        if (audioContext.state === 'suspended') {
-            audioContext.resume();
-        }
+        window.resumeSharedAudioContext();
         
         try {
             const soundFiles = Object.keys(collisionBuffers);
             const randomIndex = Math.floor(Math.random() * soundFiles.length);
             const randomSoundFile = soundFiles[randomIndex];
             
-            const source = audioContext.createBufferSource();
-            source.buffer = collisionBuffers[randomSoundFile];
+            // Use shared audio utility
+            const audioNodes = window.playAudioBuffer(
+                collisionBuffers[randomSoundFile],
+                0.3
+            );
             
-            const gainNode = audioContext.createGain();
-            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-            
-            source.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            source.start();
-            
-            // Cleanup on end to prevent memory leak
-            source.onended = () => {
-                try {
-                    source.disconnect();
-                    gainNode.disconnect();
-                    // Remove from active sources array
-                    const index = activeSources.findIndex(s => s.source === source);
-                    if (index !== -1) {
-                        activeSources.splice(index, 1);
+            if (audioNodes) {
+                const { source, gainNode } = audioNodes;
+                
+                // Cleanup on end to prevent memory leak
+                source.onended = () => {
+                    try {
+                        source.disconnect();
+                        gainNode.disconnect();
+                        // Remove from active sources array
+                        const index = activeSources.findIndex(s => s.source === source);
+                        if (index !== -1) {
+                            activeSources.splice(index, 1);
+                        }
+                    } catch (e) {
+                        // Ignore disconnect errors
                     }
-                } catch (e) {
-                    // Ignore disconnect errors
-                }
-            };
-            
-            activeSources.push({ source, gainNode });
-            
-            if (activeSources.length > MAX_ACTIVE_SOUNDS) {
-                const oldest = activeSources.shift();
-                try {
-                    oldest.source.stop();
-                    oldest.source.disconnect();
-                    oldest.gainNode.disconnect();
-                } catch (e) {
-                    // Ignore stop/disconnect errors
+                };
+                
+                activeSources.push({ source, gainNode });
+                
+                if (activeSources.length > MAX_ACTIVE_SOUNDS) {
+                    const oldest = activeSources.shift();
+                    try {
+                        oldest.source.stop();
+                        oldest.source.disconnect();
+                        oldest.gainNode.disconnect();
+                    } catch (e) {
+                        // Ignore stop/disconnect errors
+                    }
                 }
             }
         } catch (error) {
@@ -950,37 +932,46 @@
         getConfig: function() {
             return CONFIG;
         },
+        isAudioLoaded: function() {
+            return audioLoaded;
+        },
+        isAudioLoading: function() {
+            return audioLoading;
+        },
         cleanup: function() {
             // Stop game
             gameState.gameRunning = false;
             gameState.gamePaused = true;
             
-            // Remove event listeners
-            if (keyDownHandler) {
-                document.removeEventListener('keydown', keyDownHandler);
-                keyDownHandler = null;
-            }
-            if (keyUpHandler) {
-                document.removeEventListener('keyup', keyUpHandler);
-                keyUpHandler = null;
-            }
-            if (canvas) {
-                if (mouseMoveHandler) {
-                    canvas.removeEventListener('mousemove', mouseMoveHandler);
-                    mouseMoveHandler = null;
+            // Remove event listeners only if they were attached
+            if (listenersAttached) {
+                if (keyDownHandler) {
+                    document.removeEventListener('keydown', keyDownHandler);
+                    keyDownHandler = null;
                 }
-                if (touchMoveHandler) {
-                    canvas.removeEventListener('touchmove', touchMoveHandler);
-                    touchMoveHandler = null;
+                if (keyUpHandler) {
+                    document.removeEventListener('keyup', keyUpHandler);
+                    keyUpHandler = null;
                 }
-                if (pointerDownHandler) {
-                    canvas.removeEventListener('pointerdown', pointerDownHandler);
-                    pointerDownHandler = null;
+                if (canvas) {
+                    if (mouseMoveHandler) {
+                        canvas.removeEventListener('mousemove', mouseMoveHandler);
+                        mouseMoveHandler = null;
+                    }
+                    if (touchMoveHandler) {
+                        canvas.removeEventListener('touchmove', touchMoveHandler);
+                        touchMoveHandler = null;
+                    }
+                    if (pointerDownHandler) {
+                        canvas.removeEventListener('pointerdown', pointerDownHandler);
+                        pointerDownHandler = null;
+                    }
                 }
-            }
-            if (resizeHandler) {
-                window.removeEventListener('resize', resizeHandler);
-                resizeHandler = null;
+                if (bumpResizeHandler) {
+                    window.removeEventListener('resize', bumpResizeHandler);
+                    bumpResizeHandler = null;
+                }
+                listenersAttached = false;
             }
             
             // Clean up timers
@@ -1001,16 +992,34 @@
             });
             activeSources = [];
             
-            // Close AudioContext
-            if (audioContext) {
-                try {
-                    audioContext.close();
-                } catch (e) {
-                    console.error('Error closing AudioContext:', e);
-                }
-                audioContext = null;
-                collisionBuffers = {};
-            }
+            // Clear collision buffers (but don't close shared AudioContext)
+            collisionBuffers = {};
         }
     };
+    
+    // Load audio files when module loads
+    (async function() {
+        audioLoading = true;
+        try {
+            const soundFiles = ['bonk.wav'];
+            
+            const loadAudioFile = async (file) => {
+                try {
+                    const audioBuffer = await window.loadAudioBuffer(file);
+                    collisionBuffers[file] = audioBuffer;
+                    console.log(`Bump: Audio file ${file} loaded successfully`);
+                } catch (error) {
+                    console.error(`Bump: Error loading audio file ${file}:`, error);
+                }
+            };
+            
+            await Promise.all(soundFiles.map(loadAudioFile));
+            audioLoaded = true;
+            console.log('Bump audio loading complete');
+        } catch (error) {
+            console.error('Bump: Error initializing audio:', error);
+        } finally {
+            audioLoading = false;
+        }
+    })();
 })();

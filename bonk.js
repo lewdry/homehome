@@ -187,8 +187,6 @@ function ensureCanvasSize() {
             }
         }
     }
-    
-    // Removed hexToRgb and getDarkerShade - now using shared utilities from utils.js
 
     checkCollision(other) {
         const dx = this.x - other.x;
@@ -270,60 +268,55 @@ function ensureCanvasSize() {
             }
 
             // Resume AudioContext if suspended (required for browsers)
-            if (audioContext && audioContext.state === 'suspended') {
-                audioContext.resume();
-            }
+            window.resumeSharedAudioContext();
 
             try {
                 const soundFiles = Object.keys(collisionBuffers);
                 const randomIndex = Math.floor(Math.random() * soundFiles.length);
                 const randomSoundFile = soundFiles[randomIndex];
 
-                // Create audio source and gain node
-                const source = audioContext.createBufferSource();
-                source.buffer = collisionBuffers[randomSoundFile];
-
-                const gainNode = audioContext.createGain();
-                
                 // Calculate volume based on collision speed
                 const normalizedSpeed = (collisionSpeed - minSpeed) / (maxSpeed - minSpeed);
                 const volume = minVolume + (maxVolume - minVolume) * normalizedSpeed;
                 const clampedVolume = Math.min(Math.max(volume, minVolume), maxVolume);
                 
-                gainNode.gain.setValueAtTime(clampedVolume, audioContext.currentTime);
-
-                // Connect and play
-                source.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                source.start();
-
-                // Cleanup on end to prevent memory leak
-                source.onended = () => {
-                    try {
-                        source.disconnect();
-                        gainNode.disconnect();
-                        // Remove from active sources array
-                        const index = activeSources.findIndex(s => s.source === source);
-                        if (index !== -1) {
-                            activeSources.splice(index, 1);
+                // Use shared audio utility
+                const audioNodes = window.playAudioBuffer(
+                    collisionBuffers[randomSoundFile], 
+                    clampedVolume
+                );
+                
+                if (audioNodes) {
+                    const { source, gainNode } = audioNodes;
+                    
+                    // Cleanup on end to prevent memory leak
+                    source.onended = () => {
+                        try {
+                            source.disconnect();
+                            gainNode.disconnect();
+                            // Remove from active sources array
+                            const index = activeSources.findIndex(s => s.source === source);
+                            if (index !== -1) {
+                                activeSources.splice(index, 1);
+                            }
+                        } catch (e) {
+                            // Ignore disconnect errors
                         }
-                    } catch (e) {
-                        // Ignore disconnect errors
-                    }
-                };
+                    };
 
-                // Track active sources
-                activeSources.push({ source, gainNode });
+                    // Track active sources
+                    activeSources.push({ source, gainNode });
 
-                // Clean up old sources if too many
-                if (activeSources.length > MAX_ACTIVE_SOUNDS) {
-                    const oldest = activeSources.shift();
-                    try {
-                        oldest.source.stop();
-                        oldest.source.disconnect();
-                        oldest.gainNode.disconnect();
-                    } catch (e) {
-                        // Ignore stop/disconnect errors
+                    // Clean up old sources if too many
+                    if (activeSources.length > MAX_ACTIVE_SOUNDS) {
+                        const oldest = activeSources.shift();
+                        try {
+                            oldest.source.stop();
+                            oldest.source.disconnect();
+                            oldest.gainNode.disconnect();
+                        } catch (e) {
+                            // Ignore stop/disconnect errors
+                        }
                     }
                 }
 
@@ -395,15 +388,19 @@ function ensureCanvasSize() {
     let allBallsStopped = false;
     let lastStopTime = 0;
     let activeSources = []; // Array to keep track of active audio sources
-    let audioContext;
     let collisionBuffers = {};
     let lastHiddenTime = 0;
     let lastTime = 0;
     let lastGrabbedPos = null;
-    let resizeHandler = null; // Store reference for cleanup
-    let visibilityHandler = null; // Store reference for cleanup
+    let bonkResizeHandler = null; // Store reference for cleanup - unique name
+    let bonkVisibilityHandler = null; // Store reference for cleanup - unique name
+    let listenersAttached = false; // Track if event listeners are currently attached
     const doubleTapDetector = createDoubleTapDetector({ timeout: 300 });
     const PAUSE_RESUME_DELAY = 500; // 0.5s delay when resuming
+    
+    // Audio loading state
+    let audioLoaded = false;
+    let audioLoading = false;
 
     function initGame() {
         if (!canvas) {
@@ -446,17 +443,8 @@ function ensureCanvasSize() {
         } else {
             gameRunning = true;
         }
-        requestAnimationFrame(gameLoop);
-    }
-
-    function resumeAudioContext() {
-        if (audioContext && audioContext.state === 'suspended') {
-            audioContext.resume().then(() => {
-                console.log('AudioContext resumed successfully');
-            }).catch(error => {
-                console.error('Failed to resume AudioContext:', error);
-            });
-        }
+        
+        // Don't start the game loop here - wait for start() to be called
     }
 
     // Handle window resizing
@@ -482,8 +470,8 @@ function ensureCanvasSize() {
     }
 
     // Store handlers for cleanup
-    resizeHandler = handleResize;
-    visibilityHandler = handleVisibilityChange;
+    bonkResizeHandler = handleResize;
+    bonkVisibilityHandler = handleVisibilityChange;
 
     function handleVisibilityChange() {
         if (document.hidden) {
@@ -492,7 +480,7 @@ function ensureCanvasSize() {
             if (Date.now() - lastHiddenTime > HIDDEN_THRESHOLD) {
                 resetGame();
             } else {
-                resumeAudioContext();
+                window.resumeSharedAudioContext();
                 if (!gameRunning) {
                     gameRunning = true;
                     requestAnimationFrame(gameLoop);
@@ -530,6 +518,7 @@ function ensureCanvasSize() {
         }
         
         if (gamePaused) {
+            // Still schedule next frame when paused, but don't update game state
             requestAnimationFrame(gameLoop);
             return;
         }
@@ -587,7 +576,10 @@ function ensureCanvasSize() {
             lastTime = currentTime;
         }
 
-        requestAnimationFrame(gameLoop);
+        // Only schedule next frame if still running
+        if (gameRunning && bonkStarted) {
+            requestAnimationFrame(gameLoop);
+        }
     }
 
         function getEventPos(event) {
@@ -681,15 +673,17 @@ function ensureCanvasSize() {
             bonkStarted = true;
             if (!gameRunning) {
                 gameRunning = true;
+                requestAnimationFrame(gameLoop);
             }
-            // Set up event listeners when game starts
-            if (resizeHandler && !window.bonkResizeListenerAdded) {
-                window.addEventListener('resize', resizeHandler);
-                window.bonkResizeListenerAdded = true;
-            }
-            if (visibilityHandler && !window.bonkVisibilityListenerAdded) {
-                document.addEventListener('visibilitychange', visibilityHandler);
-                window.bonkVisibilityListenerAdded = true;
+            // Attach event listeners only once when game starts
+            if (!listenersAttached) {
+                if (bonkResizeHandler) {
+                    window.addEventListener('resize', bonkResizeHandler);
+                }
+                if (bonkVisibilityHandler) {
+                    document.addEventListener('visibilitychange', bonkVisibilityHandler);
+                }
+                listenersAttached = true;
             }
         },
         stop: function() {
@@ -722,6 +716,12 @@ function ensureCanvasSize() {
         hasStarted: function() {
             return bonkStarted;
         },
+        isAudioLoaded: function() {
+            return audioLoaded;
+        },
+        isAudioLoading: function() {
+            return audioLoading;
+        },
         cleanup: function() {
             // Stop game
             gameRunning = false;
@@ -736,13 +736,14 @@ function ensureCanvasSize() {
             }
             
             // Remove window event listeners
-            if (resizeHandler && window.bonkResizeListenerAdded) {
-                window.removeEventListener('resize', resizeHandler);
-                window.bonkResizeListenerAdded = false;
-            }
-            if (visibilityHandler && window.bonkVisibilityListenerAdded) {
-                document.removeEventListener('visibilitychange', visibilityHandler);
-                window.bonkVisibilityListenerAdded = false;
+            if (listenersAttached) {
+                if (bonkResizeHandler) {
+                    window.removeEventListener('resize', bonkResizeHandler);
+                }
+                if (bonkVisibilityHandler) {
+                    document.removeEventListener('visibilitychange', bonkVisibilityHandler);
+                }
+                listenersAttached = false;
             }
             
             // Clean up timers
@@ -763,35 +764,21 @@ function ensureCanvasSize() {
             });
             activeSources = [];
             
-            // Close AudioContext
-            if (audioContext) {
-                try {
-                    audioContext.close();
-                } catch (e) {
-                    console.error('Error closing AudioContext:', e);
-                }
-                audioContext = null;
-                collisionBuffers = {};
-            }
+            // Clear collision buffers (but don't close shared AudioContext)
+            collisionBuffers = {};
         }
     };
 
     // Initialize audio on page load
     document.addEventListener('DOMContentLoaded', async (event) => {
+        audioLoading = true;
         try {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
             const soundFiles = ['bonk.wav'];
 
             const loadAudioFile = async (file) => {
                 try {
-                    const response = await fetch(`sounds/${file}`);
-                    if (!response.ok) {
-                        throw new Error(`Failed to fetch ${file}: ${response.statusText}`);
-                    }
-                    const arrayBuffer = await response.arrayBuffer();
-                    const audioData = await audioContext.decodeAudioData(arrayBuffer);
-                    collisionBuffers[file] = audioData;
+                    const audioBuffer = await window.loadAudioBuffer(file);
+                    collisionBuffers[file] = audioBuffer;
                     console.log(`Audio file ${file} loaded successfully`);
                 } catch (error) {
                     console.error(`Error loading audio file ${file}:`, error);
@@ -799,15 +786,15 @@ function ensureCanvasSize() {
             };
 
             await Promise.all(soundFiles.map(loadAudioFile));
+            audioLoaded = true;
+            console.log('Bonk audio loading complete');
 
-            // Set up visibility change listener after audio is loaded
-            if (visibilityHandler) {
-                document.addEventListener('visibilitychange', visibilityHandler);
-                window.bonkVisibilityListenerAdded = true;
-            }
+            // Note: Don't set up visibility listener here - it's set up in start()
 
         } catch (error) {
-            console.error('Error initializing audio context:', error);
+            console.error('Error initializing audio:', error);
+        } finally {
+            audioLoading = false;
         }
     });
 })();

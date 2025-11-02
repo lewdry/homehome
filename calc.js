@@ -17,29 +17,47 @@ let calcButtons;
 let calcKeysRandomized = false;
 const originalCalcNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
+// Event listener references for cleanup
+let buttonClickHandlers = new Map();
+let buttonTouchHandlers = new Map();
+let doubleTapHandler = null;
+let doubleTapDetector = null;
+let calcInitialized = false;
+
 // Initialize calculator when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
+    initCalculator();
+});
+
+function initCalculator() {
+    if (calcInitialized) return;
+    calcInitialized = true;
+    
     equationDisplay = document.getElementById('calc-equation');
     resultDisplay = document.getElementById('calc-result');
     calcButtons = document.querySelectorAll('.calc-btn');
 
     // Add event listeners to all calculator buttons
     calcButtons.forEach(button => {
-        // Support both click and touch events
-        button.addEventListener('click', handleButtonClick);
-        
-        // Prevent double-tap zoom on mobile
-        button.addEventListener('touchend', (e) => {
+        // Create handler references for cleanup
+        const clickHandler = (e) => handleButtonClick.call(button, e);
+        const touchHandler = (e) => {
             e.preventDefault();
             handleButtonClick.call(button, e);
-        }, { passive: false });
+        };
+        
+        buttonClickHandlers.set(button, clickHandler);
+        buttonTouchHandlers.set(button, touchHandler);
+        
+        button.addEventListener('click', clickHandler);
+        button.addEventListener('touchend', touchHandler, { passive: false });
     });
 
     // Double-tap detector for randomization easter egg
-    const doubleTapDetector = createDoubleTapDetector();
+    doubleTapDetector = createDoubleTapDetector();
     const calcContent = document.getElementById('calc-content');
     
-    calcContent.addEventListener('pointerdown', (e) => {
+    doubleTapHandler = (e) => {
         // Only trigger on blank space (not on buttons)
         if (e.target.classList.contains('calc-btn') || e.target.closest('.calc-btn')) {
             return;
@@ -51,11 +69,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 try { window.playRetroClick(); } catch (err) {}
             }
         }
-    });
+    };
+    
+    calcContent.addEventListener('pointerdown', doubleTapHandler);
 
     // Update display on load
     updateDisplay();
-});
+}
 
 function handleButtonClick(event) {
     const button = event.target.closest('.calc-btn');
@@ -251,3 +271,32 @@ function randomizeCalcKeys() {
         calcKeysRandomized = true;
     }
 }
+
+// Cleanup function to remove event listeners
+window.cleanupCalculator = function() {
+    // Remove button event listeners
+    if (calcButtons) {
+        calcButtons.forEach(button => {
+            const clickHandler = buttonClickHandlers.get(button);
+            const touchHandler = buttonTouchHandlers.get(button);
+            
+            if (clickHandler) {
+                button.removeEventListener('click', clickHandler);
+            }
+            if (touchHandler) {
+                button.removeEventListener('touchend', touchHandler);
+            }
+        });
+    }
+    
+    // Remove double-tap listener
+    const calcContent = document.getElementById('calc-content');
+    if (calcContent && doubleTapHandler) {
+        calcContent.removeEventListener('pointerdown', doubleTapHandler);
+    }
+    
+    // Clear handler maps
+    buttonClickHandlers.clear();
+    buttonTouchHandlers.clear();
+    doubleTapHandler = null;
+};

@@ -12,7 +12,7 @@
     let drawInitialized = false;
     let drawCanvas = null;
     let drawCtx = null;
-    let resizeHandler = null; // Store reference for cleanup
+    let drawResizeHandler = null; // Unique name for draw's resize handler
 
 // Helper to check if drawing is allowed
 function isDrawingAllowed() {
@@ -50,7 +50,7 @@ function initDrawing() {
     resizeDrawCanvas();
 
     // Create resize handler and store reference for cleanup
-    resizeHandler = () => {
+    drawResizeHandler = () => {
         try {
             resizeDrawCanvas();
         } catch (error) {
@@ -59,7 +59,7 @@ function initDrawing() {
     };
     
     // Resize canvas when the window is resized
-    window.addEventListener('resize', resizeHandler);
+    window.addEventListener('resize', drawResizeHandler);
 
     // Event listeners - mouse events
     drawCanvas.addEventListener('mousedown', handleDrawStart, { passive: false });
@@ -228,8 +228,6 @@ function handleDrawDoubleTap(evt) {
     }
 }
 
-// Helper functions removed - now using shared utilities from utils.js
-
 function drawLine(x1, y1, x2, y2, colour) {
     // Calculate the two colors for dithering
     const rgb = hexToRgb(colour);
@@ -317,9 +315,9 @@ function cleanupTouches() {
     // Expose cleanup function for when leaving draw tab
     window.cleanupDrawing = function() {
         // Remove resize listener
-        if (resizeHandler) {
-            window.removeEventListener('resize', resizeHandler);
-            resizeHandler = null;
+        if (drawResizeHandler) {
+            window.removeEventListener('resize', drawResizeHandler);
+            drawResizeHandler = null;
         }
         
         // Remove canvas event listeners

@@ -124,29 +124,48 @@ function createDoubleTapDetector(options = {}) {
 }
 
 
+// Shared AudioContext for the entire application
+// This prevents hitting browser limits (usually 6 AudioContexts max)
+;(function() {
+    let sharedAudioContext = null;
+    
+    // Get or create the shared AudioContext
+    function getSharedAudioContext() {
+        if (!sharedAudioContext) {
+            const Ctx = window.AudioContext || window.webkitAudioContext;
+            if (!Ctx) return null;
+            sharedAudioContext = new Ctx();
+        }
+        return sharedAudioContext;
+    }
+    
+    // Expose shared AudioContext globally
+    window.getSharedAudioContext = getSharedAudioContext;
+    
+    // Resume AudioContext if suspended (required for browsers)
+    window.resumeSharedAudioContext = function() {
+        const ctx = getSharedAudioContext();
+        if (ctx && ctx.state === 'suspended') {
+            return ctx.resume();
+        }
+        return Promise.resolve();
+    };
+})();
+
 // Retro click sound implementation that prefers an external CC0 file (`/sounds/click.wav`)
 // and falls back to a small synthesized click if the file is unavailable.
 ;(function() {
-    let audioCtx = null;
     let externalBuffer = null; // AudioBuffer for sounds/click.wav if loaded
     let loadingPromise = null; // Track the loading promise
 
     function getAudioContext() {
-        if (!audioCtx) {
-            const Ctx = window.AudioContext || window.webkitAudioContext;
-            if (!Ctx) return null;
-            audioCtx = new Ctx();
-        }
-        return audioCtx;
+        return window.getSharedAudioContext();
     }
 
     // Synth fallback (kept small and quiet) ---------------------------------
     function playSynthClick() {
         const ctx = getAudioContext();
         if (!ctx) return;
-        if (ctx.state === 'suspended' && typeof ctx.resume === 'function') {
-            ctx.resume().catch(() => {});
-        }
 
         const now = ctx.currentTime;
         const osc = ctx.createOscillator();
@@ -182,9 +201,6 @@ function createDoubleTapDetector(options = {}) {
     function playBufferClick() {
         const ctx = getAudioContext();
         if (!ctx || !externalBuffer) return false;
-        if (ctx.state === 'suspended' && typeof ctx.resume === 'function') {
-            ctx.resume().catch(() => {});
-        }
 
         const src = ctx.createBufferSource();
         src.buffer = externalBuffer;
@@ -218,6 +234,15 @@ function createDoubleTapDetector(options = {}) {
             }
         }
         
+        // Wait for loading to complete if still in progress
+        if (loadingPromise) {
+            try {
+                await loadingPromise;
+            } catch (e) {
+                // Loading failed, fall through to synth
+            }
+        }
+        
         if (externalBuffer) {
             // If buffer has been loaded, play it
             try {
@@ -226,7 +251,7 @@ function createDoubleTapDetector(options = {}) {
                 // fall through to synth
             }
         }
-        // If still loading or not available, play synth immediately (no waiting)
+        // If not available, play synth
         playSynthClick();
     }
 
@@ -261,4 +286,289 @@ function createDoubleTapDetector(options = {}) {
     } catch (e) {
         // ignore
     }
+})();
+
+// Shared audio loading utility for game sound effects
+;(function() {
+    // Load and decode an audio file, returning an AudioBuffer
+    window.loadAudioBuffer = async function(filename) {
+        const ctx = window.getSharedAudioContext();
+        if (!ctx) {
+            throw new Error('AudioContext not available');
+        }
+        
+        try {
+            const response = await fetch(`sounds/${filename}`, {cache: 'no-cache'});
+            if (!response.ok) {
+                throw new Error(`Failed to fetch ${filename}: ${response.statusText}`);
+            }
+            const arrayBuffer = await response.arrayBuffer();
+            const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+            return audioBuffer;
+        } catch (error) {
+            console.error(`Error loading audio file ${filename}:`, error);
+            throw error;
+        }
+    };
+    
+    // Play an AudioBuffer with optional volume control
+    window.playAudioBuffer = function(buffer, volume = 1.0) {
+        const ctx = window.getSharedAudioContext();
+        if (!ctx || !buffer || window.isMuted) return null;
+        
+        // Resume AudioContext if suspended
+        if (ctx.state === 'suspended') {
+            ctx.resume();
+        }
+        
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        
+        const gainNode = ctx.createGain();
+        gainNode.gain.setValueAtTime(volume, ctx.currentTime);
+        
+        source.connect(gainNode);
+        gainNode.connect(ctx.destination);
+        source.start();
+        
+        return { source, gainNode };
+    };
+})();
+
+// Shared collision sound player for games
+// Manages sound pool and prevents too many simultaneous sounds
+;(function() {
+    const MAX_ACTIVE_SOUNDS = 20;
+    let activeSources = [];
+    
+    /**
+     * Play a random collision sound from a buffer collection
+     * @param {Object} collisionBuffers - Object with sound file names as keys and AudioBuffers as values
+     * @param {number} volume - Volume level (0.0 to 1.0)
+     * @param {number} minSpeed - Minimum collision speed
+     * @param {number} collisionSpeed - Actual collision speed
+     * @param {number} maxSpeed - Maximum collision speed for normalization
+     * @param {number} minVolume - Minimum volume
+     * @param {number} maxVolume - Maximum volume
+     * @returns {boolean} - True if sound was played
+     */
+    window.playCollisionSound = function(collisionBuffers, {
+        volume = 0.3,
+        minSpeed = 0,
+        collisionSpeed = 0,
+        maxSpeed = 30,
+        minVolume = 0.1,
+        maxVolume = 0.4
+    } = {}) {
+        if (window.isMuted || Object.keys(collisionBuffers).length === 0) {
+            return false;
+        }
+        
+        // Resume AudioContext if suspended
+        window.resumeSharedAudioContext();
+        
+        try {
+            const soundFiles = Object.keys(collisionBuffers);
+            const randomIndex = Math.floor(Math.random() * soundFiles.length);
+            const randomSoundFile = soundFiles[randomIndex];
+            
+            // Calculate volume based on collision speed if provided
+            let finalVolume = volume;
+            if (collisionSpeed > minSpeed) {
+                const normalizedSpeed = (collisionSpeed - minSpeed) / (maxSpeed - minSpeed);
+                finalVolume = minVolume + (maxVolume - minVolume) * normalizedSpeed;
+                finalVolume = Math.min(Math.max(finalVolume, minVolume), maxVolume);
+            }
+            
+            const audioNodes = window.playAudioBuffer(
+                collisionBuffers[randomSoundFile],
+                finalVolume
+            );
+            
+            if (audioNodes) {
+                const { source, gainNode } = audioNodes;
+                
+                // Cleanup on end to prevent memory leak
+                source.onended = () => {
+                    try {
+                        source.disconnect();
+                        gainNode.disconnect();
+                        const index = activeSources.findIndex(s => s.source === source);
+                        if (index !== -1) {
+                            activeSources.splice(index, 1);
+                        }
+                    } catch (e) {
+                        // Ignore disconnect errors
+                    }
+                };
+                
+                activeSources.push({ source, gainNode });
+                
+                // Clean up oldest sounds if too many active
+                if (activeSources.length > MAX_ACTIVE_SOUNDS) {
+                    const oldest = activeSources.shift();
+                    try {
+                        oldest.source.stop();
+                        oldest.source.disconnect();
+                        oldest.gainNode.disconnect();
+                    } catch (e) {
+                        // Ignore stop/disconnect errors
+                    }
+                }
+                
+                return true;
+            }
+        } catch (error) {
+            console.error("Error playing collision sound:", error);
+        }
+        
+        return false;
+    };
+    
+    // Cleanup all active sounds
+    window.cleanupCollisionSounds = function() {
+        activeSources.forEach(({ source, gainNode }) => {
+            try {
+                source.stop();
+                source.disconnect();
+                gainNode.disconnect();
+            } catch (e) {
+                // Ignore errors
+            }
+        });
+        activeSources = [];
+    };
+})();
+
+// Shared canvas initialization utility
+;(function() {
+    /**
+     * Initialize a canvas with error handling
+     * @param {string} canvasId - ID of the canvas element
+     * @returns {Object|null} - { canvas, ctx } or null on error
+     */
+    window.initCanvasElement = function(canvasId) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) {
+            console.error(`Canvas element '${canvasId}' not found`);
+            return null;
+        }
+        
+        let ctx = null;
+        try {
+            ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.error(`Could not get 2D context for canvas '${canvasId}'`);
+                return null;
+            }
+        } catch (error) {
+            console.error(`Error getting canvas context for '${canvasId}':`, error);
+            return null;
+        }
+        
+        return { canvas, ctx };
+    };
+})();
+
+// Shared dithered pattern generation utilities
+;(function() {
+    /**
+     * Generate a dithered circle pattern
+     * @param {number} radius - Circle radius
+     * @param {string} color - Base color (hex)
+     * @param {number} pixelSize - Size of each pixel (default 2)
+     * @returns {Object} - { pattern, baseColor, ditherColor }
+     */
+    window.generateDitheredCircle = function(radius, color, pixelSize = 2) {
+        const rgb = hexToRgb(color);
+        const ditherColor = getDarkerShade(rgb, 0.7);
+        
+        const minX = Math.floor(-radius / pixelSize);
+        const minY = Math.floor(-radius / pixelSize);
+        const maxX = Math.ceil(radius / pixelSize);
+        const maxY = Math.ceil(radius / pixelSize);
+        
+        const pattern = [];
+        
+        for (let gridX = minX; gridX <= maxX; gridX++) {
+            for (let gridY = minY; gridY <= maxY; gridY++) {
+                const px = gridX * pixelSize;
+                const py = gridY * pixelSize;
+                
+                const dx = px + pixelSize / 2;
+                const dy = py + pixelSize / 2;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance <= radius) {
+                    const isDithered = (gridX + gridY) % 2 === 0;
+                    pattern.push({
+                        offsetX: px,
+                        offsetY: py,
+                        isDithered: isDithered
+                    });
+                }
+            }
+        }
+        
+        return { pattern, baseColor: color, ditherColor, pixelSize };
+    };
+    
+    /**
+     * Generate a dithered rectangle pattern
+     * @param {number} width - Rectangle width
+     * @param {number} height - Rectangle height
+     * @param {string} color - Base color (hex)
+     * @param {number} pixelSize - Size of each pixel (default 2)
+     * @returns {Object} - { pattern, baseColor, ditherColor }
+     */
+    window.generateDitheredRect = function(width, height, color, pixelSize = 2) {
+        const rgb = hexToRgb(color);
+        const ditherColor = getDarkerShade(rgb, 0.7);
+        
+        const pattern = [];
+        const cols = Math.ceil(width / pixelSize);
+        const rows = Math.ceil(height / pixelSize);
+        
+        for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+                const isDithered = (row + col) % 2 === 0;
+                pattern.push({
+                    offsetX: col * pixelSize,
+                    offsetY: row * pixelSize,
+                    isDithered: isDithered
+                });
+            }
+        }
+        
+        return { pattern, baseColor: color, ditherColor, pixelSize };
+    };
+    
+    /**
+     * Draw a dithered pattern to canvas
+     * @param {CanvasRenderingContext2D} ctx - Canvas context
+     * @param {number} x - X position
+     * @param {number} y - Y position
+     * @param {Object} patternData - Pattern data from generate functions
+     */
+    window.drawDitheredPattern = function(ctx, x, y, patternData) {
+        const { pattern, baseColor, ditherColor, pixelSize } = patternData;
+        
+        // Draw base color pixels
+        ctx.fillStyle = baseColor;
+        for (let i = 0; i < pattern.length; i++) {
+            const pixel = pattern[i];
+            if (!pixel.isDithered) {
+                ctx.fillRect(x + pixel.offsetX, y + pixel.offsetY, pixelSize, pixelSize);
+            }
+        }
+        
+        // Draw dithered pixels
+        ctx.fillStyle = ditherColor;
+        for (let i = 0; i < pattern.length; i++) {
+            const pixel = pattern[i];
+            if (pixel.isDithered) {
+                ctx.fillRect(x + pixel.offsetX, y + pixel.offsetY, pixelSize, pixelSize);
+            }
+        }
+    };
 })();
