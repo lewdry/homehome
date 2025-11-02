@@ -37,7 +37,7 @@
         PADDLE_SPEED: 8,
         PADDLE_MAX_BOUNCE_ANGLE: Math.PI / 3, // 60 degrees max bounce angle
         BRICK_ROWS: 5,
-        BRICK_COLS: 7,
+        BRICK_COLS: 8,
         BRICK_HEIGHT: 30,
         BRICK_PADDING: 4,
         BRICK_OFFSET_TOP: 50,

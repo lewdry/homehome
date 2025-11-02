@@ -2168,8 +2168,6 @@
                 const currentTab = document.querySelector('.tab.active');
                 if (currentTab && currentTab.getAttribute('data-tab') === 'bonk' && tabName !== 'bonk') {
                     window.BonkGame.stop();
-                    bonkInitialized = false;
-                    bonkStarted = false;
                 }
             }
             
@@ -2221,6 +2219,9 @@
                 if (window.BonkGame) {
                     window.BonkGame.init();
                 }
+            } else if (tabName === 'bonk' && bonkInitialized && window.BonkGame) {
+                // Resume game when returning to tab
+                window.BonkGame.resume();
             }
             
             // Initialize bump game on first click
@@ -2330,8 +2331,6 @@
                 const currentTab = document.querySelector('.tab.active');
                 if (currentTab && currentTab.getAttribute('data-tab') === 'bonk') {
                     window.BonkGame.stop();
-                    bonkInitialized = false;
-                    bonkStarted = false;
                 }
             }
             
