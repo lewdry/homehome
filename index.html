@@ -314,6 +314,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 24px;
         }
 
         #drawCanvas {
@@ -1142,6 +1143,7 @@
         /* Calculator styles */
         .calculator {
             max-width: 550px;
+            max-height: 600px;
             width: 100%;
             margin: 0 auto;
             display: flex;
@@ -1152,7 +1154,7 @@
         .calc-display {
             background-color: var(--bg-base);
             border: 3px solid var(--border-color);
-            padding: 8px 12px;
+            padding: 24px 12px 8px 12px;
             min-height: 60px;
             display: flex;
             flex-direction: column;
@@ -1250,7 +1252,7 @@
             font-family: 'Courier New', 'Courier', monospace;
             font-size: 1.5em;
             font-weight: bold;
-            padding: 20px;
+            padding: 16px;
             border: 3px solid var(--border-color);
             background-color: var(--bg-surface);
             background-image: 
@@ -1592,6 +1594,10 @@
             
             .content {
                 padding: 16px;
+            }
+            
+            #calc-content.active {
+                padding: 24px 16px;
             }
 
             .tab {
