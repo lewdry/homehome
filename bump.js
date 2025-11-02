@@ -28,7 +28,7 @@
     // Game configuration - tweakable parameters
     const CONFIG = {
         BALL_RADIUS: 8,
-        BALL_SPEED_INITIAL: 3,
+        BALL_SPEED_INITIAL: 4,
         BALL_SPEED_INCREMENT: 0.0002, // Very slight speed increase per frame
         BALL_SPEED_MAX: 5,
         SPEED_MULTIPLIER: 1, // Current speed multiplier (1, 1.5, or 2)
@@ -36,9 +36,9 @@
         PADDLE_WIDTH: 80,
         PADDLE_SPEED: 8,
         PADDLE_MAX_BOUNCE_ANGLE: Math.PI / 3, // 60 degrees max bounce angle
-        BRICK_ROWS: 6,
-        BRICK_COLS: 8,
-        BRICK_HEIGHT: 20,
+        BRICK_ROWS: 5,
+        BRICK_COLS: 7,
+        BRICK_HEIGHT: 30,
         BRICK_PADDING: 4,
         BRICK_OFFSET_TOP: 50,
         BRICK_OFFSET_LEFT: 10,

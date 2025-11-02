@@ -405,7 +405,7 @@
 
         h1 {
             font-size: 1.4em;
-            margin-bottom: 10px;
+            margin-bottom: 2px;
             letter-spacing: 3px;
             background-color: #1e7bb2;
             background-image: 
@@ -1796,7 +1796,7 @@
             </p>
 
             <p>
-                Homehomehome is an imagined Web 0.1 operating system, for a time before the <span class="highlight">world wide web</span> was born.
+                Homehomehome is an imagined Web 0.1 operating system, from a time before the <span class="highlight">world wide web</span> was born.
             </p>
 
             <p class="divider">
@@ -2544,6 +2544,34 @@
                 }
             }
             
+            // Replace all hour markers with bold numbers (1-12)
+            const numbers = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+            for (let i = 0; i < 12; i++) {
+                const angle = (i * 30 - 90) * Math.PI / 180;
+                const x = Math.round(centerX + (radius - 1) * 1.8 * Math.cos(angle));
+                const y = Math.round(centerY + (radius - 1) * Math.sin(angle));
+                const num = numbers[i].toString();
+                
+                if (num.length === 1) {
+                    // Single digit numbers (1-9)
+                    if (y >= 0 && y < 21 && x >= 0 && x < 41) {
+                        grid[y][x] = { char: `<b>${num}</b>`, color: null, isBold: true };
+                    }
+                } else {
+                    // Two digit numbers (10, 11, 12)
+                    if (y >= 0 && y < 21) {
+                        // Place first digit one position to the left
+                        if (x - 1 >= 0 && x - 1 < 41) {
+                            grid[y][x - 1] = { char: `<b>${num[0]}</b>`, color: null, isBold: true };
+                        }
+                        // Place second digit at the calculated position
+                        if (x >= 0 && x < 41) {
+                            grid[y][x] = { char: `<b>${num[1]}</b>`, color: null, isBold: true };
+                        }
+                    }
+                }
+            }
+            
             // Draw center
             grid[centerY][centerX] = { char: '●', color: null };
             
@@ -2583,6 +2611,7 @@
                     if (cell.color) {
                         return `<span style="color: ${cell.color}">${cell.char}</span>`;
                     }
+                    // Bold numbers are already wrapped in <b> tags in the char property
                     return cell.char;
                 }).join('');
             }).join('\n');
