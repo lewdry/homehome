@@ -146,9 +146,10 @@ function createDoubleTapDetector(options = {}) {
     window.resumeSharedAudioContext = function() {
         const ctx = getSharedAudioContext();
         if (ctx && ctx.state === 'suspended') {
-            return ctx.resume();
+            // On mobile, resume() must be called within a user gesture.
+            // We'll trust this is the case.
+            ctx.resume();
         }
-        return Promise.resolve();
     };
 })();
 
