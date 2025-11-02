@@ -600,7 +600,7 @@ window.addEventListener('resize', () => {
             const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             ctx.fillStyle = isDarkMode ? '#839496' : '#586e75';
             // Use a monospaced Courier font for score text to match site theme
-            ctx.font = 'bold 16px "Courier New", Courier, monospace';
+            ctx.font = 'bold 14px "Courier New", Courier, monospace';
             
             const counterText = `${collisionCount} Bonks`;
             const textWidth = ctx.measureText(counterText).width;
