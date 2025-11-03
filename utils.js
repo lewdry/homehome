@@ -157,10 +157,10 @@ function createDoubleTapDetector(options = {}) {
     };
 })();
 
-// Retro click sound implementation that prefers an external CC0 file (`/sounds/click.wav`)
+// Retro click sound implementation that prefers an external CC0 file (`/sounds/click.mp3`)
 // and falls back to a small synthesized click if the file is unavailable.
 ;(function() {
-    let externalBuffer = null; // AudioBuffer for sounds/click.wav if loaded
+    let externalBuffer = null; // AudioBuffer for sounds/click.mp3 if loaded
     let loadingPromise = null; // Track the loading promise
 
     function getAudioContext() {
@@ -260,11 +260,11 @@ function createDoubleTapDetector(options = {}) {
         playSynthClick();
     }
 
-    // Try to load /sounds/click.wav asynchronously. If not found or decoding
+    // Try to load /sounds/click.mp3 asynchronously. If not found or decoding
     // fails, we silently keep the synth fallback.
     (function loadExternalClick() {
         // Use a relative path that works when the app is served from project root
-        const path = 'sounds/click.wav';
+        const path = 'sounds/click.mp3';
         const ctx = getAudioContext();
         if (!ctx) return;
 

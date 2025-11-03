@@ -773,7 +773,7 @@ function ensureCanvasSize() {
     document.addEventListener('DOMContentLoaded', async (event) => {
         audioLoading = true;
         try {
-            const soundFiles = ['bonk.wav'];
+            const soundFiles = ['G2.mp3', 'A2.mp3', 'B2.mp3', 'D3.mp3', 'E3.mp3', 'G3.mp3'];
 
             const loadAudioFile = async (file) => {
                 try {

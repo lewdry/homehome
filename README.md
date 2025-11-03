@@ -71,8 +71,13 @@ homehomehome/
 ├── note.js            # Notepad with on-screen keyboard
 ├── utils.js           # Shared utilities and sound generation
 └── sounds/
-    ├── bonk.wav       # Collision sound effect
-    └── click.wav      # UI click sound effect
+    ├── G2.mp3         # Musical collision sounds (G2, A2, B2, D3, E3, G3)
+    ├── A2.mp3         # Randomly selected for game collisions
+    ├── B2.mp3         # Basic Tape Keys instrument from Ableton
+    ├── D3.mp3
+    ├── E3.mp3
+    ├── G3.mp3
+    └── click.mp3      # UI click sound effect
 ```
 
 ## Technical Details

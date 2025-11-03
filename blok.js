@@ -717,6 +717,13 @@
         gameState.gameRunning = false;
         gameState.gamePaused = true;
         
+        // Play win or game over sound
+        if (won) {
+            playWinSound();
+        } else {
+            playGameOverSound();
+        }
+        
         // Get popup elements
         const endgamePopup = document.getElementById('blok-endgame-popup');
         const endgameTitle = document.getElementById('blok-endgame-title');
@@ -888,6 +895,52 @@
         }
     }
 
+    function playWinSound() {
+        if (window.isMuted || !collisionBuffers['G2.mp3'] || !collisionBuffers['D3.mp3']) {
+            return;
+        }
+        
+        // Resume AudioContext if suspended
+        window.resumeSharedAudioContext();
+        
+        try {
+            // Play G2
+            const audioNodes1 = window.playAudioBuffer(collisionBuffers['G2.mp3'], 0.4);
+            
+            // Play D3 after 200ms
+            setTimeout(() => {
+                if (!window.isMuted) {
+                    const audioNodes2 = window.playAudioBuffer(collisionBuffers['D3.mp3'], 0.4);
+                }
+            }, 200);
+        } catch (error) {
+            console.error("Error playing win sound:", error);
+        }
+    }
+
+    function playGameOverSound() {
+        if (window.isMuted || !collisionBuffers['D3.mp3'] || !collisionBuffers['G2.mp3']) {
+            return;
+        }
+        
+        // Resume AudioContext if suspended
+        window.resumeSharedAudioContext();
+        
+        try {
+            // Play D3
+            const audioNodes1 = window.playAudioBuffer(collisionBuffers['D3.mp3'], 0.4);
+            
+            // Play G2 after 200ms
+            setTimeout(() => {
+                if (!window.isMuted) {
+                    const audioNodes2 = window.playAudioBuffer(collisionBuffers['G2.mp3'], 0.4);
+                }
+            }, 200);
+        } catch (error) {
+            console.error("Error playing game over sound:", error);
+        }
+    }
+
     // Initialize speed slider
     function initSpeedSlider() {
         const speedSlider = document.getElementById('blok-speed-slider');
@@ -1038,7 +1091,7 @@
     (async function() {
         audioLoading = true;
         try {
-            const soundFiles = ['bonk.wav'];
+            const soundFiles = ['G2.mp3', 'A2.mp3', 'B2.mp3', 'D3.mp3', 'E3.mp3', 'G3.mp3'];
             
             const loadAudioFile = async (file) => {
                 try {
