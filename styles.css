@@ -759,7 +759,7 @@ body.force-dark .cursor {
 }
 
 .clock-popup-content {
-    padding: 32px 24px 24px 24px;
+    padding: 12px 12px 12px 12px;
 }
 
 /* Overlay for blocking interactions when clock is open */
