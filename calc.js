@@ -58,6 +58,7 @@ let buttonClickHandlers = new Map();
 let buttonTouchHandlers = new Map();
 let doubleTapHandler = null;
 let doubleTapDetector = null;
+let keyboardHandler = null;
 let calcInitialized = false;
 
 // Initialize calculator when DOM is ready
@@ -109,6 +110,10 @@ function initCalculator() {
     
     calcContent.addEventListener('pointerdown', doubleTapHandler);
 
+    // Keyboard support
+    keyboardHandler = (e) => handleKeyboardInput(e);
+    document.addEventListener('keydown', keyboardHandler);
+
     // Update display on load
     updateDisplay();
 }
@@ -137,6 +142,82 @@ function handleButtonClick(event) {
     }
 
     updateDisplay();
+}
+
+function handleKeyboardInput(event) {
+    // Only handle keyboard input when calculator tab is active
+    const calcContent = document.getElementById('calc-content');
+    if (!calcContent || !calcContent.classList.contains('active')) {
+        return;
+    }
+
+    const key = event.key;
+    
+    // Prevent default for keys we're handling
+    if (/^[0-9+\-*/=.cC]$/.test(key) || key === 'Enter' || key === 'Escape' || key === 'Backspace') {
+        event.preventDefault();
+    }
+
+    // Numbers 0-9
+    if (/^[0-9]$/.test(key)) {
+        handleNumber(key);
+        updateDisplay();
+        return;
+    }
+
+    // Decimal point
+    if (key === '.') {
+        handleDecimal();
+        updateDisplay();
+        return;
+    }
+
+    // Operators
+    if (key === '+') {
+        handleOperator('+');
+        updateDisplay();
+        return;
+    }
+    if (key === '-') {
+        handleOperator('-');
+        updateDisplay();
+        return;
+    }
+    if (key === '*') {
+        handleOperator('*');
+        updateDisplay();
+        return;
+    }
+    if (key === '/') {
+        handleOperator('/');
+        updateDisplay();
+        return;
+    }
+
+    // Equals
+    if (key === '=' || key === 'Enter') {
+        handleEquals();
+        updateDisplay();
+        return;
+    }
+
+    // Clear
+    if (key === 'c' || key === 'C' || key === 'Escape') {
+        handleClear();
+        updateDisplay();
+        return;
+    }
+
+    // Backspace - delete last character
+    if (key === 'Backspace') {
+        if (calculatorState.currentValue.length > 1) {
+            calculatorState.currentValue = calculatorState.currentValue.slice(0, -1);
+        } else {
+            calculatorState.currentValue = '0';
+        }
+        updateDisplay();
+        return;
+    }
 }
 
 function handleNumber(num) {
@@ -331,10 +412,16 @@ window.cleanupCalculator = function() {
         calcContent.removeEventListener('pointerdown', doubleTapHandler);
     }
     
+    // Remove keyboard listener
+    if (keyboardHandler) {
+        document.removeEventListener('keydown', keyboardHandler);
+    }
+    
     // Clear handler maps
     buttonClickHandlers.clear();
     buttonTouchHandlers.clear();
     doubleTapHandler = null;
+    keyboardHandler = null;
     
     // Reset initialization flag so listeners can be re-attached
     calcInitialized = false;
