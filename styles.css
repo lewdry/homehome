@@ -49,6 +49,14 @@ body {
     text-size-adjust: none;
 }
 
+/* Mobile devices: position at top instead of center to avoid Safari toolbar issues */
+@media (pointer: coarse) and (hover: none) {
+    body {
+        align-items: flex-start;
+        padding-top: 20px;
+    }
+}
+
 .container {
     width: min(600px, 100%);
     aspect-ratio: 2 / 3;
@@ -1786,15 +1794,11 @@ body.force-dark .note-text-area > div {
 @media (max-width: 640px) {
     body {
         padding: 10px;
-        /* Keep centered alignment for better visual balance */
-        align-items: center;
     }
     
     .container {
         height: calc(100vh - 20px);
-        height: min(95dvh, calc(100dvh - 20px)); /* Use 95dvh to offset upward and avoid bottom clipping */
         max-height: calc(100vh - 20px);
-        max-height: min(95dvh, calc(100dvh - 20px));
     }
     
     .ascii-art {
@@ -1835,6 +1839,19 @@ body.force-dark .note-text-area > div {
 
     .note-text-area {
         font-size: 1.4em;
+    }
+}
+
+/* Mobile touch devices: use dynamic viewport and top alignment */
+@media (max-width: 640px) and (pointer: coarse) and (hover: none) {
+    body {
+        align-items: flex-start;
+        padding-top: 10px;
+    }
+    
+    .container {
+        height: calc(100dvh - 20px);
+        max-height: calc(100dvh - 20px);
     }
 }
 
