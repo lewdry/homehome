@@ -256,8 +256,8 @@ function ensureCanvasSize() {
             
             const minSpeed = 0;
             const maxSpeed = 30;
-            const minVolume = 0.1;
-            const maxVolume = 0.4;
+            const minVolume = 0.5;
+            const maxVolume = 0.9;
             
             const thisSpeed = this.getSpeed();
             const otherSpeed = other.getSpeed();

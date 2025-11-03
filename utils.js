@@ -211,7 +211,7 @@ function createDoubleTapDetector(options = {}) {
         src.buffer = externalBuffer;
         const gain = ctx.createGain();
         // Keep external file volume modest
-        gain.gain.setValueAtTime(0.18, ctx.currentTime);
+        gain.gain.setValueAtTime(0.8, ctx.currentTime);
         src.connect(gain);
         gain.connect(ctx.destination);
         src.start();

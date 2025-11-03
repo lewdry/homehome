@@ -856,7 +856,7 @@
             // Use shared audio utility
             const audioNodes = window.playAudioBuffer(
                 collisionBuffers[randomSoundFile],
-                0.3
+                0.9
             );
             
             if (audioNodes) {
@@ -896,7 +896,7 @@
     }
 
     function playWinSound() {
-        if (window.isMuted || !collisionBuffers['G2.mp3'] || !collisionBuffers['D3.mp3']) {
+        if (window.isMuted || !collisionBuffers['D3.mp3'] || !collisionBuffers['G3.mp3']) {
             return;
         }
         
