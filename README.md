@@ -8,7 +8,7 @@ A retro Web 0.1 operating system experience, imagined for a time before the worl
 
 - **HOME** - Welcome screen with ASCII art and system status
 - **BONK** - Physics-based bouncing ball game with collision detection
-- **BUMP** - Classic breakout/brick-breaker game
+- **BLOK** - Classic breakout/brick-breaker game
 - **CALC** - Functional calculator with persistent state
 - **DRAW** - Simple pixel-art drawing canvas
 - **NOTE** - On-screen keyboard notepad (uppercase only)
@@ -38,7 +38,7 @@ Simply open `index.html` in a web browser. No build process or dependencies requ
 - Drag balls to throw them
 - Double-tap anywhere to reset
 
-**BUMP:**
+**BLOK:**
 - Mouse/touch to move paddle
 - Keyboard arrows or A/D keys also work
 - Double-tap to toggle rainbow/random colors
@@ -65,7 +65,7 @@ Simply open `index.html` in a web browser. No build process or dependencies requ
 homehomehome/
 ├── index.html          # Main HTML with embedded CSS
 ├── bonk.js            # Bouncing balls physics game
-├── bump.js            # Breakout/brick-breaker game
+├── blok.js            # Breakout/brick-breaker game
 ├── calc.js            # Calculator logic
 ├── draw.js            # Drawing canvas functionality
 ├── note.js            # Notepad with on-screen keyboard
@@ -93,7 +93,7 @@ homehomehome/
 
 ## Content Attribution
 
-- **BUMP game** adapted from [Mozilla's 2D breakout tutorial](https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript)
+- **BLOK game** adapted from [Mozilla's 2D breakout tutorial](https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript)
 - **BONK and DRAW** adapted from [Playpip Games](https://playpip.games)
 
 ## Browser Compatibility

@@ -1,8 +1,8 @@
-// Bumperblock Game Logic (Breakout)
+// Blokbreaker Game Logic (Breakout)
 // Version: 2024-11-02-paddle-clamp-fix
 (function() {
     // Constants
-    const canvas = document.getElementById('bumpCanvas');
+    const canvas = document.getElementById('blokCanvas');
     let ctx = null;
 
     // Solarized color palette organized for rainbow effect
@@ -85,7 +85,7 @@
     let mouseMoveHandler = null;
     let touchMoveHandler = null;
     let pointerDownHandler = null;
-    let bumpResizeHandler = null; // Unique name to avoid conflicts
+    let blokResizeHandler = null; // Unique name to avoid conflicts
     let listenersAttached = false; // Track if event listeners are currently attached
 
     // Generate pixel pattern for dithered rectangle
@@ -278,14 +278,14 @@
     // Initialize game
     function initGame() {
         if (!canvas) {
-            console.error('BUMP canvas element not found');
+            console.error('BLOK canvas element not found');
             return;
         }
 
         try {
             ctx = canvas.getContext('2d');
             if (!ctx) {
-                console.error('Could not get 2D context for bump canvas');
+                console.error('Could not get 2D context for blok canvas');
                 return;
             }
         } catch (error) {
@@ -293,7 +293,7 @@
             return;
         }
         
-        resizeBumpCanvas();
+        resizeBlokCanvas();
         
         // Initialize audio if not already done
         initAudio();
@@ -339,7 +339,7 @@
             }
         };
         
-        bumpResizeHandler = () => {
+        blokResizeHandler = () => {
             try {
                 handleResize();
             } catch (error) {
@@ -354,24 +354,24 @@
         canvas.addEventListener('touchmove', touchMoveHandler, { passive: false });
         canvas.addEventListener('pointerdown', pointerDownHandler, { passive: false });
         
-        window.addEventListener('resize', bumpResizeHandler);
+        window.addEventListener('resize', blokResizeHandler);
         
         listenersAttached = true;
         
         // Set up speed slider
         initSpeedSlider();
         
-        console.log('BUMP game initialized');
+        console.log('BLOK game initialized');
     }
 
     // Resize canvas
-    function resizeBumpCanvas() {
+    function resizeBlokCanvas() {
         if (!canvas || !ctx) return;
         resizeCanvas(canvas, ctx);
     }
 
     function handleResize() {
-        resizeBumpCanvas();
+        resizeBlokCanvas();
         // Reposition paddle and ball if game is active
         if (gameState.gameStarted) {
             const canvasWidth = canvas.width / (window.devicePixelRatio || 1);
@@ -411,7 +411,7 @@
         gameState.colorsAreRainbow = true; // Reset to rainbow order
         
         // Show speed slider
-        const speedSlider = document.getElementById('bump-speed-slider');
+        const speedSlider = document.getElementById('blok-speed-slider');
         if (speedSlider) {
             speedSlider.style.display = 'flex';
         }
@@ -718,10 +718,10 @@
         gameState.gamePaused = true;
         
         // Get popup elements
-        const endgamePopup = document.getElementById('bump-endgame-popup');
-        const endgameTitle = document.getElementById('bump-endgame-title');
-        const endgameMessage = document.getElementById('bump-endgame-message');
-        const endgameOkBtn = document.getElementById('bump-endgame-ok');
+        const endgamePopup = document.getElementById('blok-endgame-popup');
+        const endgameTitle = document.getElementById('blok-endgame-title');
+        const endgameMessage = document.getElementById('blok-endgame-message');
+        const endgameOkBtn = document.getElementById('blok-endgame-ok');
         
         if (!endgamePopup || !endgameTitle || !endgameMessage || !endgameOkBtn) {
             console.error('Endgame popup elements not found');
@@ -890,7 +890,7 @@
 
     // Initialize speed slider
     function initSpeedSlider() {
-        const speedSlider = document.getElementById('bump-speed-slider');
+        const speedSlider = document.getElementById('blok-speed-slider');
         if (!speedSlider) return;
         
         const speedButtons = speedSlider.querySelectorAll('.speed-step');
@@ -933,7 +933,7 @@
     }
 
     // Public API
-    window.BumpGame = {
+    window.BlokGame = {
         init: initGame,
         start: startGame,
         stop: function() {
@@ -1004,9 +1004,9 @@
                         pointerDownHandler = null;
                     }
                 }
-                if (bumpResizeHandler) {
-                    window.removeEventListener('resize', bumpResizeHandler);
-                    bumpResizeHandler = null;
+                if (blokResizeHandler) {
+                    window.removeEventListener('resize', blokResizeHandler);
+                    blokResizeHandler = null;
                 }
                 listenersAttached = false;
             }
@@ -1044,17 +1044,17 @@
                 try {
                     const audioBuffer = await window.loadAudioBuffer(file);
                     collisionBuffers[file] = audioBuffer;
-                    console.log(`Bump: Audio file ${file} loaded successfully`);
+                    console.log(`Blok: Audio file ${file} loaded successfully`);
                 } catch (error) {
-                    console.error(`Bump: Error loading audio file ${file}:`, error);
+                    console.error(`Blok: Error loading audio file ${file}:`, error);
                 }
             };
             
             await Promise.all(soundFiles.map(loadAudioFile));
             audioLoaded = true;
-            console.log('Bump audio loading complete');
+            console.log('Blok audio loading complete');
         } catch (error) {
-            console.error('Bump: Error initializing audio:', error);
+            console.error('Blok: Error initializing audio:', error);
         } finally {
             audioLoading = false;
         }

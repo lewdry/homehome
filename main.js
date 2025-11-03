@@ -129,8 +129,8 @@ function handleResetApp() {
     if (window.BonkGame && window.BonkGame.cleanup) {
         try { window.BonkGame.cleanup(); } catch (e) {}
     }
-    if (window.BumpGame && window.BumpGame.cleanup) {
-        try { window.BumpGame.cleanup(); } catch (e) {}
+    if (window.BlokGame && window.BlokGame.cleanup) {
+        try { window.BlokGame.cleanup(); } catch (e) {}
     }
     if (window.cleanupDrawing) {
         try { window.cleanupDrawing(); } catch (e) {}
@@ -144,8 +144,8 @@ function handleResetApp() {
     
     // Clear bonk ever-started flag
     bonkEverStarted = false;
-    // Clear bump ever-started flag
-    bumpEverStarted = false;
+    // Clear blok ever-started flag
+    blokEverStarted = false;
     
     // Play click sound before reload
     if (window.playRetroClick) {
@@ -173,20 +173,20 @@ const tabs = document.querySelectorAll('.tab');
 const tabContents = document.querySelectorAll('.tab-content');
 const bonkTab = document.querySelector('.tab[data-tab="bonk"]');
 let bonkInitialized = false;
-let bumpInitialized = false;
+let blokInitialized = false;
 let drawInitialized = false;
 let noteInitialized = false;
 let bonkStarted = false;
-let bumpStarted = false;
+let blokStarted = false;
 let drawStarted = false;
 let bonkEverStarted = false; // Track if bonk has ever been started
-let bumpEverStarted = false; // Track if bump has ever been started
+let blokEverStarted = false; // Track if blok has ever been started
 
 // Popup elements
 const bonkPopup = document.getElementById('bonk-popup');
 const bonkStartBtn = document.getElementById('bonk-start');
-const bumpPopup = document.getElementById('bump-popup');
-const bumpStartBtn = document.getElementById('bump-start');
+const blokPopup = document.getElementById('blok-popup');
+const blokStartBtn = document.getElementById('blok-start');
 const drawPopup = document.getElementById('draw-popup');
 const drawStartBtn = document.getElementById('draw-start');
 
@@ -202,16 +202,16 @@ bonkStartBtn.addEventListener('click', () => {
     bonkTab.focus();
 });
 
-// Handle BUMP start button
-bumpStartBtn.addEventListener('click', () => {
-    bumpPopup.style.display = 'none';
-    bumpStarted = true;
-    bumpEverStarted = true; // Mark that bump has been started at least once
-    if (bumpInitialized && window.BumpGame) {
-        window.BumpGame.start();
+// Handle BLOK start button
+blokStartBtn.addEventListener('click', () => {
+    blokPopup.style.display = 'none';
+    blokStarted = true;
+    blokEverStarted = true; // Mark that blok has been started at least once
+    if (blokInitialized && window.BlokGame) {
+        window.BlokGame.start();
     }
     // Return focus to the tab after closing popup
-    document.querySelector('.tab[data-tab="bump"]').focus();
+    document.querySelector('.tab[data-tab="blok"]').focus();
 });
 
 // Handle DRAW start button
@@ -243,9 +243,9 @@ function switchToTab(tab) {
         }
     }
     
-    if (currentTabName === 'bump' && bumpInitialized && window.BumpGame) {
-        if (window.BumpGame.isRunning()) {
-            window.BumpGame.stop();
+    if (currentTabName === 'blok' && blokInitialized && window.BlokGame) {
+        if (window.BlokGame.isRunning()) {
+            window.BlokGame.stop();
         }
     }
     
@@ -309,21 +309,21 @@ function switchToTab(tab) {
         window.BonkGame.resume();
     }
     
-    // Initialize bump game on first click
-    if (tabName === 'bump' && !bumpInitialized) {
-        bumpInitialized = true;
-        // Only show popup if bump has never been started before
-        if (!bumpEverStarted) {
-            bumpPopup.style.display = 'flex';
+    // Initialize blok game on first click
+    if (tabName === 'blok' && !blokInitialized) {
+        blokInitialized = true;
+        // Only show popup if blok has never been started before
+        if (!blokEverStarted) {
+            blokPopup.style.display = 'flex';
             // Focus the START button for keyboard users
-            setTimeout(() => bumpStartBtn.focus(), 100);
+            setTimeout(() => blokStartBtn.focus(), 100);
         }
-        if (window.BumpGame) {
-            window.BumpGame.init();
+        if (window.BlokGame) {
+            window.BlokGame.init();
         }
-    } else if (tabName === 'bump' && bumpInitialized && window.BumpGame) {
+    } else if (tabName === 'blok' && blokInitialized && window.BlokGame) {
         // Resume game when returning to tab
-        window.BumpGame.resume();
+        window.BlokGame.resume();
     }
     
     // Initialize drawing on first click
@@ -426,11 +426,11 @@ function showCredits() {
         }
     }
     
-    // Stop/pause bump game when leaving bump tab
-    if (bumpInitialized && window.BumpGame && window.BumpGame.isRunning()) {
+    // Stop/pause blok game when leaving blok tab
+    if (blokInitialized && window.BlokGame && window.BlokGame.isRunning()) {
         const currentTab = document.querySelector('.tab.active');
-        if (currentTab && currentTab.getAttribute('data-tab') === 'bump') {
-            window.BumpGame.stop();
+        if (currentTab && currentTab.getAttribute('data-tab') === 'blok') {
+            window.BlokGame.stop();
         }
     }
 
@@ -755,9 +755,9 @@ function showClockPopup() {
         window.BonkGame.stop();
     }
     
-    // Stop bump game if running
-    if (bumpInitialized && window.BumpGame && window.BumpGame.isRunning()) {
-        window.BumpGame.stop();
+    // Stop blok game if running
+    if (blokInitialized && window.BlokGame && window.BlokGame.isRunning()) {
+        window.BlokGame.stop();
     }
     
     // Update clock immediately and start interval
@@ -789,9 +789,9 @@ function hideClockPopup() {
         window.BonkGame.resume();
     }
     
-    // Resume bump game if it was on the bump tab
-    if (currentTab && currentTab.getAttribute('data-tab') === 'bump' && bumpInitialized && window.BumpGame) {
-        window.BumpGame.resume();
+    // Resume blok game if it was on the blok tab
+    if (currentTab && currentTab.getAttribute('data-tab') === 'blok' && blokInitialized && window.BlokGame) {
+        window.BlokGame.resume();
     }
     
     // Return focus to the footer clock

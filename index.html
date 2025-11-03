@@ -73,9 +73,9 @@
         
         <nav aria-label="Application tabs">
         <div class="tabs" role="tablist">
-            <div class="tab active" data-tab="home" role="tab" aria-selected="true" aria-controls="home-content" tabindex="0">HOME</div>
+            <div class="tab active" data-tab="home" role="tab" aria-selected="true" aria-controls="home-content" tabindex="0">⌂</div>
+            <div class="tab" data-tab="blok" role="tab" aria-selected="false" aria-controls="blok-content" tabindex="-1">BLOK</div>
             <div class="tab" data-tab="bonk" role="tab" aria-selected="false" aria-controls="bonk-content" tabindex="-1">BONK</div>
-            <div class="tab" data-tab="bump" role="tab" aria-selected="false" aria-controls="bump-content" tabindex="-1">BUMP</div>
             <div class="tab" data-tab="calc" role="tab" aria-selected="false" aria-controls="calc-content" tabindex="-1">CALC</div>
             <div class="tab" data-tab="draw" role="tab" aria-selected="false" aria-controls="draw-content" tabindex="-1">DRAW</div>
             <div class="tab" data-tab="note" role="tab" aria-selected="false" aria-controls="note-content" tabindex="-1">NOTE</div>
@@ -95,7 +95,7 @@
 ╚═══════════════════════════════╝
             </div>
 
-            <h1>Welcome Homehomehome ⌂</h1>
+            <h1>⌂ Welcome Homehomehome ⌂</h1>
 
             <p class="divider">
                 ═══════════════════════════════════
@@ -106,7 +106,7 @@
             </p>
 
             <p>
-                Homehomehome is an imaginary Web 0.1 portal, from a time before the <span class="highlight">world wide web</span> was born.
+                Homehomehome is an imaginary Web 0.1 portal from a time before the <span class="highlight">World Wide Web</span> was born.
             </p>
 
             <p class="divider">
@@ -132,30 +132,30 @@
             <canvas id="drawingCanvas" aria-label="Game canvas with bouncing balls"></canvas>
         </div>
 
-        <div id="bump-content" class="content tab-content" role="tabpanel" aria-labelledby="bump-tab">
-            <div class="instruction-popup" id="bump-popup" style="display: none;" role="dialog" aria-labelledby="bump-popup-title" aria-modal="true">
-                <div class="instruction-popup-title" id="bump-popup-title">BLOCKBUMPER.EXE</div>
+        <div id="blok-content" class="content tab-content" role="tabpanel" aria-labelledby="blok-tab">
+            <div class="instruction-popup" id="blok-popup" style="display: none;" role="dialog" aria-labelledby="blok-popup-title" aria-modal="true">
+                <div class="instruction-popup-title" id="blok-popup-title">BLOKBREAKER.EXE</div>
                 <div class="instruction-popup-content">
                     <p>Break all bricks to win!</p>
                     <p>Drag paddle to move.</p>
                     <p>Double-tap to swap colours.</p>
-                    <button id="bump-start">START</button>
+                    <button id="blok-start">START</button>
                 </div>
             </div>
-            <div class="instruction-popup" id="bump-endgame-popup" style="display: none;" role="dialog" aria-labelledby="bump-endgame-title" aria-modal="true">
-                <div class="instruction-popup-title" id="bump-endgame-title">GAME OVER</div>
+            <div class="instruction-popup" id="blok-endgame-popup" style="display: none;" role="dialog" aria-labelledby="blok-endgame-title" aria-modal="true">
+                <div class="instruction-popup-title" id="blok-endgame-title">GAME OVER</div>
                 <div class="instruction-popup-content">
-                    <p id="bump-endgame-message">You won!</p>
-                    <button id="bump-endgame-ok">OK</button>
+                    <p id="blok-endgame-message">You won!</p>
+                    <button id="blok-endgame-ok">OK</button>
                 </div>
             </div>
-            <div class="bump-speed-slider" id="bump-speed-slider" style="display: none;">
+            <div class="blok-speed-slider" id="blok-speed-slider" style="display: none;">
                 <span class="speed-label">Speed:</span>
                 <button class="speed-step active" data-speed="1" aria-label="Speed 1">►</button>
                 <button class="speed-step" data-speed="1.5" aria-label="Speed 1.5">►►</button>
                 <button class="speed-step" data-speed="2" aria-label="Speed 2">►►►</button>
             </div>
-            <canvas id="bumpCanvas" aria-label="Breakout game canvas"></canvas>
+            <canvas id="blokCanvas" aria-label="Breakout game canvas"></canvas>
         </div>
 
         <!-- Clock popup -->
@@ -241,7 +241,7 @@
 
                 <p>
                     <span class="highlight">Content</span><br>
-                    ▶ BUMP adapted from: <a href="https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript" target="_blank" rel="noopener noreferrer">Mozilla's 2D breakout tutorial</a><br>
+                    ▶ BLOK adapted from: <a href="https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript" target="_blank" rel="noopener noreferrer">Mozilla's 2D breakout tutorial</a><br>
                     ▶ BONK and DRAW adapted from: <a href="https://playpip.games" target="_blank" rel="noopener noreferrer">Playpip Games</a>
                 </p>
                 </ul>
@@ -257,7 +257,7 @@
 
     <script src="utils.js"></script>
     <script src="bonk.js"></script>
-    <script src="bump.js"></script>
+    <script src="blok.js"></script>
     <script src="calc.js"></script>
     <script src="draw.js"></script>
     <script src="note.js"></script>

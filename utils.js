@@ -1,6 +1,6 @@
 // Shared utility functions
 
-// Solarized color palette (shared across bonk, bump, draw)
+// Solarized color palette (shared across bonk, blok, draw)
 const SOLARIZED_COLORS = [
     '#268bd2', // blue
     '#2aa198', // cyan

@@ -273,7 +273,7 @@ function drawDitheredCircle(centerX, centerY, radius, baseColor, ditherColor) {
             
             if (distance <= radius) {
                 // Determine if this pixel should be base or dither color
-                // Using checkerboard pattern like bump.js: (gridX + gridY) % 2
+                // Using checkerboard pattern like blok.js: (gridX + gridY) % 2
                 const gridX = Math.floor(px / PIXEL_SIZE);
                 const gridY = Math.floor(py / PIXEL_SIZE);
                 const isDithered = (gridX + gridY) % 2 === 0;
