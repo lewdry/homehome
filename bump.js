@@ -58,6 +58,7 @@
         gameRunning: false,
         gamePaused: false,
         gameStarted: false,
+        ballInMotion: false, // Track if ball is currently moving
         keys: { left: false, right: false },
         mouseX: null,
         touchX: null,
@@ -254,9 +255,9 @@
                 }
             });
             
-            // Set paddle to a rainbow color
-            const paddleColorGroup = RAINBOW_COLORS[5]; // Blues
-            const newPaddleColor = paddleColorGroup[0];
+            // Set paddle to a random rainbow color group
+            const paddleColorGroup = RAINBOW_COLORS[Math.floor(Math.random() * RAINBOW_COLORS.length)];
+            const newPaddleColor = paddleColorGroup[Math.floor(Math.random() * paddleColorGroup.length)];
             gameState.paddle.color = newPaddleColor;
             gameState.paddle.pattern = generateRectPattern(
                 CONFIG.PADDLE_WIDTH, 
@@ -264,9 +265,9 @@
                 newPaddleColor
             );
             
-            // Set ball to a rainbow color
-            const ballColorGroup = RAINBOW_COLORS[5]; // Blues
-            const newBallColor = ballColorGroup[0];
+            // Set ball to a random rainbow color group
+            const ballColorGroup = RAINBOW_COLORS[Math.floor(Math.random() * RAINBOW_COLORS.length)];
+            const newBallColor = ballColorGroup[Math.floor(Math.random() * ballColorGroup.length)];
             gameState.ball.color = newBallColor;
             gameState.ball.pattern = generateCirclePattern(CONFIG.BALL_RADIUS, newBallColor);
             
@@ -418,7 +419,7 @@
         // Initialize bricks
         gameState.bricks = initBricks();
         
-        // Initialize ball
+        // Initialize ball (stationary, waiting for tap to start)
         const canvasWidth = canvas.width / (window.devicePixelRatio || 1);
         const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
         
@@ -431,12 +432,14 @@
         gameState.ball = {
             x: canvasWidth / 2,
             y: canvasHeight - 100,
-            dx: adjustedSpeed * (Math.random() > 0.5 ? 1 : -1),
-            dy: -adjustedSpeed,
+            dx: 0, // Ball starts stationary
+            dy: 0, // Ball starts stationary
             speed: adjustedSpeed,
             color: ballColor,
             pattern: generateCirclePattern(CONFIG.BALL_RADIUS, ballColor)
         };
+        
+        gameState.ballInMotion = false;
         
         // Initialize paddle - using center-based coordinates
         const paddleColor = allColors[Math.floor(Math.random() * allColors.length)];
@@ -459,13 +462,16 @@
         // Apply speed multiplier to reset ball speed
         const adjustedSpeed = CONFIG.BALL_SPEED_INITIAL * CONFIG.SPEED_MULTIPLIER;
         
-        gameState.ball.x = canvasWidth / 2;
+        // Position ball directly above paddle (same x position)
+        gameState.ball.x = gameState.paddle.x;
         gameState.ball.y = canvasHeight - 100;
-        gameState.ball.dx = adjustedSpeed * (Math.random() > 0.5 ? 1 : -1);
-        gameState.ball.dy = -adjustedSpeed;
+        gameState.ball.dx = 0; // Ball starts stationary
+        gameState.ball.dy = 0; // Ball starts stationary
         gameState.ball.speed = adjustedSpeed;
         
-        // Brief pause before resuming
+        gameState.ballInMotion = false; // Ball needs tap to start
+        
+        // Brief pause before allowing interaction
         gameState.gamePaused = true;
         setTimeout(() => {
             if (gameState.gameRunning) {
@@ -517,6 +523,13 @@
         if (gameState.touchX !== null) {
             // Clamp paddle center to keep paddle within bounds
             gameState.paddle.x = Math.max(paddleHalfWidth, Math.min(gameState.touchX, canvasWidth - paddleHalfWidth));
+        }
+        
+        // Only update ball physics if ball is in motion
+        if (!gameState.ballInMotion) {
+            // Keep ball centered above paddle when stationary
+            gameState.ball.x = gameState.paddle.x;
+            return; // Don't process ball physics
         }
         
         // Gradually increase ball speed
@@ -748,6 +761,11 @@
         if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
             gameState.keys.right = true;
         }
+        // Launch ball with spacebar
+        if (e.key === ' ' && gameState.gameStarted && !gameState.ballInMotion && !gameState.gamePaused) {
+            e.preventDefault(); // Prevent page scroll
+            launchBall();
+        }
     }
 
     function handleKeyUp(e) {
@@ -784,10 +802,29 @@
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
         
-        // Check for double tap to toggle colors
+        // If ball is not in motion, launch it with a tap
+        if (!gameState.ballInMotion && !gameState.gamePaused) {
+            launchBall();
+            return; // Don't process double-tap for color change on launch
+        }
+        
+        // Check for double tap to toggle colors (only when ball is moving)
         if (doubleTapDetector.isDoubleTap(x, y)) {
             toggleColors();
         }
+    }
+    
+    // Launch the ball from stationary state
+    function launchBall() {
+        const adjustedSpeed = gameState.ball.speed;
+        
+        // Launch ball upward with random horizontal direction
+        gameState.ball.dx = adjustedSpeed * (Math.random() > 0.5 ? 1 : -1);
+        gameState.ball.dy = -adjustedSpeed;
+        gameState.ballInMotion = true;
+        
+        // Play a sound for feedback
+        playCollisionSound();
     }
 
     // Audio functions

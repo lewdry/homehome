@@ -53,6 +53,7 @@ body {
     width: min(600px, 100%);
     aspect-ratio: 2 / 3;
     height: min(80vh, 900px);
+    max-height: 750px; /* Absolute maximum height for better performance on large displays */
     border: 3px solid var(--border-color);
     background-color: var(--bg-surface);
     display: flex;
@@ -703,7 +704,7 @@ body.force-dark .cursor {
 }
 
 .instruction-popup-content {
-    padding: 24px;
+    padding: 12px;
 }
 
 .instruction-popup-content p {
@@ -1163,18 +1164,28 @@ body.force-dark .thks-content-area a {
 }
 
 .calc-display {
-    background-color: var(--bg-base);
+    background-color: #073642;
     border: 3px solid var(--border-color);
-    padding: 24px 12px 8px 12px;
-    min-height: 60px;
+    padding: 12px;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
     gap: 4px;
-    box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.3);
     touch-action: manipulation;
     -webkit-user-select: none;
     user-select: none;
+}
+
+body.force-light .calc-display {
+    background-color: #93a1a1;
+}
+
+@media (prefers-color-scheme: light) {
+    body:not(.force-dark) .calc-display {
+        background-color: #93a1a1;
+    }
 }
 
 .calc-equation {
@@ -1187,73 +1198,33 @@ body.force-dark .thks-content-area a {
 }
 
 .calc-result {
-    font-size: 1.8em;
+    font-size: 0.85em;
     font-weight: bold;
     text-align: right;
-    word-wrap: break-word;
-    word-break: break-all;
+    font-family: 'Courier New', Courier, monospace;
+    line-height: 1.1;
+    white-space: pre;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    background-color: var(--text-primary);
-    background-image: 
-        repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.12) 2px,
-            rgba(0, 0, 0, 0.12) 4px
-        ),
-        repeating-linear-gradient(
-            90deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.12) 2px,
-            rgba(0, 0, 0, 0.12) 4px
-        );
-    background-size: 4px 4px;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: var(--text-primary);
+    color: #cb4b16;
+    text-shadow: 0 0 6px rgba(210, 110, 38, 0.4);
+    letter-spacing: 0.05em;
 }
 
 @media (prefers-color-scheme: dark) {
     .calc-result {
-        background-image: 
-            repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                rgba(0, 0, 0, 0.08) 2px,
-                rgba(0, 0, 0, 0.08) 4px
-            ),
-            repeating-linear-gradient(
-                90deg,
-                transparent,
-                transparent 2px,
-                rgba(0, 0, 0, 0.08) 2px,
-                rgba(0, 0, 0, 0.08) 4px
-            );
+        color: #2aa198;
+        text-shadow: 0 0 8px rgba(42, 161, 152, 0.6);
     }
 }
 
+body.force-light .calc-result {
+    color: #cb4b16;
+    text-shadow: 0 0 6px rgba(210, 78, 38, 0.4);
+}
+
 body.force-dark .calc-result {
-    background-image: 
-        repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.08) 2px,
-            rgba(0, 0, 0, 0.08) 4px
-        ),
-        repeating-linear-gradient(
-            90deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.08) 2px,
-            rgba(0, 0, 0, 0.08) 4px
-        );
+    color: #2aa198;
+    text-shadow: 0 0 8px rgba(42, 161, 152, 0.6);
 }
 
 .calc-buttons {
@@ -1584,6 +1555,56 @@ body.force-dark .note-text-area > div {
     background-color: #cc221f;
 }
 
+.note-key.shift {
+    background-color: #2aa198;
+    background-image: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.15) 2px,
+            rgba(0, 0, 0, 0.15) 4px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.15) 2px,
+            rgba(0, 0, 0, 0.15) 4px
+        );
+    background-size: 4px 4px;
+    color: var(--bg-base);
+    flex: 2;
+}
+
+.note-key.shift:hover {
+    background-color: #239992;
+}
+
+.note-key.shift.active {
+    background-color: #859900;
+    background-image: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.15) 2px,
+            rgba(0, 0, 0, 0.15) 4px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.15) 2px,
+            rgba(0, 0, 0, 0.15) 4px
+        );
+    background-size: 4px 4px;
+}
+
+.note-key.shift.active:hover {
+    background-color: #719e07;
+}
+
 /* Media queries for short displays - prioritize home page content */
 @media (max-height: 700px) {
     .content {
@@ -1878,7 +1899,7 @@ body.force-dark .note-text-area > div {
     }
     
     .calc-display {
-        min-height: 50px;
+        padding: 10px;
     }
     
     .calc-result {
@@ -1894,8 +1915,7 @@ body.force-dark .note-text-area > div {
     }
     
     .calc-display {
-        min-height: 45px;
-        padding: 6px 10px;
+        padding: 8px;
     }
     
     .calc-result {

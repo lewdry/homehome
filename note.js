@@ -17,8 +17,19 @@ const keyboardLayout = [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
     ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
     ['Z', 'X', 'C', 'V', 'B', 'N', 'M', '.'],
-    ['SPACE', '⌫']
+    ['SHIFT', 'SPACE', '⌫']
 ];
+
+// Alternative keyboard layout for shifted mode (numbers & symbols)
+const shiftedLayout = [
+    ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+    ['!', '@', '#', '$', '%', '&', '*', '_', '⌂'],
+    [',', ';', ':', '?', '"', "'", '-', '/'],
+    ['SHIFT', 'SPACE', '⌫']
+];
+
+// Shift mode state
+let shiftMode = false;
 
 // Key mapping for randomization easter egg
 let noteKeysRandomized = false;
@@ -26,7 +37,14 @@ const originalNoteLayout = [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
     ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
     ['Z', 'X', 'C', 'V', 'B', 'N', 'M', '.'],
-    ['SPACE', '⌫']
+    ['SHIFT', 'SPACE', '⌫']
+];
+
+const originalShiftedLayout = [
+    ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+    ['!', '@', '#', '$', '%', '&', '*', '_', '⌂'],
+    [',', ';', ':', '?', '"', "'", '-', '/'],
+    ['SHIFT', 'SPACE', '⌫']
 ];
 
 // Backspace hold-to-delete state
@@ -156,8 +174,11 @@ function buildKeyboard() {
     const noteKeyboard = document.getElementById('noteKeyboard');
     noteKeyboard.innerHTML = '';
     
+    // Use the appropriate layout based on shift mode
+    const currentLayout = shiftMode ? shiftedLayout : keyboardLayout;
+    
     // Create keyboard rows
-    keyboardLayout.forEach((row, index) => {
+    currentLayout.forEach((row, index) => {
         const rowDiv = document.createElement('div');
         rowDiv.className = 'note-keyboard-row';
         
@@ -165,7 +186,20 @@ function buildKeyboard() {
             const keyButton = document.createElement('button');
             keyButton.className = 'note-key';
             
-            if (key === 'SPACE') {
+            if (key === 'SHIFT') {
+                keyButton.classList.add('shift');
+                if (shiftMode) {
+                    keyButton.classList.add('active');
+                }
+                keyButton.textContent = 'SHIFT';
+                keyButton.setAttribute('data-key', 'SHIFT');
+                keyButton.setAttribute('aria-label', 'Shift');
+                keyButton.addEventListener('click', handleShiftToggle);
+                keyButton.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    handleShiftToggle();
+                });
+            } else if (key === 'SPACE') {
                 keyButton.classList.add('space');
                 keyButton.textContent = 'SPACE';
                 keyButton.setAttribute('data-key', ' ');
@@ -196,7 +230,8 @@ function buildKeyboard() {
             } else {
                 keyButton.textContent = key;
                 keyButton.setAttribute('data-key', key);
-                keyButton.setAttribute('aria-label', `Letter ${key}`);
+                const label = shiftMode ? `Symbol ${key}` : `Letter ${key}`;
+                keyButton.setAttribute('aria-label', label);
                 keyButton.addEventListener('click', (e) => handleKeyPress(e.target.getAttribute('data-key')));
                 keyButton.addEventListener('touchstart', (e) => {
                     e.preventDefault();
@@ -234,22 +269,26 @@ function handleDesktopKeyboard(e) {
     const noteContent = document.getElementById('note-content');
     if (!noteContent || !noteContent.classList.contains('active')) return;
     
-    // Only prevent default for keys we actually handle
-    const handledKeys = ['Backspace', 'Delete', ' ', 'Spacebar', '.'];
+    // Define all valid characters that can be typed
+    const validSymbols = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 
+                         '!', '@', '#', '$', '%', '&', '*', '_', '⌂',
+                         ',', ';', ':', '?', '"', "'", '-', '/', '.'];
     const isLetter = e.key.length === 1 && /^[A-Z]$/i.test(e.key);
+    const isValidSymbol = validSymbols.includes(e.key);
+    const isSpecialKey = e.key === 'Backspace' || e.key === 'Delete' || e.key === ' ' || e.key === 'Spacebar';
     
-    if (handledKeys.includes(e.key) || isLetter) {
+    if (isLetter || isValidSymbol || isSpecialKey) {
         e.preventDefault();
         
         if (e.key === 'Backspace' || e.key === 'Delete') {
             handleKeyPress('⌫');
         } else if (e.key === ' ' || e.key === 'Spacebar') {
             handleKeyPress(' ');
-        } else if (e.key === '.') {
-            handleKeyPress('.');
         } else if (isLetter) {
             const upperKey = e.key.toUpperCase();
             handleKeyPress(upperKey);
+        } else if (isValidSymbol) {
+            handleKeyPress(e.key);
         }
     }
 }
@@ -356,18 +395,30 @@ function stopBackspaceHold() {
     backspaceDeleteSpeed = 150; // Reset speed
 }
 
+// Handle shift key toggle
+function handleShiftToggle() {
+    shiftMode = !shiftMode;
+    buildKeyboard(); // Rebuild keyboard with new layout
+}
+
 // Easter egg: Randomize note keyboard letter keys
 function randomizeNoteKeys() {
-    // Get all letter keys (exclude SPACE and backspace)
-    const letterKeys = document.querySelectorAll('.note-key:not(.space):not(.backspace)');
+    // Get all keys except SHIFT, SPACE, and backspace
+    const letterKeys = document.querySelectorAll('.note-key:not(.shift):not(.space):not(.backspace)');
     
     if (noteKeysRandomized) {
-        // Restore original layout
-        const originalLetters = originalNoteLayout.slice(0, 3).flat(); // Flatten first 3 rows (letters and period)
+        // Restore original layout based on current shift mode
+        const originalLetters = shiftMode ? 
+            originalShiftedLayout.slice(0, 3).flat() : 
+            originalNoteLayout.slice(0, 3).flat(); // Flatten first 3 rows
+        
         letterKeys.forEach((button, index) => {
             const originalLetter = originalLetters[index];
             button.textContent = originalLetter;
-            button.setAttribute('aria-label', originalLetter === '.' ? 'Period' : `Letter ${originalLetter}`);
+            const label = shiftMode ? 
+                (originalLetter === '.' ? 'Period' : `Symbol ${originalLetter}`) : 
+                (originalLetter === '.' ? 'Period' : `Letter ${originalLetter}`);
+            button.setAttribute('aria-label', label);
             button.setAttribute('data-key', originalLetter);
         });
         noteKeysRandomized = false;
@@ -386,7 +437,8 @@ function randomizeNoteKeys() {
         letterKeys.forEach((button, index) => {
             const newLetter = shuffled[index];
             button.textContent = newLetter;
-            button.setAttribute('aria-label', newLetter === '.' ? 'Period' : `Letter ${newLetter}`);
+            const label = shiftMode ? `Symbol ${newLetter}` : `Letter ${newLetter}`;
+            button.setAttribute('aria-label', label);
             // Update data-key to match displayed text
             button.setAttribute('data-key', newLetter);
         });

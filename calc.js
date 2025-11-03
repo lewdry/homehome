@@ -13,6 +13,42 @@ let equationDisplay;
 let resultDisplay;
 let calcButtons;
 
+// LCD 7-segment display patterns
+const LCD_SEGMENTS = {
+    '0': [' ▄▄▄ ', '█   █', '█   █', '█   █', ' ▀▀▀ '],
+    '1': ['     ', '    █', '    █', '    █', '     '],
+    '2': [' ▄▄▄ ', '    █', ' ▄▄▄ ', '█    ', ' ▀▀▀ '],
+    '3': [' ▄▄▄ ', '    █', ' ▄▄▄ ', '    █', ' ▀▀▀ '],
+    '4': ['     ', '█   █', ' ▀▀▀█', '    █', '     '],
+    '5': [' ▄▄▄ ', '█    ', ' ▄▄▄ ', '    █', ' ▀▀▀ '],
+    '6': [' ▄▄▄ ', '█    ', '█▄▄▄ ', '█   █', ' ▀▀▀ '],
+    '7': [' ▄▄▄ ', '    █', '    █', '    █', '     '],
+    '8': [' ▄▄▄ ', '█   █', ' ▄▄▄ ', '█   █', ' ▀▀▀ '],
+    '9': [' ▄▄▄ ', '█   █', ' ▀▀▀█', '    █', ' ▀▀▀ '],
+    '.': ['     ', '     ', '     ', '     ', '  ▄  '],
+    '-': ['     ', '     ', ' ▄▄▄ ', '     ', '     '],
+    'E': [' ▄▄▄▄', '█    ', '█▄▄▄ ', '█    ', ' ▀▀▀▀'],
+    'r': ['     ', '     ', '█▄▄  ', '█    ', '█    '],
+    'o': ['     ', '     ', ' ▄▄▄ ', '█   █', ' ▀▀▀ '],
+    ' ': ['     ', '     ', '     ', '     ', '     '],
+};
+
+// Convert text to LCD display
+function textToLCD(text) {
+    // Limit display to 8 characters
+    const displayText = text.toString().slice(-8).toUpperCase();
+    const lines = ['', '', '', '', ''];
+    
+    for (let char of displayText) {
+        const pattern = LCD_SEGMENTS[char] || LCD_SEGMENTS[' '];
+        for (let i = 0; i < 5; i++) {
+            lines[i] += pattern[i] + ' ';
+        }
+    }
+    
+    return lines.join('\n');
+}
+
 // Key mapping for randomization easter egg
 let calcKeysRandomized = false;
 const originalCalcNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -231,7 +267,7 @@ function getOperatorSymbol(op) {
 
 function updateDisplay() {
     if (resultDisplay) {
-        resultDisplay.textContent = calculatorState.currentValue;
+        resultDisplay.textContent = textToLCD(calculatorState.currentValue);
     }
     if (equationDisplay) {
         equationDisplay.textContent = calculatorState.equation;
@@ -299,4 +335,7 @@ window.cleanupCalculator = function() {
     buttonClickHandlers.clear();
     buttonTouchHandlers.clear();
     doubleTapHandler = null;
+    
+    // Reset initialization flag so listeners can be re-attached
+    calcInitialized = false;
 };
