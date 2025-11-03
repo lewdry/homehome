@@ -47,13 +47,14 @@ body {
     height: 100%;
     -webkit-text-size-adjust: none;
     text-size-adjust: none;
+    padding-bottom: 16px; /* Offset container 20px upward from center */
 }
 
 .container {
     width: min(600px, 100%);
     aspect-ratio: 2 / 3;
     height: min(80vh, 900px);
-    max-height: 750px; /* Absolute maximum height for better performance on large displays */
+    max-height: 700px; /* Absolute maximum height for better performance on large displays */
     border: 3px solid var(--border-color);
     background-color: var(--bg-surface);
     display: flex;
