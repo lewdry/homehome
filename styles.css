@@ -47,7 +47,6 @@ body {
     height: 100%;
     -webkit-text-size-adjust: none;
     text-size-adjust: none;
-    padding-bottom: 16px; /* Offset container 20px upward from center */
 }
 
 .container {
@@ -1793,9 +1792,9 @@ body.force-dark .note-text-area > div {
     
     .container {
         height: calc(100vh - 20px);
-        height: calc(100dvh - 20px); /* Use dynamic viewport height for mobile */
+        height: min(90dvh, calc(100dvh - 20px)); /* Use 90dvh to offset upward and avoid bottom clipping */
         max-height: calc(100vh - 20px);
-        max-height: calc(100dvh - 20px);
+        max-height: min(90dvh, calc(100dvh - 20px));
     }
     
     .ascii-art {
