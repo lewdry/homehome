@@ -1166,12 +1166,11 @@ body.force-dark .thks-content-area a {
 .calc-display {
     background-color: #073642;
     border: 3px solid var(--border-color);
-    padding: 12px;
+    padding: 8px 12px;
     min-height: 0;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 4px;
+    justify-content: flex-end;
     box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.3);
     touch-action: manipulation;
     -webkit-user-select: none;
@@ -1189,12 +1188,7 @@ body.force-light .calc-display {
 }
 
 .calc-equation {
-    font-size: 0.9em;
-    color: var(--text-secondary);
-    height: 20px;
-    text-align: right;
-    word-wrap: break-word;
-    word-break: break-all;
+    display: none;
 }
 
 .calc-result {
@@ -1806,7 +1800,7 @@ body.force-dark .note-text-area > div {
     }
 
     .calc-result {
-        font-size: 0.75em;
+        font-size: 0.5em;
     }
 
     .note-key {
@@ -1899,11 +1893,11 @@ body.force-dark .note-text-area > div {
     }
     
     .calc-display {
-        padding: 10px;
+        padding: 6px 10px;
     }
     
     .calc-result {
-        font-size: 1.4em;
+        font-size: 0.5em;
     }
 }
 
@@ -1915,15 +1909,11 @@ body.force-dark .note-text-area > div {
     }
     
     .calc-display {
-        padding: 8px;
+        padding: 4px 8px;
     }
     
     .calc-result {
-        font-size: 1.2em;
-    }
-    
-    .calc-equation {
-        font-size: 0.8em;
+        font-size: 0.45em;
     }
 }
 
