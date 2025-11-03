@@ -322,11 +322,27 @@ function downloadDrawing() {
     if (!drawCanvas) return;
     
     try {
-        // Create download link
+        // Create a temporary canvas to add background color
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = drawCanvas.width;
+        tempCanvas.height = drawCanvas.height;
+        const tempCtx = tempCanvas.getContext('2d');
+        
+        // Get the --bg-surface CSS variable value
+        const bgSurface = getComputedStyle(document.documentElement).getPropertyValue('--bg-surface').trim();
+        
+        // Fill the background with --bg-surface color
+        tempCtx.fillStyle = bgSurface;
+        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+        
+        // Draw the original canvas content on top
+        tempCtx.drawImage(drawCanvas, 0, 0);
+        
+        // Create download link using the temp canvas
         const link = document.createElement('a');
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
         link.download = `drawing-${timestamp}.png`;
-        link.href = drawCanvas.toDataURL('image/png');
+        link.href = tempCanvas.toDataURL('image/png');
         link.click();
         
         // Play sound if available

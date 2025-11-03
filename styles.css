@@ -1154,7 +1154,7 @@ body.force-dark .thks-content-area a {
 
 /* Calculator styles */
 .calculator {
-    max-width: 550px;
+    max-width: 380px;
     max-height: 600px;
     width: 100%;
     margin: 0 auto;
@@ -1192,7 +1192,7 @@ body.force-light .calc-display {
 }
 
 .calc-result {
-    font-size: 0.85em;
+    font-size: 0.6em;
     font-weight: bold;
     text-align: right;
     font-family: 'Courier New', Courier, monospace;
@@ -1786,8 +1786,8 @@ body.force-dark .note-text-area > div {
 @media (max-width: 640px) {
     body {
         padding: 10px;
-        align-items: flex-start;
-        padding-top: 10px;
+        /* Keep centered alignment for better visual balance */
+        align-items: center;
     }
     
     .container {

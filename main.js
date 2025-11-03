@@ -521,8 +521,14 @@ footerText.addEventListener('keydown', (e) => {
 document.addEventListener('pointerdown', async (e) => {
     try {
         const el = e.target.closest('button, .tab, .calc-btn, .note-key, .footer-text, [role="tab"]');
-        if (el && window.playRetroClick) {
-            await window.playRetroClick();
+        if (el) {
+            // Resume AudioContext before playing sound (critical for mobile)
+            if (window.resumeSharedAudioContext) {
+                await window.resumeSharedAudioContext();
+            }
+            if (window.playRetroClick) {
+                await window.playRetroClick();
+            }
         }
     } catch (err) {
         // ignore

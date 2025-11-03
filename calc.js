@@ -35,8 +35,17 @@ const LCD_SEGMENTS = {
 
 // Convert text to LCD display
 function textToLCD(text) {
-    // Limit display to 8 characters
-    const displayText = text.toString().slice(-8).toUpperCase();
+    const textStr = text.toString();
+    let displayText;
+    
+    // Allow 9 characters if it starts with a minus sign (for negative 8-digit numbers)
+    if (textStr.startsWith('-')) {
+        displayText = textStr.slice(0, 9).toUpperCase();
+    } else {
+        // Limit display to 8 characters
+        displayText = textStr.slice(-8).toUpperCase();
+    }
+    
     const lines = ['', '', '', '', ''];
     
     for (let char of displayText) {

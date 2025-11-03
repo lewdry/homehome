@@ -143,12 +143,16 @@ function createDoubleTapDetector(options = {}) {
     window.getSharedAudioContext = getSharedAudioContext;
     
     // Resume AudioContext if suspended (required for browsers)
-    window.resumeSharedAudioContext = function() {
+    window.resumeSharedAudioContext = async function() {
         const ctx = getSharedAudioContext();
         if (ctx && ctx.state === 'suspended') {
             // On mobile, resume() must be called within a user gesture.
             // We'll trust this is the case.
-            ctx.resume();
+            try {
+                await ctx.resume();
+            } catch (e) {
+                console.error('Failed to resume AudioContext:', e);
+            }
         }
     };
 })();
@@ -365,8 +369,10 @@ function createDoubleTapDetector(options = {}) {
             return false;
         }
         
-        // Resume AudioContext if suspended
-        window.resumeSharedAudioContext();
+        // Resume AudioContext if suspended (fire and forget - don't await)
+        if (window.resumeSharedAudioContext) {
+            window.resumeSharedAudioContext().catch(() => {});
+        }
         
         try {
             const soundFiles = Object.keys(collisionBuffers);
