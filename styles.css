@@ -1792,9 +1792,9 @@ body.force-dark .note-text-area > div {
     
     .container {
         height: calc(100vh - 20px);
-        height: min(90dvh, calc(100dvh - 20px)); /* Use 90dvh to offset upward and avoid bottom clipping */
+        height: min(95dvh, calc(100dvh - 20px)); /* Use 95dvh to offset upward and avoid bottom clipping */
         max-height: calc(100vh - 20px);
-        max-height: min(90dvh, calc(100dvh - 20px));
+        max-height: min(95dvh, calc(100dvh - 20px));
     }
     
     .ascii-art {
