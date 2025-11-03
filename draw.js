@@ -338,11 +338,57 @@ function downloadDrawing() {
         // Draw the original canvas content on top
         tempCtx.drawImage(drawCanvas, 0, 0);
         
-        // Create download link using the temp canvas
-        const link = document.createElement('a');
+        // Generate filename with timestamp
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-        link.download = `drawing-${timestamp}.png`;
-        link.href = tempCanvas.toDataURL('image/png');
+        const filename = `drawing-${timestamp}.png`;
+        
+        // Check if Web Share API is available and supports sharing files
+        if (navigator.share && navigator.canShare) {
+            // Convert canvas to blob
+            tempCanvas.toBlob(async (blob) => {
+                const file = new File([blob], filename, { type: 'image/png' });
+                const shareData = {
+                    files: [file],
+                    title: 'Drawing from Homehomehome',
+                    text: 'Check out my drawing!'
+                };
+                
+                // Check if the device can share this data
+                if (navigator.canShare(shareData)) {
+                    try {
+                        await navigator.share(shareData);
+                        // Play sound if available
+                        if (window.playRetroClick) {
+                            try { window.playRetroClick(); } catch (err) {}
+                        }
+                        return;
+                    } catch (err) {
+                        // User cancelled - don't download
+                        if (err.name === 'AbortError') {
+                            return;
+                        }
+                        // Other error occurred, fall through to download
+                        console.log('Share failed, falling back to download:', err);
+                    }
+                }
+                
+                // Fallback to download if share not available or failed
+                downloadCanvasAsFile(tempCanvas, filename);
+            }, 'image/png');
+        } else {
+            // Fallback to download if Web Share API not available
+            downloadCanvasAsFile(tempCanvas, filename);
+        }
+    } catch (error) {
+        console.error('Error sharing/downloading drawing:', error);
+    }
+}
+
+function downloadCanvasAsFile(canvas, filename) {
+    try {
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = canvas.toDataURL('image/png');
         link.click();
         
         // Play sound if available
@@ -350,7 +396,7 @@ function downloadDrawing() {
             try { window.playRetroClick(); } catch (err) {}
         }
     } catch (error) {
-        console.error('Error downloading drawing:', error);
+        console.error('Error downloading file:', error);
     }
 }
 

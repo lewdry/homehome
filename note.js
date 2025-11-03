@@ -55,13 +55,57 @@ let backspaceDeleteSpeed = 150; // Start speed in ms
 // Download function for NOTE
 function downloadNote() {
     try {
+        // Generate filename with timestamp
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+        const filename = `note-${timestamp}.txt`;
+        
+        // Check if Web Share API is available and supports sharing files
+        if (navigator.share && navigator.canShare) {
+            // Create a file from the text content
+            const blob = new Blob([noteText], { type: 'text/plain' });
+            const file = new File([blob], filename, { type: 'text/plain' });
+            const shareData = {
+                files: [file],
+                title: 'Note from Homehomehome'
+            };
+            
+            // Check if the device can share this data
+            if (navigator.canShare(shareData)) {
+                navigator.share(shareData)
+                    .then(() => {
+                        // Play sound if available
+                        if (window.playRetroClick) {
+                            try { window.playRetroClick(); } catch (err) {}
+                        }
+                    })
+                    .catch((err) => {
+                        // User cancelled - don't download
+                        if (err.name === 'AbortError') {
+                            return;
+                        }
+                        // Other error occurred, fall back to download
+                        console.log('Share failed, falling back to download:', err);
+                        downloadNoteAsFile(noteText, filename);
+                    });
+                return;
+            }
+        }
+        
+        // Fallback to download if Web Share API not available
+        downloadNoteAsFile(noteText, filename);
+    } catch (error) {
+        console.error('Error sharing/downloading note:', error);
+    }
+}
+
+function downloadNoteAsFile(text, filename) {
+    try {
         // Create a blob with the text content
-        const blob = new Blob([noteText], { type: 'text/plain' });
+        const blob = new Blob([text], { type: 'text/plain' });
         
         // Create download link
         const link = document.createElement('a');
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-        link.download = `note-${timestamp}.txt`;
+        link.download = filename;
         link.href = URL.createObjectURL(blob);
         link.click();
         
@@ -73,7 +117,7 @@ function downloadNote() {
             try { window.playRetroClick(); } catch (err) {}
         }
     } catch (error) {
-        console.error('Error downloading note:', error);
+        console.error('Error downloading file:', error);
     }
 }
 
