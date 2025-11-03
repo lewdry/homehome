@@ -1383,6 +1383,7 @@ body.force-dark .calc-result {
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
+    position: relative;
 }
 
 .note-text-area > div {
@@ -1597,6 +1598,30 @@ body.force-dark .note-text-area > div {
 
 .note-key.shift.active:hover {
     background-color: #719e07;
+}
+
+/* Download icon styles */
+.download-icon {
+    position: absolute;
+    bottom: 0.4rem;
+    right: 0.6rem;
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--border-color);
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: opacity 0.2s;
+    z-index: 10;
+    line-height: 1;
+}
+
+.download-icon:hover {
+    opacity: 0.7;
+}
+
+.download-icon:active {
+    opacity: 0.5;
 }
 
 /* Media queries for short displays - prioritize home page content */

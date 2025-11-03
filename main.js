@@ -2,8 +2,9 @@
 // Global mute state
 window.isMuted = false;
 
-// Clock interval reference
-let clockInterval = null;
+// Clock interval references (separate footer and popup intervals to avoid overwriting)
+let footerClockInterval = null;
+let popupClockInterval = null;
 
 // Theme toggle functionality
 const themeToggle = document.querySelector('.theme-toggle');
@@ -540,9 +541,9 @@ function updateClock() {
     }
 }
 
-// Update clock immediately and then every second
+// Update footer clock immediately and then every second
 updateClock();
-clockInterval = setInterval(updateClock, 1000);
+footerClockInterval = setInterval(updateClock, 1000);
 
 // Cleanup clock interval on page unload
 window.addEventListener('beforeunload', () => {
@@ -760,9 +761,9 @@ function showClockPopup() {
         window.BlokGame.stop();
     }
     
-    // Update clock immediately and start interval
+    // Update clock popup immediately and start popup interval
     updateClockPopup();
-    clockInterval = setInterval(updateClockPopup, 1000);
+    popupClockInterval = setInterval(updateClockPopup, 1000);
     
     // Focus the Home button for keyboard users
     setTimeout(() => clockHomeBtn.focus(), 100);
@@ -775,10 +776,10 @@ function hideClockPopup() {
     clockPopup.style.display = 'none';
     if (clockOverlay) clockOverlay.style.display = 'none';
     
-    // Clear interval
-    if (clockInterval) {
-        clearInterval(clockInterval);
-        clockInterval = null;
+    // Clear popup interval
+    if (popupClockInterval) {
+        clearInterval(popupClockInterval);
+        popupClockInterval = null;
     }
     
     // Resume games if they were on their respective tabs

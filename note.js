@@ -52,6 +52,31 @@ let backspaceHoldTimer = null;
 let backspaceHoldInterval = null;
 let backspaceDeleteSpeed = 150; // Start speed in ms
 
+// Download function for NOTE
+function downloadNote() {
+    try {
+        // Create a blob with the text content
+        const blob = new Blob([noteText], { type: 'text/plain' });
+        
+        // Create download link
+        const link = document.createElement('a');
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+        link.download = `note-${timestamp}.txt`;
+        link.href = URL.createObjectURL(blob);
+        link.click();
+        
+        // Clean up the URL object
+        URL.revokeObjectURL(link.href);
+        
+        // Play sound if available
+        if (window.playRetroClick) {
+            try { window.playRetroClick(); } catch (err) {}
+        }
+    } catch (error) {
+        console.error('Error downloading note:', error);
+    }
+}
+
 function initNote() {
     const noteTextArea = document.getElementById('noteTextArea');
     const noteKeyboard = document.getElementById('noteKeyboard');
@@ -140,6 +165,16 @@ function initNote() {
         };
         
         window.addEventListener('resize', resizeHandler);
+        
+        // Download button event listener
+        const downloadBtn = document.getElementById('note-download');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', downloadNote);
+            downloadBtn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                downloadNote();
+            });
+        }
         
         noteListenersAttached = true;
     }
@@ -474,6 +509,17 @@ window.cleanupNote = function() {
         resizeHandler = null;
     }
     
+    // Clear any backspace hold timers to avoid leaving intervals running
+    if (backspaceHoldTimer) {
+        clearTimeout(backspaceHoldTimer);
+        backspaceHoldTimer = null;
+    }
+    if (backspaceHoldInterval) {
+        clearInterval(backspaceHoldInterval);
+        backspaceHoldInterval = null;
+    }
+    backspaceDeleteSpeed = 150; // Reset speed
+
     // Clear handler references
     textAreaClickHandler = null;
     textAreaTouchHandler = null;

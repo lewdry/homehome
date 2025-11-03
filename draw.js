@@ -73,6 +73,16 @@ function initDrawing() {
     drawCanvas.addEventListener('touchend', handleDrawEnd, { passive: false });
     drawCanvas.addEventListener('touchcancel', handleDrawCancel, { passive: false });
 
+    // Download button event listener
+    const downloadBtn = document.getElementById('draw-download');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', downloadDrawing);
+        downloadBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            downloadDrawing();
+        });
+    }
+
     console.log('Drawing initialized');
 }
 
@@ -305,6 +315,26 @@ function cleanupTouches() {
         if (!ongoingTouches[i] || !ongoingTouches[i].id) {
             ongoingTouches.splice(i, 1);
         }
+    }
+}
+
+function downloadDrawing() {
+    if (!drawCanvas) return;
+    
+    try {
+        // Create download link
+        const link = document.createElement('a');
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+        link.download = `drawing-${timestamp}.png`;
+        link.href = drawCanvas.toDataURL('image/png');
+        link.click();
+        
+        // Play sound if available
+        if (window.playRetroClick) {
+            try { window.playRetroClick(); } catch (err) {}
+        }
+    } catch (error) {
+        console.error('Error downloading drawing:', error);
     }
 }
 
