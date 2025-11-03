@@ -59,36 +59,32 @@ function downloadNote() {
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
         const filename = `note-${timestamp}.txt`;
         
-        // Check if Web Share API is available and supports sharing files
-        if (navigator.share && navigator.canShare) {
-            // Create a file from the text content
-            const blob = new Blob([noteText], { type: 'text/plain' });
-            const file = new File([blob], filename, { type: 'text/plain' });
+        // Check if Web Share API is available
+        if (navigator.share) {
+            // Share just the text content (no file attachment)
             const shareData = {
-                files: [file],
+                text: noteText,
                 title: 'Note from Homehomehome'
             };
             
-            // Check if the device can share this data
-            if (navigator.canShare(shareData)) {
-                navigator.share(shareData)
-                    .then(() => {
-                        // Play sound if available
-                        if (window.playRetroClick) {
-                            try { window.playRetroClick(); } catch (err) {}
-                        }
-                    })
-                    .catch((err) => {
-                        // User cancelled - don't download
-                        if (err.name === 'AbortError') {
-                            return;
-                        }
-                        // Other error occurred, fall back to download
-                        console.log('Share failed, falling back to download:', err);
-                        downloadNoteAsFile(noteText, filename);
-                    });
-                return;
-            }
+            // Share as text (this will populate the message field)
+            navigator.share(shareData)
+                .then(() => {
+                    // Play sound if available
+                    if (window.playRetroClick) {
+                        try { window.playRetroClick(); } catch (err) {}
+                    }
+                })
+                .catch((err) => {
+                    // User cancelled - don't download
+                    if (err.name === 'AbortError') {
+                        return;
+                    }
+                    // Other error occurred, fall back to download
+                    console.log('Share failed, falling back to download:', err);
+                    downloadNoteAsFile(noteText, filename);
+                });
+            return;
         }
         
         // Fallback to download if Web Share API not available

@@ -1607,7 +1607,7 @@ body.force-dark .note-text-area > div {
     right: 0.6rem;
     font-size: 2rem;
     font-weight: bold;
-    color: var(--border-color);
+    color: var(--text-primary);
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
