@@ -358,9 +358,31 @@ function getOperatorSymbol(op) {
 function updateDisplay() {
     if (resultDisplay) {
         resultDisplay.textContent = textToLCD(calculatorState.currentValue);
+        adjustFontSizeToFit();
     }
     if (equationDisplay) {
         equationDisplay.textContent = calculatorState.equation;
+    }
+}
+
+// Dynamically adjust font size if content overflows
+function adjustFontSizeToFit() {
+    if (!resultDisplay) return;
+    
+    // Reset to default size first
+    resultDisplay.style.fontSize = '';
+    
+    // Check if content overflows (scrollWidth > clientWidth means content doesn't fit)
+    if (resultDisplay.scrollWidth > resultDisplay.clientWidth) {
+        // Calculate scale factor needed
+        const scaleFactor = resultDisplay.clientWidth / resultDisplay.scrollWidth;
+        
+        // Get current computed font size
+        const currentFontSize = parseFloat(window.getComputedStyle(resultDisplay).fontSize);
+        
+        // Apply scaled down font size (with a small padding factor for safety)
+        const newFontSize = currentFontSize * scaleFactor * 0.95;
+        resultDisplay.style.fontSize = `${newFontSize}px`;
     }
 }
 
