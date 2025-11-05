@@ -947,7 +947,7 @@ body.force-dark #clock-date-display {
 #clock-digital-display {
     font-family: 'Courier New', 'Courier', monospace;
     font-size: 0.9em;
-    font-weight: 500;
+    font-weight: 700;
     text-align: center;
     margin-bottom: 12px;
     letter-spacing: 2px;

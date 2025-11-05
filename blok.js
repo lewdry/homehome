@@ -27,10 +27,10 @@
 
     // Game configuration - tweakable parameters
     const CONFIG = {
-        BALL_RADIUS: 8,
-        BALL_SPEED_INITIAL: 4,
-        BALL_SPEED_INCREMENT: 0.0002, // Very slight speed increase per frame
-        BALL_SPEED_MAX: 5,
+    BALL_RADIUS: 8,
+    BALL_SPEED_INITIAL: 140, // pixels per second (was 4 per frame)
+    BALL_SPEED_INCREMENT: 2, // pixels per second per second (was 0.0002 per frame)
+    BALL_SPEED_MAX: 280, // pixels per second (was 5 per frame)
         SPEED_MULTIPLIER: 1, // Current speed multiplier (1, 1.5, or 2)
         PADDLE_HEIGHT: 12,
         PADDLE_WIDTH: 80,
@@ -505,7 +505,10 @@
     function update(deltaTime) {
         const canvasWidth = canvas.width / (window.devicePixelRatio || 1);
         const canvasHeight = canvas.height / (window.devicePixelRatio || 1);
-        
+
+        // Convert deltaTime from ms to seconds
+        const dt = deltaTime / 1000;
+
         // Update paddle position - paddle.x is the center
         const paddleHalfWidth = CONFIG.PADDLE_WIDTH / 2;
         if (gameState.keys.left && gameState.paddle.x > paddleHalfWidth) {
@@ -514,7 +517,7 @@
         if (gameState.keys.right && gameState.paddle.x < canvasWidth - paddleHalfWidth) {
             gameState.paddle.x += CONFIG.PADDLE_SPEED;
         }
-        
+
         // Mouse/touch control - paddle.x is the center
         if (gameState.mouseX !== null) {
             // Clamp paddle center to keep paddle within bounds
@@ -524,27 +527,30 @@
             // Clamp paddle center to keep paddle within bounds
             gameState.paddle.x = Math.max(paddleHalfWidth, Math.min(gameState.touchX, canvasWidth - paddleHalfWidth));
         }
-        
+
         // Only update ball physics if ball is in motion
         if (!gameState.ballInMotion) {
             // Keep ball centered above paddle when stationary
             gameState.ball.x = gameState.paddle.x;
             return; // Don't process ball physics
         }
-        
-        // Gradually increase ball speed
+
+        // Gradually increase ball speed (pixels per second)
         const maxSpeed = CONFIG.BALL_SPEED_MAX * CONFIG.SPEED_MULTIPLIER;
         if (gameState.ball.speed < maxSpeed) {
-            gameState.ball.speed += CONFIG.BALL_SPEED_INCREMENT * CONFIG.SPEED_MULTIPLIER;
-            const speedRatio = gameState.ball.speed / Math.sqrt(gameState.ball.dx ** 2 + gameState.ball.dy ** 2);
-            gameState.ball.dx *= speedRatio;
-            gameState.ball.dy *= speedRatio;
+            gameState.ball.speed += CONFIG.BALL_SPEED_INCREMENT * CONFIG.SPEED_MULTIPLIER * deltaTime;
+            const currentSpeed = Math.sqrt(gameState.ball.dx ** 2 + gameState.ball.dy ** 2);
+            if (currentSpeed > 0) {
+                const speedRatio = gameState.ball.speed / currentSpeed;
+                gameState.ball.dx *= speedRatio;
+                gameState.ball.dy *= speedRatio;
+            }
         }
-        
-        // Update ball position
-        gameState.ball.x += gameState.ball.dx;
-        gameState.ball.y += gameState.ball.dy;
-        
+
+        // Update ball position using time-based movement
+        gameState.ball.x += gameState.ball.dx * dt;
+        gameState.ball.y += gameState.ball.dy * dt;
+
         // Ball edges for collision detection
         const ballLeft = gameState.ball.x - CONFIG.BALL_RADIUS;
         const ballRight = gameState.ball.x + CONFIG.BALL_RADIUS;

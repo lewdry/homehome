@@ -562,16 +562,14 @@ window.addEventListener('beforeunload', () => {
 // Random modern tech term
 const modernTechTerms = [
     'the cloud',
-    'blockchain',
-    'generative AI',
-    'quantum computing',
-    '6G networks',
-    'edge computing',
+    'cyberspace',
+    'an alternate universe',
     'virtual reality',
-    'robotics',
     'the metaverse',
-    'crypto',
-    'virtual assistants'
+    'blockchain',
+    'the matrix',
+    'quantum space',
+    'space tourism'
 ];
 
 // Get a random term that's different from the default "the cloud"
@@ -670,13 +668,13 @@ function drawAsciiClock(hours, minutes, seconds) {
     // Draw center
     grid[centerY][centerX] = { char: '●', color: null };
     
-    // Draw hour hand (blue - #268bd2)
+    // Draw hour hand (blue - #1e7bb2)
     const hourAngle = ((hours % 12) * 30 + minutes * 0.5 - 90) * Math.PI / 180;
     for (let i = 1; i <= 5; i++) {
         const x = Math.round(centerX + i * 1.8 * 0.6 * Math.cos(hourAngle));
         const y = Math.round(centerY + i * 0.6 * Math.sin(hourAngle));
         if (y >= 0 && y < 21 && x >= 0 && x < 41) {
-            grid[y][x] = { char: '█', color: '#268bd2' };
+            grid[y][x] = { char: '█', color: '#1e7bb2' };
         }
     }
     
@@ -731,7 +729,7 @@ function updateClockPopup() {
         const hoursStr = String(hours).padStart(2, '0');
         const minutesStr = String(minutes).padStart(2, '0');
         const secondsStr = String(seconds).padStart(2, '0');
-        digitalDisplay.textContent = `${hoursStr}:${minutesStr}:${secondsStr}`;
+        digitalDisplay.innerHTML = `<span style=\"color:#1e7bb2\">${hoursStr}</span><span class=\"clock-colon\">:</span><span style=\"color:#859900\">${minutesStr}</span><span class=\"clock-colon\">:</span><span style=\"color:#dc322f\">${secondsStr}</span>`;
     }
     
     // Update date display
