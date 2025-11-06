@@ -573,7 +573,7 @@ const modernTechTerms = [
 ];
 
 // Get a random term that's different from the default "the cloud"
-const defaultTerm = 'the cloud';
+const defaultTerm = 'utopia';
 let randomTerm;
 do {
     randomTerm = modernTechTerms[Math.floor(Math.random() * modernTechTerms.length)];
