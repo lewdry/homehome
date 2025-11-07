@@ -4,7 +4,7 @@ A retro Web 0.1 operating system experience, imagined for a time before the worl
 
 ## Features
 
-**Six Interactive Tabs:**
+**Seven Interactive Tabs:**
 
 - **HOME** - Welcome screen with ASCII art and system status
 - **BONK** - Physics-based bouncing ball game with collision detection
@@ -12,6 +12,7 @@ A retro Web 0.1 operating system experience, imagined for a time before the worl
 - **CALC** - Functional calculator with persistent state
 - **DRAW** - Simple pixel-art drawing canvas
 - **NOTE** - On-screen keyboard notepad (uppercase only)
+- **BOOK** - Lightweight e-reader for the plain-text books in `books/` (search, page jump, adjustable text size)
 
 **Additional Features:**
 - Dark/light theme toggle with Solarized color palette
@@ -59,25 +60,55 @@ Simply open `index.html` in a web browser. No build process or dependencies requ
 - Hold backspace to delete continuously
 - Double-tap text area to randomize keys
 
+## BOOK
+
+**BOOK (e-reader):**
+- Browse and open any plain-text file from the `books/` folder
+- Search within a book, jump to a page/line, and change text size for comfortable reading
+- Book progress will be saved to local storage, so the app will remember where you got to
+- Swipe to move between pages/sections
+
+## Deeplinks (parameterised URLs)
+
+You can open Homehomehome directly into an app or a specific book using query parameters in the URL. This makes it easy to link to a particular book or location.
+
 ## File Structure
 
 ```
 homehomehome/
 ├── index.html          # Main HTML with embedded CSS
-├── bonk.js            # Bouncing balls physics game
-├── blok.js            # Breakout/brick-breaker game
-├── calc.js            # Calculator logic
-├── draw.js            # Drawing canvas functionality
-├── note.js            # Notepad with on-screen keyboard
-├── utils.js           # Shared utilities and sound generation
+├── bonk.js             # Bouncing balls physics game
+├── blok.js             # Breakout/brick-breaker game
+├── calc.js             # Calculator logic
+├── draw.js             # Drawing canvas functionality
+├── note.js             # Notepad with on-screen keyboard
+├── book.js             # BOOK e-reader app
+├── utils.js            # Shared utilities and sound generation
 └── sounds/
-    ├── G2.mp3         # Musical collision sounds (G2, A2, B2, D3, E3, G3)
-    ├── A2.mp3         # Randomly selected for game collisions
-    ├── B2.mp3         # Basic Tape Keys instrument from Ableton
+    ├── A2.mp3         # Musical collision notes and UI tones
+    ├── B2.mp3
+    ├── B3.mp3
     ├── D3.mp3
+    ├── D4.mp3
     ├── E3.mp3
+    ├── G2.mp3
     ├── G3.mp3
+    ├── G4.mp3
     └── click.mp3      # UI click sound effect
+
+└── books/
+    ├── aroundtheworld.txt
+    ├── awakening.txt
+    ├── callofcthulhu.txt
+    ├── frankenstein.txt
+    ├── janeeyre.txt
+    ├── littlewomen.txt
+    ├── mobydick.txt
+    ├── prideandprejudice.txt
+    ├── rubaiyat.txt
+    ├── thirtyninesteps.txt
+    ├── treasureisland.txt
+    └── yellowwallpaper.txt
 ```
 
 ## Technical Details
@@ -85,7 +116,7 @@ homehomehome/
 - **Pure vanilla JavaScript** - No frameworks or libraries
 - **Solarized color scheme** by Ethan Schoonover
 - **Pixel-perfect rendering** with dithering effects
-- **Web Audio API** for sound effects with CC0 samples
+- **Web Audio API** for sound effects with homemade CC0 samples
 - **Responsive canvas** rendering with device pixel ratio support
 - **Touch-optimized** with proper event handling
 - **Accessibility-first** approach with ARIA labels and keyboard support

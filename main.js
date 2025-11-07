@@ -155,9 +155,27 @@ function handleResetApp() {
         } catch (err) {}
     }
     
-    // Brief delay to let sound play, then reload
+    // Brief delay to let sound play, then navigate back to HOME tab
     setTimeout(() => {
-        window.location.reload();
+        try {
+            // Hide any open popups
+            if (typeof hideClockPopup === 'function') hideClockPopup();
+            if (bonkPopup) bonkPopup.style.display = 'none';
+            if (blokPopup) blokPopup.style.display = 'none';
+            if (drawPopup) drawPopup.style.display = 'none';
+
+            // Hide credits if visible
+            if (thksVisible && typeof hideCredits === 'function') hideCredits();
+
+            // Switch to the home tab instead of reloading the page
+            const homeTab = document.querySelector('.tab[data-tab="home"]');
+            if (homeTab) {
+                switchToTab(homeTab);
+            }
+        } catch (err) {
+            // Fallback to reload if something unexpected fails
+            try { window.location.reload(); } catch (e) {}
+        }
     }, 100);
 }
 
@@ -173,6 +191,7 @@ resetApp.addEventListener('keydown', (e) => {
 const tabs = document.querySelectorAll('.tab');
 const tabContents = document.querySelectorAll('.tab-content');
 const bonkTab = document.querySelector('.tab[data-tab="bonk"]');
+const tabsContainer = document.querySelector('.tabs');
 let bonkInitialized = false;
 let blokInitialized = false;
 let drawInitialized = false;
@@ -182,6 +201,182 @@ let blokStarted = false;
 let drawStarted = false;
 let bonkEverStarted = false; // Track if bonk has ever been started
 let blokEverStarted = false; // Track if blok has ever been started
+// When true, the next call to switchToTab will not move focus to the tab.
+// Used to avoid showing the browser focus ring on initial load routing.
+let suppressNextTabFocus = false;
+
+// --- Simple client-side router / history helpers ---
+let isNavigatingHistory = false; // true when handling popstate/route to avoid loops
+let routerPreviousPath = '/';
+let previousPathBeforePopup = null;
+
+function getPathForTabName(name) {
+    switch (name) {
+        case 'home': return '/';
+        case 'bonk': return '/bonk';
+        case 'blok': return '/blok';
+        case 'book': return '/book';
+        case 'calc': return '/calc';
+        case 'draw': return '/draw';
+        case 'note': return '/note';
+        default: return '/';
+    }
+}
+
+function updateHistory(path, replace = false) {
+    try {
+        if (replace) history.replaceState({ path }, '', path);
+        else history.pushState({ path }, '', path);
+    } catch (err) {
+        // ignore URL update errors (some platforms may restrict)
+    }
+}
+
+function route(path) {
+    // route to a path (called from popstate or initial load). Avoid pushing new history here.
+    isNavigatingHistory = true;
+    try {
+        routerPreviousPath = (location.pathname || '/') + (location.search || '');
+
+        // If there's a special query param format like ?=bonk or ?=books/frankenstein, prefer that
+        const search = location.search || '';
+        if (search.startsWith('?=')) {
+            const raw = decodeURIComponent(search.slice(2).split('&')[0] || '');
+            if (!raw || raw === 'home') {
+                const homeTab = document.querySelector('.tab[data-tab="home"]');
+                if (homeTab) switchToTab(homeTab);
+                if (clockPopupVisible) hideClockPopup();
+                if (thksVisible) hideCredits();
+                return;
+            }
+
+            // books deep-link: ?=books/:id
+            if (raw.startsWith('books/')) {
+                const parts = raw.split('/');
+                const id = parts[1];
+                const tab = document.querySelector('.tab[data-tab="book"]');
+                if (tab) {
+                    switchToTab(tab);
+                    setTimeout(() => { if (typeof openBook === 'function' && id) openBook(id); }, 50);
+                }
+                return;
+            }
+
+            // single token routes: bonk, blok, book, calc, draw, note, clock, thks
+            switch (raw) {
+                case 'bonk': case 'blok': case 'book': case 'calc': case 'draw': case 'note': {
+                    const tab = document.querySelector(`.tab[data-tab="${raw}"]`);
+                    if (tab) switchToTab(tab);
+                    return;
+                }
+                case 'clock':
+                    showClockPopup();
+                    return;
+                case 'thks':
+                case 'thanks':
+                case 'credits':
+                    showCredits();
+                    return;
+                default: {
+                    // Unknown token -> fallback to home
+                    const homeTab = document.querySelector('.tab[data-tab="home"]');
+                    if (homeTab) switchToTab(homeTab);
+                    return;
+                }
+            }
+        }
+
+        // Fallback to pathname-based routing (existing behavior)
+        // normalize trailing slash (except root)
+        if (path && path.length > 1 && path.endsWith('/')) path = path.slice(0, -1);
+
+        if (!path || path === '/' || path === '/home') {
+            const homeTab = document.querySelector('.tab[data-tab="home"]');
+            if (homeTab) switchToTab(homeTab);
+            if (clockPopupVisible) hideClockPopup();
+            if (thksVisible) hideCredits();
+            return;
+        }
+
+        if (path === '/bonk' || path === '/blok' || path === '/book' || path === '/calc' || path === '/draw' || path === '/note') {
+            const tabName = path.slice(1);
+            const tab = document.querySelector(`.tab[data-tab="${tabName}"]`);
+            if (tab) switchToTab(tab);
+            return;
+        }
+
+        if (path === '/clock') {
+            showClockPopup();
+            return;
+        }
+
+        if (path === '/thks' || path === '/thanks' || path === '/credits') {
+            showCredits();
+            return;
+        }
+
+        // books deep-link: /books/:id
+        if (path.startsWith('/books/')) {
+            const id = path.split('/')[2];
+            const tab = document.querySelector('.tab[data-tab="book"]');
+            if (tab) {
+                switchToTab(tab);
+                // open the book after a short delay to allow book list to initialize
+                setTimeout(() => {
+                    if (typeof openBook === 'function' && id) openBook(id);
+                }, 50);
+            }
+            return;
+        }
+
+        // Unknown path -> fallback to home
+        const homeTab = document.querySelector('.tab[data-tab="home"]');
+        if (homeTab) switchToTab(homeTab);
+    } finally {
+        isNavigatingHistory = false;
+    }
+}
+
+window.addEventListener('popstate', (e) => {
+    const path = location.pathname || '/';
+    route(path);
+});
+
+function updateTabOverflowClass() {
+    if (!tabsContainer) return;
+    // Remove all responsive classes first
+    tabsContainer.classList.remove('tight-tabs', 'tighter-tabs', 'tiny-tabs');
+    // Check if tabs overflow
+    const containerWidth = tabsContainer.offsetWidth;
+    let totalTabsWidth = 0;
+    tabs.forEach(tab => {
+        totalTabsWidth += tab.offsetWidth;
+    });
+    if (totalTabsWidth > containerWidth) {
+        tabsContainer.classList.add('tight-tabs');
+        // Recalculate after class applied
+        setTimeout(() => {
+            let totalTabsWidth2 = 0;
+            tabs.forEach(tab => { totalTabsWidth2 += tab.offsetWidth; });
+            if (totalTabsWidth2 > containerWidth) {
+                tabsContainer.classList.remove('tight-tabs');
+                tabsContainer.classList.add('tighter-tabs');
+                setTimeout(() => {
+                    let totalTabsWidth3 = 0;
+                    tabs.forEach(tab => { totalTabsWidth3 += tab.offsetWidth; });
+                    if (totalTabsWidth3 > containerWidth) {
+                        tabsContainer.classList.remove('tighter-tabs');
+                        tabsContainer.classList.add('tiny-tabs');
+                    }
+                }, 10);
+            }
+        }, 10);
+    }
+}
+
+window.addEventListener('resize', updateTabOverflowClass);
+window.addEventListener('DOMContentLoaded', updateTabOverflowClass);
+setTimeout(updateTabOverflowClass, 100);
 
 // Popup elements
 const bonkPopup = document.getElementById('bonk-popup');
@@ -284,9 +479,23 @@ function switchToTab(tab) {
     if (tabName === 'home' && typeof triggerAsciiGlow === 'function') {
         triggerAsciiGlow();
     }
-    
+
+    // Initialize BOOK tab when switching to it
+    if (tabName === 'book' && typeof window.initBookTab === 'function') {
+        console.log('[BOOK] switchToTab: calling initBookTab (tab switch)');
+        window.initBookTab();
+    }
+
     // Focus the tab for screen reader announcement
-    tab.focus();
+    // Focus the tab for screen reader announcement unless we've suppressed
+    // focus for the next tab activation (used on initial routing to avoid
+    // the browser showing a focus ring on load).
+    if (suppressNextTabFocus) {
+        // Clear the flag so subsequent switches behave normally
+        suppressNextTabFocus = false;
+    } else {
+        tab.focus();
+    }
     
     // Initialize bonk game on first click
     if (tabName === 'bonk' && !bonkInitialized) {
@@ -351,6 +560,16 @@ function switchToTab(tab) {
         if (typeof initCalculator === 'function') {
             initCalculator();
         }
+    }
+
+    // Update address bar silently (don't push when handling popstate/route)
+    if (!isNavigatingHistory) {
+        // Use query-style routing to avoid server rewrite requirements.
+        // Compute base from current pathname (so subpath hosting still works)
+        const base = (location.pathname && location.pathname !== '/') ? location.pathname.split('?')[0] : '/';
+        const q = `?=${encodeURIComponent(tabName)}`;
+        const pathToPush = (base === '/' ? '/' : base) + q;
+        updateHistory(pathToPush);
     }
 }
 
@@ -455,6 +674,13 @@ function showCredits() {
     // Show credits content
     thksContent.classList.add('active');
     thksVisible = true;
+
+    // update URL to credits
+    if (!isNavigatingHistory) {
+        const base = (location.pathname && location.pathname !== '/') ? location.pathname.split('?')[0] : '/';
+        const pathToPush = (base === '/' ? '/' : base) + `?=${encodeURIComponent('thks')}`;
+        updateHistory(pathToPush);
+    }
 }
 
 function hideCredits() {
@@ -471,6 +697,14 @@ function hideCredits() {
         if (homeTab) {
             switchToTab(homeTab);
         }
+    }
+
+    // Restore URL to previous tab path (replace rather than push)
+    if (!isNavigatingHistory) {
+        const prevPath = previousTab ? previousTab.getAttribute('data-tab') : 'home';
+        const base = (location.pathname && location.pathname !== '/') ? location.pathname.split('?')[0] : '/';
+        const pathToPush = (base === '/' ? '/' : base) + `?=${encodeURIComponent(prevPath)}`;
+        updateHistory(pathToPush, true);
     }
 }
 
@@ -771,10 +1005,28 @@ function showClockPopup() {
     
     // Focus the Home button for keyboard users
     setTimeout(() => clockHomeBtn.focus(), 100);
+
+    // update URL to /clock
+    try {
+        previousPathBeforePopup = (location.pathname || '/') + (location.search || '');
+        if (!isNavigatingHistory) {
+            const base = (location.pathname && location.pathname !== '/') ? location.pathname.split('?')[0] : '/';
+            const pathToPush = (base === '/' ? '/' : base) + `?=${encodeURIComponent('clock')}`;
+            updateHistory(pathToPush);
+        }
+    } catch (err) {}
 }
 
 // Hide clock popup
 function hideClockPopup() {
+    // If the BOOK tab is active when closing the clock popup, re-init the book tab
+    const activeTab = document.querySelector('.tab.active');
+    if (activeTab && activeTab.getAttribute('data-tab') === 'book') {
+        console.log('[BOOK] hideClockPopup: calling initBookTab');
+        if (typeof window.initBookTab === 'function') {
+            window.initBookTab();
+        }
+    }
     clockPopupVisible = false;
     const clockOverlay = document.getElementById('clock-overlay');
     clockPopup.style.display = 'none';
@@ -801,6 +1053,15 @@ function hideClockPopup() {
     
     // Return focus to the footer clock
     footerClock.focus();
+
+    // restore URL to previous path (replace to avoid adding extra history)
+    try {
+        if (!isNavigatingHistory) {
+            const to = previousPathBeforePopup || '/';
+            updateHistory(to, true);
+        }
+    } catch (err) {}
+    previousPathBeforePopup = null;
 }
 
 // Clock home button click handler
@@ -830,4 +1091,15 @@ footerClock.addEventListener('keydown', (e) => {
             showClockPopup();
         }
     }
+});
+
+// On initial load, route to current location (supports deep links)
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        // Allow other init code to run first. Suppress the automatic focus
+        // on the first tab activation so the browser doesn't show the focus
+        // ring on page load.
+        suppressNextTabFocus = true;
+        setTimeout(() => route(location.pathname || '/'), 50);
+    } catch (err) {}
 });

@@ -1,3 +1,295 @@
+/* h1 keeps 1.4em, .book-link-h1 matches book text size */
+/* Book reader links match THKS tab links */
+.book-reader-content a {
+    color: #268bd2;
+    text-decoration: none;
+    font-weight: bold;
+    background-color: #268bd2;
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.12) 2px,
+            rgba(0, 0, 0, 0.12) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.12) 2px,
+            rgba(0, 0, 0, 0.12) 4px
+        );
+    background-size: 4px 4px;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: opacity 0.2s;
+}
+.book-reader-content a:hover {
+    opacity: 0.7;
+}
+@media (prefers-color-scheme: dark) {
+    .book-reader-content a {
+        color: #3294c2;
+        background-color: #3294c2;
+        background-image: 
+            repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.08) 2px,
+                rgba(0, 0, 0, 0.08) 4px
+            ),
+            repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 0, 0, 0.08) 2px,
+                rgba(0, 0, 0, 0.08) 4px
+            );
+    }
+}
+body.force-dark .book-reader-content a {
+    color: #3294c2;
+    background-color: #3294c2;
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.08) 2px,
+            rgba(0, 0, 0, 0.08) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.08) 2px,
+            rgba(0, 0, 0, 0.08) 4px
+        );
+}
+
+body.force-dark h1, body.force-dark .book-link-h1 {
+    background-color: #3294c2;
+    background-image: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.08) 2px,
+            rgba(0, 0, 0, 0.08) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.08) 2px,
+            rgba(0, 0, 0, 0.08) 4px
+        );
+    color: #3294c2;
+}
+/* Responsive tab overflow classes */
+.tabs.tight-tabs .tab {
+    padding: 4px 8px !important;
+    font-size: 0.9em !important;
+}
+.tabs.tighter-tabs .tab {
+    padding: 2px 4px !important;
+    font-size: 0.8em !important;
+}
+.tabs.tiny-tabs .tab {
+    padding: 0 2px !important;
+    font-size: 0.7em !important;
+}
+/* BOOK Tab Styles */
+.book-list-container {
+    height: 100%;
+    overflow-y: auto;
+    background: var(--bg-base);
+    border: 2px solid var(--border-color);
+    box-shadow: 2px 2px 0 var(--border-color);
+    padding: 0;
+    margin: 0;
+    scrollbar-width: thin;
+    scrollbar-color: #586e75 var(--bg-surface);
+}
+
+.book-percent-read {
+    float: right;
+    text-align: right;
+    min-width: 3em;
+    font-weight: normal;
+    color: inherit;
+    vertical-align: middle;
+}
+
+/* Blocky, square-ended, dithered scrollbars (global + per-component fallback)
+   - WebKit (Chrome / Safari / Edge): custom thumb with repeating dither and square end caps
+   - Firefox: fallback using scrollbar-color and scrollbar-width
+*/
+/* Firefox fallback for all scrollable elements */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scroll-thumb) var(--bg-surface);
+}
+
+/* WebKit-based browsers (Chrome / Safari / Edge) */
+*::-webkit-scrollbar {
+    width: 18px;
+    height: 18px;
+    background: var(--bg-surface);
+}
+*::-webkit-scrollbar-thumb {
+    /* dithered diagonal pattern using the two theme colors */
+    background: repeating-linear-gradient(135deg, var(--scroll-thumb) 0 4px, var(--scroll-thumb-alt) 4px 8px);
+    border: 2px solid var(--border-color);
+    border-radius: 0; /* square end caps */
+    min-height: 32px;
+    box-shadow: none;
+}
+*::-webkit-scrollbar-track {
+    background: var(--bg-surface);
+    border-radius: 0;
+}
+*::-webkit-scrollbar-corner {
+    background: var(--bg-surface);
+}
+
+/* Keep the component-specific rule for .book-list-container so it remains explicit */
+.book-list-container::-webkit-scrollbar { width: 18px; background: var(--bg-surface); }
+.book-list-container::-webkit-scrollbar-thumb { background: repeating-linear-gradient(135deg, var(--scroll-thumb) 0 4px, var(--scroll-thumb-alt) 4px 8px); border: 2px solid var(--border-color); border-radius: 0; min-height: 32px; }
+.book-list-container::-webkit-scrollbar-track { background: var(--bg-surface); }
+
+.book-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.book-list-item {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    padding: 5px 18px 5px 32px;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    background: none;
+    color: var(--text-primary);
+    transition: background 0.15s, color 0.15s;
+    outline: none;
+    position: relative;
+    user-select: none;
+}
+.book-list-item:last-child {
+    border-bottom: none;
+}
+.book-list-item:focus-visible {
+    outline: 3px solid #268bd2;
+    background: var(--bg-surface);
+}
+.book-list-item:hover {
+    background: var(--bg-surface);
+}
+.book-list-item .offline-indicator {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.9em;
+    color: #35b1a8;
+}
+.book-list-item.read {
+    text-decoration: line-through;
+    color: #93a1a1;
+    font-weight: normal;
+}
+.book-list-item.started {
+    font-weight: bold;
+}
+.book-list-item.unread {
+    font-weight: normal;
+}
+
+/* Book reader container */
+.book-reader-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-base);
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    box-shadow: 2px 2px 0 var(--border-color);
+    border: 2px solid var(--border-color);
+    padding: 0;
+    overflow: hidden;
+}
+.book-reader-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: var(--bg-surface);
+    border-bottom: 2px solid var(--border-color);
+    padding: 8px 12px;
+    font-family: inherit;
+    font-size: 1em;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+.book-reader-close {
+    cursor: pointer;
+    font-size: 1.2em;
+    background: none;
+    border: none;
+    color: #dc322f;
+    font-weight: bold;
+    margin-left: 12px;
+    position: absolute;
+    right: 16px;
+    top: 8px;
+    user-select: none;
+}
+.book-reader-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 18px 24px 18px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.1em;
+    color: var(--text-primary);
+    background: var(--bg-base);
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.7;
+    user-select: text;
+    -webkit-user-select: text;
+    outline: none;
+}
+.book-reader-content:focus-visible {
+    outline: 3px solid #268bd2;
+}
+
+/* ASCII spinner */
+.book-spinner {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.2em;
+    color: #268bd2;
+    text-align: center;
+    margin: 48px 0 0 0;
+    letter-spacing: 2px;
+    animation: book-spinner-anim 1s steps(4) infinite;
+    user-select: none;
+}
+@keyframes book-spinner-anim {
+    0% { opacity: 1; }
+    25% { opacity: 0.7; }
+    50% { opacity: 0.5; }
+    75% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
 * {
     margin: 0;
     padding: 0;
@@ -16,6 +308,9 @@
     --text-primary: #586e75;
     --text-secondary: #93a1a1;
     --border-color: #93a1a1;
+    /* scrollbar colors used for dithered thumb pattern */
+    --scroll-thumb: #586e75;
+    --scroll-thumb-alt: #eee8d5;
 }
 
 /* Solarized Dark */
@@ -26,6 +321,9 @@
         --text-primary: #839496;
         --text-secondary: #586e75;
         --border-color: #586e75;
+        /* dark theme scrollbar variants */
+        --scroll-thumb: #839496;
+        --scroll-thumb-alt: #073642;
     }
 }
 
@@ -58,6 +356,7 @@ body {
 }
 
 .container {
+    position: relative;
     width: min(600px, 100%);
     aspect-ratio: 2 / 3;
     height: min(80vh, 900px);
@@ -635,6 +934,12 @@ body.force-dark .cursor {
 }
 
 /* Focus indicators for accessibility */
+.tab:focus {
+    /* Hide the native focus ring when the tab receives focus programmatically or via mouse.
+       Keep :focus-visible below so keyboard users still see a clear outline. */
+    outline: none;
+}
+
 .tab:focus-visible,
 .calc-btn:focus-visible,
 .note-key:focus-visible {
@@ -764,6 +1069,12 @@ body.force-dark .cursor {
 .clock-popup {
     max-width: 500px;
     z-index: 1000;
+    /* Use fixed positioning so the popup sits above the full-screen overlay
+       and remains centered regardless of scroll or parent stacking contexts. */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .clock-popup-content {

@@ -76,6 +76,7 @@
             <div class="tab active" data-tab="home" role="tab" aria-selected="true" aria-controls="home-content" tabindex="0">⌂</div>
             <div class="tab" data-tab="blok" role="tab" aria-selected="false" aria-controls="blok-content" tabindex="-1">BLOK</div>
             <div class="tab" data-tab="bonk" role="tab" aria-selected="false" aria-controls="bonk-content" tabindex="-1">BONK</div>
+            <div class="tab" data-tab="book" role="tab" aria-selected="false" aria-controls="book-content" tabindex="-1">BOOK</div>
             <div class="tab" data-tab="calc" role="tab" aria-selected="false" aria-controls="calc-content" tabindex="-1">CALC</div>
             <div class="tab" data-tab="draw" role="tab" aria-selected="false" aria-controls="draw-content" tabindex="-1">DRAW</div>
             <div class="tab" data-tab="note" role="tab" aria-selected="false" aria-controls="note-content" tabindex="-1">NOTE</div>
@@ -116,6 +117,16 @@
             <p>
                 Status: <span class="highlight">Online</span><span class="cursor">█</span>
             </p>
+        </div>
+
+        <!-- BOOK Tab Content -->
+        <div id="book-content" class="content tab-content" role="tabpanel" aria-labelledby="book-tab">
+            <div class="book-list-container" id="book-list-container">
+                <!-- Book list will be rendered here by book.js -->
+            </div>
+            <div class="book-reader-container" id="book-reader-container" style="display:none;">
+                <!-- Book reader will be rendered here by book.js -->
+            </div>
         </div>
 
         <div id="bonk-content" class="content tab-content" role="tabpanel" aria-labelledby="bonk-tab">
@@ -253,11 +264,19 @@
 
         <div class="footer">
             <span class="footer-text" role="button" tabindex="0" aria-label="Toggle credits">© 1988-2025 Homehomehome </span>
+            <div class="book-scroll-slider" id="book-scroll-slider" title="Scroll through book">
+                <span class="slider-dot slider-dot-left"></span>
+                <div class="slider-track">
+                    <div class="slider-handle" id="slider-handle"></div>
+                </div>
+                <span class="slider-dot slider-dot-right"></span>
+            </div>
             <span class="clock" id="clock">00:00</span>
         </div>
     </div>
 
     <script src="utils.js"></script>
+    <script src="book.js"></script>
     <script src="bonk.js"></script>
     <script src="blok.js"></script>
     <script src="calc.js"></script>
