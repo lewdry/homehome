@@ -141,7 +141,17 @@ const books = [
   { id: 'timemachine', title: 'The Time Machine', author: 'H. G. Wells', file: '/books/timemachine.txt' },
   { id: 'wutheringheights', title: 'Wuthering Heights', author: 'Emily Brontë', file: '/books/wutheringheights.txt' },
   { id: 'poemsandsongs', title: 'Poems and Songs of Robert Burns', author: 'Robert Burns', file: '/books/poemsandsongs.txt' },
-  // Add remaining books here
+  { id: 'secretgarden', title: 'The Secret Garden', author: 'Frances Hodgson Burnett', file: '/books/secretgarden.txt' },
+  { id: 'heidi', title: 'Heidi', author: 'Johanna Spyri', file: '/books/heidi.txt' },
+  { id: 'junglebook', title: 'The Jungle Book', author: 'Rudyard Kipling', file: '/books/junglebook.txt' },
+  { id: 'peterpan', title: 'Peter Pan', author: 'J. M. Barrie', file: '/books/peterpan.txt' },
+  { id: 'aliceinwonderland', title: 'Alice\'s Adventures in Wonderland', author: 'Lewis Carroll', file: '/books/aliceinwonderland.txt' },
+  { id: 'peterrabbit', title: 'The Tale of Peter Rabbit', author: 'Beatrix Potter', file: '/books/peterrabbit.txt' },
+  { id: 'blackbeauty', title: 'Black Beauty', author: 'Anna Sewell', file: '/books/blackbeauty.txt' },
+  { id: 'railwaychildren', title: 'The Railway Children', author: 'E. Nesbit', file: '/books/railwaychildren.txt' },
+  { id: 'winniethepooh', title: 'Winnie-the-Pooh', author: 'A. A. Milne', file: '/books/winniethepooh.txt' },
+  { id: 'velveteenrabbit', title: 'The Velveteen Rabbit', author: 'Margery Williams Bianco', file: '/books/velveteenrabbit.txt' }, 
+  // Add new books here
 ];
 
 let bookTabInitialized = false;
