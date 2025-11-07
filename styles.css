@@ -92,15 +92,15 @@ body.force-dark h1, body.force-dark .book-link-h1 {
 /* Responsive tab overflow classes */
 .tabs.tight-tabs .tab {
     padding: 4px 8px !important;
-    font-size: 0.9em !important;
+    font-size: 1em !important;
 }
 .tabs.tighter-tabs .tab {
-    padding: 2px 4px !important;
-    font-size: 0.8em !important;
+    padding: 4px 4px !important;
+    font-size: 0.9em !important;
 }
 .tabs.tiny-tabs .tab {
-    padding: 0 2px !important;
-    font-size: 0.7em !important;
+    padding: 4px 2px !important;
+    font-size: 0.9em !important;
 }
 /* BOOK Tab Styles */
 .book-list-container {
@@ -113,6 +113,9 @@ body.force-dark h1, body.force-dark .book-link-h1 {
     margin: 0;
     scrollbar-width: thin;
     scrollbar-color: #586e75 var(--bg-surface);
+    /* Allow native vertical panning on touch devices (preserve momentum) */
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
 }
 
 .book-percent-read {
@@ -259,7 +262,9 @@ body.force-dark h1, body.force-dark .book-link-h1 {
     padding: 24px 18px 24px 18px;
     font-family: 'Courier New', Courier, monospace;
     font-size: 1.1em;
-    color: var(--text-primary);
+    /* Use a dedicated --book-text variable so we can increase contrast in
+       light mode without changing the global --text-primary for other UI. */
+    color: var(--book-text, var(--text-primary));
     background: var(--bg-base);
     white-space: pre-wrap;
     word-break: break-word;
@@ -267,6 +272,9 @@ body.force-dark h1, body.force-dark .book-link-h1 {
     user-select: text;
     -webkit-user-select: text;
     outline: none;
+    /* Allow native vertical panning on touch devices (preserve momentum) */
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
 }
 .book-reader-content:focus-visible {
     outline: 3px solid #268bd2;
@@ -311,6 +319,34 @@ body.force-dark h1, body.force-dark .book-link-h1 {
     /* scrollbar colors used for dithered thumb pattern */
     --scroll-thumb: #586e75;
     --scroll-thumb-alt: #eee8d5;
+}
+
+/* Book-specific text override: increase contrast for book body in light mode
+   without altering global --text-primary used elsewhere. Defaults to the
+   global value so dark mode preserves existing styling. */
+:root {
+    --book-text: var(--text-primary);
+}
+
+@media (prefers-color-scheme: light) {
+    /* Stronger, darker book text for better legibility on light backgrounds */
+    :root {
+        --book-text: #073642; /* Solarized base02 - high contrast on light bg */
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    /* Ensure book text in dark mode stays the intended lighter shade */
+    :root {
+        --book-text: var(--text-primary);
+    }
+}
+
+body.force-light {
+    --book-text: #073642;
+}
+body.force-dark {
+    --book-text: var(--text-primary);
 }
 
 /* Solarized Dark */
@@ -527,6 +563,8 @@ body.force-light {
 .tab {
     padding: 8px 16px;
     cursor: pointer;
+    /* Keep a readable tab font size by default; responsive classes can reduce this */
+    font-size: 0.9em;
     background-color: var(--border-color);
     background-image: 
         repeating-linear-gradient(
@@ -551,6 +589,9 @@ body.force-light {
     transition: background-color 0.2s;
     user-select: none;
     white-space: nowrap;
+    /* Make tabs flex so they evenly fill available horizontal space */
+    flex: 1 1 0;
+    text-align: center;
 }
 
 .tab:hover {

@@ -347,24 +347,26 @@ function updateTabOverflowClass() {
     // Remove all responsive classes first
     tabsContainer.classList.remove('tight-tabs', 'tighter-tabs', 'tiny-tabs');
     // Check if tabs overflow
-    const containerWidth = tabsContainer.offsetWidth;
+    const containerWidth = tabsContainer.clientWidth;
+    // Sum the rendered widths of tabs using getBoundingClientRect to avoid fractional rounding issues
     let totalTabsWidth = 0;
     tabs.forEach(tab => {
-        totalTabsWidth += tab.offsetWidth;
+        totalTabsWidth += tab.getBoundingClientRect().width;
     });
-    if (totalTabsWidth > containerWidth) {
+    // Compare using rounded values so tiny sub-pixel/box-model differences don't trigger the responsive classes
+    if (Math.ceil(totalTabsWidth) > Math.floor(containerWidth)) {
         tabsContainer.classList.add('tight-tabs');
         // Recalculate after class applied
         setTimeout(() => {
             let totalTabsWidth2 = 0;
-            tabs.forEach(tab => { totalTabsWidth2 += tab.offsetWidth; });
-            if (totalTabsWidth2 > containerWidth) {
+            tabs.forEach(tab => { totalTabsWidth2 += tab.getBoundingClientRect().width; });
+            if (Math.ceil(totalTabsWidth2) > Math.floor(containerWidth)) {
                 tabsContainer.classList.remove('tight-tabs');
                 tabsContainer.classList.add('tighter-tabs');
                 setTimeout(() => {
                     let totalTabsWidth3 = 0;
-                    tabs.forEach(tab => { totalTabsWidth3 += tab.offsetWidth; });
-                    if (totalTabsWidth3 > containerWidth) {
+                    tabs.forEach(tab => { totalTabsWidth3 += tab.getBoundingClientRect().width; });
+                    if (Math.ceil(totalTabsWidth3) > Math.floor(containerWidth)) {
                         tabsContainer.classList.remove('tighter-tabs');
                         tabsContainer.classList.add('tiny-tabs');
                     }

@@ -210,16 +210,18 @@ function renderBookList() {
     const { pos } = getBookState(book.id);
     let percentRead = Math.round(pos);
     // Always show percentage (show 0% for first-time users)
+    // Move percent to the same line as the author to avoid title collisions
     let percentSpan = `<span class="book-percent-read" style="float:right;display:inline-block;text-align:right;min-width:3em;font-weight:normal;color:inherit;">${percentRead}%</span>`;
     li.innerHTML =
-      // Title (inline so percent can float to the right on the same line)
-      `<span class="book-title" style="display:inline-block;vertical-align:middle;">${book.title}</span>` +
-      // Percent read, floats right via existing class
-      percentSpan +
+      // Title on its own line
+      `<span class="book-title" style="display:block;vertical-align:middle;">${book.title}</span>` +
+      // Author and percent on the same line: author left, percent floated right
+      `<span class="book-author" style="display:block;vertical-align:middle;opacity:0.95;margin-top:0px;">` +
+        `<span class="book-author-name" style="display:inline-block;">${book.author ? book.author : ''}</span>` +
+        `${percentSpan}` +
+      `</span>` +
       // Offline indicator (absolutely positioned)
-      `<span class="offline-indicator" title="Offline/cached status" aria-label="Offline/cached status">●</span>` +
-      // Author shown below the title, using same font styling (inherited from .book-list-item)
-      `<span class="book-author" style="display:block;vertical-align:middle;opacity:0.95;margin-top:0px;">${book.author ? book.author : ''}</span>`;
+      `<span class="offline-indicator" title="Offline/cached status" aria-label="Offline/cached status">●</span>`;
     // Font weight and strikethrough for state
     if (book.state === 'unread') {
       li.style.fontWeight = 'bold';
@@ -258,15 +260,18 @@ function renderBookList() {
     let pointerId = null;
 
     ul.addEventListener('pointerdown', (e) => {
-      // Only left mouse or touch/pen
-      if (e.pointerType === 'mouse' && e.button !== 0) return;
-      isPointerDown = true;
-      pointerId = e.pointerId;
-      lastY = e.clientY;
-      lastScrollTop = ul.scrollTop;
-      ul.setPointerCapture(pointerId);
-      ul.style.cursor = 'grabbing';
-      e.preventDefault();
+      // For mouse: implement click-drag scrolling. For touch/pen let native scrolling handle momentum.
+      if (e.pointerType === 'mouse') {
+        if (e.button !== 0) return;
+        isPointerDown = true;
+        pointerId = e.pointerId;
+        lastY = e.clientY;
+        lastScrollTop = ul.scrollTop;
+        try { ul.setPointerCapture(pointerId); } catch (err) {}
+        ul.style.cursor = 'grabbing';
+        e.preventDefault();
+      }
+      // touch/pen: do not preventDefault so native momentum scrolling works
     });
     ul.addEventListener('pointermove', (e) => {
       if (!isPointerDown || e.pointerId !== pointerId) return;
@@ -439,14 +444,18 @@ function renderBookReader(book, text) {
   let lastScrollTop = 0;
   let pointerId = null;
   contentDiv.addEventListener('pointerdown', (e) => {
-    if (e.pointerType === 'mouse' && e.button !== 0) return;
-    isPointerDown = true;
-    pointerId = e.pointerId;
-    lastY = e.clientY;
-    lastScrollTop = contentDiv.scrollTop;
-    contentDiv.setPointerCapture(pointerId);
-    contentDiv.style.cursor = 'grabbing';
-    e.preventDefault();
+    // For mouse: implement click-drag scrolling. For touch/pen let native scrolling handle momentum.
+    if (e.pointerType === 'mouse') {
+      if (e.button !== 0) return;
+      isPointerDown = true;
+      pointerId = e.pointerId;
+      lastY = e.clientY;
+      lastScrollTop = contentDiv.scrollTop;
+      try { contentDiv.setPointerCapture(pointerId); } catch (err) {}
+      contentDiv.style.cursor = 'grabbing';
+      e.preventDefault();
+    }
+    // touch/pen: do not preventDefault so native momentum scrolling works
   });
   contentDiv.addEventListener('pointermove', (e) => {
     if (!isPointerDown || e.pointerId !== pointerId) return;
