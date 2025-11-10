@@ -651,6 +651,78 @@ tabs.forEach(tab => {
 const footerText = document.querySelector('.footer-text');
 const thksContent = document.getElementById('thks-content');
 let thksVisible = false;
+// --- Drag/Touch Scroll Implementation for Credits/Thanks Page ---
+function enableThksContentDragScroll() {
+    const thksArea = document.getElementById('thks-content-area');
+    if (!thksArea) return;
+    let isPointerDown = false;
+    let lastY = 0;
+    let lastScrollTop = 0;
+    let pointerId = null;
+
+    thksArea.addEventListener('pointerdown', (e) => {
+        // For mouse: implement click-drag scrolling. For touch/pen let native scrolling handle momentum.
+        if (e.pointerType === 'mouse') {
+            if (e.button !== 0) return;
+            isPointerDown = true;
+            pointerId = e.pointerId;
+            lastY = e.clientY;
+            lastScrollTop = thksArea.scrollTop;
+            try { thksArea.setPointerCapture(pointerId); } catch (err) {}
+            thksArea.style.cursor = 'grabbing';
+            e.preventDefault();
+        }
+        // touch/pen: do not preventDefault so native momentum scrolling works
+    });
+    thksArea.addEventListener('pointermove', (e) => {
+        if (!isPointerDown || e.pointerId !== pointerId) return;
+        const deltaY = e.clientY - lastY;
+        thksArea.scrollTop = lastScrollTop - deltaY;
+        // Don't select text while dragging
+        if (Math.abs(deltaY) > 2) {
+            window.getSelection()?.removeAllRanges();
+        }
+    });
+    thksArea.addEventListener('pointerup', (e) => {
+        if (e.pointerId !== pointerId) return;
+        isPointerDown = false;
+        pointerId = null;
+        thksArea.releasePointerCapture(e.pointerId);
+        thksArea.style.cursor = '';
+    });
+    thksArea.addEventListener('pointerleave', (e) => {
+        if (!isPointerDown || e.pointerId !== pointerId) return;
+        isPointerDown = false;
+        pointerId = null;
+        thksArea.releasePointerCapture(e.pointerId);
+        thksArea.style.cursor = '';
+    });
+    // Prevent accidental text selection on drag
+    thksArea.addEventListener('dragstart', (e) => e.preventDefault());
+}
+
+// Enable drag scroll for credits on DOMContentLoaded and when showing credits
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', enableThksContentDragScroll, { once: true });
+} else {
+    enableThksContentDragScroll();
+}
+
+// Also re-enable when credits are shown (in case of tab switch)
+function showCreditsWithScroll() {
+    showCredits();
+    setTimeout(enableThksContentDragScroll, 0);
+}
+
+// Patch toggleCredits to use showCreditsWithScroll
+const origToggleCredits = toggleCredits;
+toggleCredits = function() {
+    if (thksVisible) {
+        hideCredits();
+    } else {
+        showCreditsWithScroll();
+    }
+};
 let previousTab = null;
 
 function showCredits() {

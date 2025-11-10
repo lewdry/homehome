@@ -1397,6 +1397,27 @@ body.force-dark #clock-date-display {
         provide the 24px padding, keep this area unpadded so text lines up.
         Also ensure list spacing matches paragraph spacing in HOME. */
     padding: 0;
+    overflow-y: auto;
+    max-height: 60vh;
+    min-height: 200px;
+    -webkit-overflow-scrolling: touch;
+    outline: none;
+    scroll-behavior: smooth;
+    /* visually match book list scroll area */
+    border-radius: 4px;
+    box-shadow: none;
+    /* Hide scrollbars on Webkit */
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) var(--bg-surface);
+}
+
+.thks-content-area::-webkit-scrollbar {
+    width: 8px;
+    background: var(--bg-surface);
+}
+.thks-content-area::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
 }
 
 .thks-content-area a {
