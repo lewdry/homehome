@@ -309,6 +309,19 @@ body.force-dark h1, body.force-dark .book-link-h1 {
     -webkit-touch-callout: none;
 }
 
+/* Allow text selection and native touch-callout inside the Book reader only.
+   This overrides the global "user-select: none" reset but keeps interaction
+   blocked for the rest of the UI. The rule targets the book reader container
+   (present only when a book is open) so selection is enabled only while
+   reading. */
+.book-reader-container,
+.book-reader-container * {
+    -webkit-user-select: text !important;
+    user-select: text !important;
+    -webkit-touch-callout: default !important;
+    touch-action: auto !important;
+}
+
 /* Solarized Light (default) */
 :root {
     --bg-base: #fdf6e3;
