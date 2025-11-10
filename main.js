@@ -155,7 +155,7 @@ function handleResetApp() {
         } catch (err) {}
     }
     
-    // Brief delay to let sound play, then navigate back to HOME tab
+    // Brief delay to let sound play, then navigate back to HOME tab and force a reload
     setTimeout(() => {
         try {
             // Hide any open popups
@@ -167,16 +167,30 @@ function handleResetApp() {
             // Hide credits if visible
             if (thksVisible && typeof hideCredits === 'function') hideCredits();
 
-            // Switch to the home tab instead of reloading the page
+            // Switch to the home tab first so the app state is consistent in history
             const homeTab = document.querySelector('.tab[data-tab="home"]');
             if (homeTab) {
                 switchToTab(homeTab);
             }
+
+            // Now perform a cache-bypassing reload (similar to pressing F5).
+            // We use a timestamp query param to ensure a fresh load and include
+            // the ?=home token so the internal router returns to the HOME tab
+            // after reload. Use replace() to avoid adding an extra history entry.
+            try {
+                const base = (location.pathname && location.pathname !== '/') ? location.pathname.split('?')[0] : '/';
+                const reloadUrl = (base === '/' ? '/' : base) + `?=${encodeURIComponent('home')}&_=${Date.now()}`;
+                // Replace current history entry and navigate to the fresh URL
+                window.location.replace(reloadUrl);
+            } catch (navErr) {
+                // Fallback to a standard reload if building a URL fails
+                try { window.location.reload(); } catch (e) {}
+            }
         } catch (err) {
-            // Fallback to reload if something unexpected fails
+            // Final fallback - try a normal reload
             try { window.location.reload(); } catch (e) {}
         }
-    }, 100);
+    }, 120);
 }
 
 resetApp.addEventListener('click', handleResetApp);
