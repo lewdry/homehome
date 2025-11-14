@@ -108,7 +108,7 @@ renderBookList = function() {
 // If you have a function that closes the book reader, call hideBookReader() there
 // book.js — Homehomehome BOOK Tab logic
 // See PRD for requirements
-console.log('[BOOK] book.js loaded');
+// book.js loaded
 
 const books = [
   { id: 'frankenstein', title: 'Frankenstein; or, The Modern Prometheus', author: 'Mary Shelley', file: '/books/frankenstein.txt' },
@@ -227,6 +227,11 @@ function renderBookList() {
   // Final order: started, unread, read
   const orderedBooks = [...startedBooks, ...unreadBooks, ...readBooks];
 
+  // Track last pointerdown on a list item as a fallback for browsers
+  // (Chromium) that end up reporting the click target as the container.
+  let lastPointerDownBookId = null;
+  let lastPointerDownAt = 0;
+
   orderedBooks.forEach(book => {
     const li = document.createElement('li');
     li.className = `book-list-item ${book.state}`;
@@ -261,7 +266,16 @@ function renderBookList() {
       li.style.fontWeight = 'normal';
       li.style.textDecoration = 'line-through';
     }
-    li.addEventListener('click', () => openBook(book.id));
+    li.addEventListener('click', (e) => {
+      openBook(book.id);
+    });
+    // Debug: also log pointer events on each list item to help diagnose Chrome issues
+    li.addEventListener('pointerdown', (e) => {
+      // Save last pointerdown as a fallback when composedPath()/target
+      // can't be used to locate the originating list item (Chromium).
+      lastPointerDownBookId = book.id;
+      lastPointerDownAt = Date.now();
+    });
     li.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
@@ -281,6 +295,49 @@ function renderBookList() {
   listContainer.appendChild(ul);
   console.log('[BOOK] Book list rendered:', orderedBooks.map(b => b.title));
 
+  // Delegated click handler: some browsers (Chromium) may change the click
+  // target to the container when pointer capture is used. Use the event's
+  // composedPath()/path when available to find the original list item and
+  // open the book.
+  ul.addEventListener('click', (e) => {
+    try {
+      let li = null;
+      // Prefer composedPath() which reflects the original event path even
+      // when the final event.target is the container (Chromium behaviour).
+      const path = (typeof e.composedPath === 'function') ? e.composedPath() : (e.path || []);
+      if (path && path.length) {
+        for (let i = 0; i < path.length; i++) {
+          const node = path[i];
+          if (node && node.classList && node.classList.contains('book-list-item')) {
+            li = node;
+            break;
+          }
+        }
+      }
+      // Fallback to closest() from event.target
+      if (!li && e.target && e.target.closest) li = e.target.closest('.book-list-item');
+
+      // Additional fallback: use the last pointerdown-recorded list item
+      // when composedPath/target fail (observed in Chromium where click
+      // target becomes the UL). Only use if very recent.
+      if (!li && lastPointerDownBookId && (Date.now() - lastPointerDownAt) < 700) {
+        const fallbackLi = ul.querySelector(`.book-list-item[data-book-id="${lastPointerDownBookId}"]`);
+        if (fallbackLi) {
+          li = fallbackLi;
+        }
+      }
+
+      if (!li) return;
+      const id = li.dataset.bookId;
+      if (!id) return;
+      // Avoid double-open if already opening the same book
+      if (currentBookId === id) return;
+      openBook(id);
+    } catch (err) {
+      console.error('[BOOK] delegated click handler error', err);
+    }
+  });
+
     // --- Drag/Touch Scroll Implementation for Book List ---
     let isPointerDown = false;
     let lastY = 0;
@@ -297,7 +354,9 @@ function renderBookList() {
         lastScrollTop = ul.scrollTop;
         try { ul.setPointerCapture(pointerId); } catch (err) {}
         ul.style.cursor = 'grabbing';
-        e.preventDefault();
+        // Do not preventDefault here; preventing pointerdown's default can cancel
+        // subsequent click events in some browsers (Chrome). We rely on
+        // pointermove to remove selection when dragging instead.
       }
       // touch/pen: do not preventDefault so native momentum scrolling works
     });
@@ -341,6 +400,8 @@ function hideBookSpinner() {
 }
 
 function openBook(bookId) {
+  // Guard: ignore if we're already opening this book (prevents duplicate fetches)
+  if (currentBookId === bookId) return;
   currentBookId = bookId;
   showBookSpinner();
   // update URL to deep-link for this book (if router is present)
@@ -481,7 +542,8 @@ function renderBookReader(book, text) {
       lastScrollTop = contentDiv.scrollTop;
       try { contentDiv.setPointerCapture(pointerId); } catch (err) {}
       contentDiv.style.cursor = 'grabbing';
-      e.preventDefault();
+      // Avoid calling e.preventDefault() here; preventing pointerdown can stop
+      // click events (including links) in some Chromium-based browsers.
     }
     // touch/pen: do not preventDefault so native momentum scrolling works
   });
