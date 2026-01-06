@@ -394,6 +394,33 @@ window.addEventListener('resize', updateTabOverflowClass);
 window.addEventListener('DOMContentLoaded', updateTabOverflowClass);
 setTimeout(updateTabOverflowClass, 100);
 
+// Update footer year and relevant meta tags to the current year
+(function updateYearDisplay() {
+    const startYear = 1988;
+    const now = new Date().getFullYear();
+
+    // Update footer text (keeps 1988 and adds current year if later)
+    const footerEl = document.querySelector('.footer-text');
+    if (footerEl) {
+        const yearText = (now <= startYear) ? `${startYear}` : `${startYear}-${now}`;
+        footerEl.textContent = `© ${yearText} Homehomehome`;
+    }
+
+    // Update some meta tags and the document title for consistency
+    try {
+        const titleText = `Homehomehome ⌂ Web 0.1 (1988-${now})`;
+        document.title = titleText;
+        const metaTitle = document.querySelector('meta[name="title"]');
+        if (metaTitle) metaTitle.setAttribute('content', titleText);
+        const ogTitle = document.querySelector('meta[property="og:title"]');
+        if (ogTitle) ogTitle.setAttribute('content', titleText);
+        const twitterTitle = document.querySelector('meta[name="twitter:title"]');
+        if (twitterTitle) twitterTitle.setAttribute('content', titleText);
+        const copyrightMeta = document.querySelector('meta[name="copyright"]');
+        if (copyrightMeta) copyrightMeta.setAttribute('content', `© 1988-${now} Lewis Dryburgh`);
+    } catch (err) { /* ignore errors in older browsers */ }
+})();
+
 // Popup elements
 const bonkPopup = document.getElementById('bonk-popup');
 const bonkStartBtn = document.getElementById('bonk-start');
