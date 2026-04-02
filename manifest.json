@@ -1,0 +1,15 @@
+{
+  "name": "Homehomehome ⌂ Web 0.1",
+  "short_name": "Homehomehome",
+  "description": "Retro Web 0.1 portal experience with games, e-reader, drawing, and calculator.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#002b36",
+  "theme_color": "#002b36",
+  "orientation": "any",
+  "icons": [
+    {"src": "fav.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "fav.png", "sizes": "512x512", "type": "image/png"}
+  ]
+}

@@ -464,6 +464,13 @@ drawStartBtn.addEventListener('click', (e) => {
 });
 
 // Function to switch to a specific tab
+function announceForA11y(message) {
+    const announcer = document.getElementById('a11y-announcer');
+    if (announcer) {
+        announcer.textContent = message;
+    }
+}
+
 function switchToTab(tab) {
     const tabName = tab.getAttribute('data-tab');
     const currentTab = document.querySelector('.tab.active');
@@ -539,6 +546,9 @@ function switchToTab(tab) {
     } else {
         tab.focus();
     }
+
+    // Announce tab switch for screen reader users
+    announceForA11y(`${tabName.charAt(0).toUpperCase() + tabName.slice(1)} tab activated`);
     
     // Initialize bonk game on first click
     if (tabName === 'bonk' && !bonkInitialized) {
@@ -1217,4 +1227,15 @@ document.addEventListener('DOMContentLoaded', () => {
         suppressNextTabFocus = true;
         setTimeout(() => route(location.pathname || '/'), 50);
     } catch (err) {}
+
+    // Register the service worker for PWA offline support
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+            .then((registration) => {
+                console.log('Service Worker registered:', registration.scope);
+            })
+            .catch((error) => {
+                console.warn('Service Worker registration failed:', error);
+            });
+    }
 });

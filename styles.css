@@ -996,7 +996,25 @@ body.force-dark .cursor {
 
 .tab:focus-visible,
 .calc-btn:focus-visible,
-.note-key:focus-visible {
+.note-key:focus-visible,
+.theme-toggle:focus-visible,
+.mute-toggle:focus-visible,
+.reset-app:focus-visible,
+.speed-step:focus-visible,
+.download-icon:focus-visible,
+.book-list-item:focus-visible,
+.book-reader-close:focus-visible,
+.footer-text:focus-visible {
+    outline: 3px solid #268bd2;
+    outline-offset: 2px;
+}
+
+/* Accessibility behavior: keep all action target outlines and high contrast on keyboard focus */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
     outline: 3px solid #268bd2;
     outline-offset: 2px;
 }

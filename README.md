@@ -18,6 +18,7 @@ A retro Web 0.1 operating system experience, imagined for a time before the worl
 - Dark/light theme toggle with Solarized color palette
 - Sound effects with mute toggle
 - Responsive design optimized for desktop and mobile
+- PWA install support with offline caching (manifest + service worker)
 - Accessibility features (ARIA labels, keyboard navigation, screen reader support)
 - Easter eggs: Double-tap interactions and randomization effects
 - Retro pixel-art rendering with dithering effects
