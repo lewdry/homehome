@@ -1,92 +1,89 @@
 # Homehomehome ⌂
 
-A retro Web 0.1 operating system experience, imagined for a time before the world wide web was born. Built with vanilla HTML, CSS, and JavaScript with a Solarized color scheme and pixel-art aesthetic.
+A retro web OS built with vanilla HTML, CSS, and JavaScript. Solarized color scheme, pixel-art style.
 
 ## Features
 
-**Seven Interactive Tabs:**
+**Tabs:**
 
 - **HOME** - Welcome screen with ASCII art and system status
-- **BONK** - Physics-based bouncing ball game with collision detection
-- **BLOK** - Classic breakout/brick-breaker game
-- **CALC** - Functional calculator with persistent state
-- **DRAW** - Simple pixel-art drawing canvas
-- **NOTE** - On-screen keyboard notepad (uppercase only)
-- **BOOK** - Lightweight e-reader for the plain-text books in `books/` (search, page jump, adjustable text size)
+- **BONK** - Bouncing ball physics game
+- **BLOK** - Breakout/brick-breaker game
+- **CALC** - Calculator with persistent state
+- **DRAW** - Pixel-art drawing canvas
+- **NOTE** - Notepad with on-screen keyboard (uppercase only)
+- **BOOK** - E-reader for plain-text books in `books/` (search, page jump, adjustable text size)
 
-**Additional Features:**
-- Dark/light theme toggle with Solarized color palette
+**Other:**
+- Dark/light theme toggle (Solarized)
 - Sound effects with mute toggle
-- Responsive design optimized for desktop and mobile
-- PWA install support with offline caching (manifest + service worker)
-- Accessibility features (ARIA labels, keyboard navigation, screen reader support)
-- Easter eggs: Double-tap interactions and randomization effects
-- Retro pixel-art rendering with dithering effects
+- Works on desktop and mobile
+- PWA with offline support (manifest + service worker)
+- ARIA labels, keyboard navigation, screen reader support
+- Easter eggs: double-tap interactions and randomization effects
 
 ## Usage
 
-Simply open `index.html` in a web browser. No build process or dependencies required.
+Open `index.html` in a browser. No build step or dependencies needed.
 
 ### Controls
 
 **General:**
-- Click/tap tabs to switch between applications
+- Click/tap tabs to switch apps
 - Theme toggle (▨) in menu bar
 - Sound toggle (♫) in menu bar
-- Reset app (☒) to reload to initial state
-- Footer click to view credits
+- Reset (☒) to reload
+- Click footer to view credits
 
 **BONK:**
 - Drag balls to throw them
-- Double-tap anywhere to reset
+- Double-tap to reset
 
 **BLOK:**
 - Mouse/touch to move paddle
-- Keyboard arrows or A/D keys also work
+- Arrow keys or A/D also work
 - Double-tap to toggle rainbow/random colors
-- Break all bricks to win!
+- Break all bricks to win
 
 **CALC:**
-- Click buttons or use keyboard for input
+- Click buttons or use keyboard
 - Double-tap blank area to randomize number keys
 
 **DRAW:**
-- Touch/click and drag to draw
-- Double-tap to clear canvas
+- Click/drag to draw
+- Double-tap to clear
 
 **NOTE:**
 - Click on-screen keyboard to type (uppercase only)
-- Click in text area to move cursor
-- Desktop keyboard also supported
+- Click text area to move cursor
+- Desktop keyboard also works
 - Hold backspace to delete continuously
 - Double-tap text area to randomize keys
 
-## BOOK
+**BOOK:**
+- Browse and open any `.txt` file from `books/`
+- Search, jump to a page, and change text size
+- Progress saved to local storage
+- Swipe to turn pages
 
-**BOOK (e-reader):**
-- Browse and open any plain-text file from the `books/` folder
-- Search within a book, jump to a page/line, and change text size for comfortable reading
-- Book progress will be saved to local storage, so the app will remember where you got to
-- Swipe to move between pages/sections
+## Deeplinks
 
-## Deeplinks (parameterised URLs)
-
-You can open Homehomehome directly into an app or a specific book using query parameters in the URL. This makes it easy to link to a particular book or location.
+Open the app directly to a specific tab or book using URL query parameters.
 
 ## File Structure
 
 ```
 homehomehome/
-├── index.html          # Main HTML with embedded CSS
-├── bonk.js             # Bouncing balls physics game
-├── blok.js             # Breakout/brick-breaker game
-├── calc.js             # Calculator logic
-├── draw.js             # Drawing canvas functionality
-├── note.js             # Notepad with on-screen keyboard
-├── book.js             # BOOK e-reader app
-├── utils.js            # Shared utilities and sound generation
+├── index.html          # Main HTML
+├── bonk.js             # Bouncing balls game
+├── blok.js             # Breakout game
+├── calc.js             # Calculator
+├── draw.js             # Drawing canvas
+├── note.js             # Notepad
+├── book.js             # E-reader
+├── utils.js            # Shared utilities and sound
 └── sounds/
-    ├── A2.mp3         # Musical collision notes and UI tones
+    ├── A2.mp3
     ├── B2.mp3
     ├── B3.mp3
     ├── D3.mp3
@@ -95,7 +92,7 @@ homehomehome/
     ├── G2.mp3
     ├── G3.mp3
     ├── G4.mp3
-    └── click.mp3      # UI click sound effect
+    └── click.mp3
 
 └── books/
     ├── aroundtheworld.txt
@@ -112,39 +109,36 @@ homehomehome/
     └── yellowwallpaper.txt
 ```
 
-## Technical Details
+## Technical Notes
 
-- **Pure vanilla JavaScript** - No frameworks or libraries
-- **Solarized color scheme** by Ethan Schoonover
-- **Pixel-perfect rendering** with dithering effects
-- **Web Audio API** for sound effects with homemade CC0 samples
-- **Responsive canvas** rendering with device pixel ratio support
-- **Touch-optimized** with proper event handling
-- **Accessibility-first** approach with ARIA labels and keyboard support
+- No frameworks or libraries
+- Solarized color scheme by Ethan Schoonover
+- Web Audio API for sound with homemade CC0 samples
+- Responsive canvas with device pixel ratio support
 
 ## Inspirations
 
 - **Ethos and image style:** [Low Tech Magazine](https://solar.lowtechmagazine.com)
 - **The best fictitious OS:** [Windows93.net](https://www.windows93.net)
-- **Colors and theme:** [Solarized by Ethan Schoonover](https://ethanschoonover.com/solarized/)
+- **Colors:** [Solarized by Ethan Schoonover](https://ethanschoonover.com/solarized/)
 
-## Content Attribution
+## Attribution
 
-- **BLOK game** adapted from [Mozilla's 2D breakout tutorial](https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript)
+- **BLOK** adapted from [Mozilla's 2D breakout tutorial](https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript)
 - **BONK and DRAW** adapted from [Playpip Games](https://playpip.games)
 
 ## Browser Compatibility
 
-Tested and working on:
-- Modern Chrome, Firefox, Safari, Edge
+Tested on:
+- Chrome, Firefox, Safari, Edge
 - Mobile Safari (iOS)
 - Mobile Chrome (Android)
 
-Requires JavaScript enabled and supports Web Audio API.
+Requires JavaScript and Web Audio API support.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+MIT — see [LICENSE](LICENSE)
 
 ## Author
 
