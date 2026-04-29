@@ -1,4 +1,4 @@
-const CACHE_NAME = 'homehomehome-v1';
+const CACHE_NAME = 'homehomehome-20260429';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',

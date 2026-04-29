@@ -586,6 +586,10 @@ function renderBookReader(book, text) {
   const state = getReadStateFromScroll(percent);
   setBookState(book.id, percent, state);
   updateBookListItemState(book.id, state);
+
+  // Show and wire up the scroll slider
+  showBookScrollSlider(true);
+  setTimeout(() => { initBookScrollSlider(); }, 50);
 }
 
 function closeBookReader() {

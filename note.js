@@ -129,6 +129,13 @@ function initNote() {
     
     // Only build keyboard and set attributes on first initialization
     if (!noteKeyboardBuilt) {
+        // Restore saved note text from previous session
+        const savedNote = localStorage.getItem('homehome:note:text');
+        if (savedNote) {
+            noteText = savedNote;
+            cursorPosition = noteText.length;
+        }
+
         // Calculate max characters based on text area dimensions
         calculateMaxCharacters();
         
@@ -399,6 +406,9 @@ function updateNoteDisplay() {
         afterSpan.textContent = afterCursor;
         container.appendChild(afterSpan);
     }
+
+    // Persist note text across page reloads
+    localStorage.setItem('homehome:note:text', noteText);
 }
 
 // Handle clicking on text area to move cursor
@@ -565,6 +575,7 @@ window.cleanupNote = function() {
     textAreaTouchHandler = null;
     textAreaPointerHandler = null;
     
-    // Reset flag so listeners can be re-attached when returning to tab
+    // Reset flags so listeners and keyboard can be re-attached when returning to tab
     noteListenersAttached = false;
+    noteKeyboardBuilt = false;
 };

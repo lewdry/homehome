@@ -42,8 +42,8 @@ function textToLCD(text) {
     if (textStr.startsWith('-')) {
         displayText = textStr.slice(0, 9).toUpperCase();
     } else {
-        // Limit display to 8 characters
-        displayText = textStr.slice(-8).toUpperCase();
+        // Limit display to 8 characters - truncate from the right to preserve integer part
+        displayText = textStr.slice(0, 8).toUpperCase();
     }
     
     const lines = ['', '', '', '', ''];
