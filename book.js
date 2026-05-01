@@ -445,9 +445,9 @@ function renderBookReader(book, text) {
   // Header with close button
   const fileName = book.file.split('/').pop().toUpperCase();
   reader.innerHTML = `
-    <div class="book-reader-header" style="display:flex;align-items:center;justify-content:center;position:relative;background:var(--bg-surface);border-bottom:2px solid var(--border-color);padding:8px 12px;font-family:inherit;font-size:1em;font-weight:bold;letter-spacing:2px;">
-      <span class="book-reader-title" style="flex:1;text-align:center;">${fileName}</span>
-      <button class="book-reader-close" aria-label="Close book reader" style="position:absolute;right:16px;top:8px;font-size:1.2em;background:none;border:none;color:#dc322f;font-weight:bold;user-select:none;">✕</button>
+    <div class="book-reader-header">
+      <span class="book-reader-title" style="background:var(--bg-surface);padding:0 8px;position:relative;z-index:1;font-family:Chicago_12,'Courier New',Courier,monospace;">${fileName}</span>
+      <button class="book-reader-close" aria-label="Close book reader">✕</button>
     </div>
     <div class="book-reader-content" tabindex="0" style="font-size:${fontSize};"></div>
     <div class="book-reader-footer-bar">

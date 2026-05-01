@@ -85,13 +85,14 @@
     <div id="a11y-announcer" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
     <div class="container">
         <div class="menu-bar">
-            <span class="theme-toggle" role="button" tabindex="0" aria-label="Toggle dark mode and light mode">▨</span>
+            <button class="theme-toggle" tabindex="0" aria-label="Toggle dark mode and light mode">▨</button>
             <span>HOMEHOMEHOME.ORG</span>
             <div class="menu-bar-right">
-                <span class="mute-toggle" role="button" tabindex="0" aria-label="Toggle sound on and off">♫</span>
-                <span class="reset-app" role="button" tabindex="0" aria-label="Reset application to initial state">☒</span>
+                <button class="mute-toggle" tabindex="0" aria-label="Toggle sound on and off">♫</button>
+                <button class="reset-app" tabindex="0" aria-label="Reset application to initial state">☒</button>
             </div>
         </div>
+        <div class="separator"></div>
         
         <nav aria-label="Application tabs">
         <div class="tabs" role="tablist">
@@ -153,7 +154,7 @@
 
         <div id="bonk-content" class="content tab-content" role="tabpanel" aria-labelledby="bonk-tab">
             <div class="instruction-popup" id="bonk-popup" style="display: none;" role="dialog" aria-labelledby="bonk-popup-title" aria-modal="true">
-                <div class="instruction-popup-title" id="bonk-popup-title">BONK.EXE</div>
+                <div class="instruction-popup-title" id="bonk-popup-title"><span>BONK.EXE</span></div>
                 <div class="instruction-popup-content">
                     <p>Bouncing balls.</p>
                     <p>Drag a ball to throw.</p>
@@ -167,7 +168,7 @@
 
         <div id="blok-content" class="content tab-content" role="tabpanel" aria-labelledby="blok-tab">
             <div class="instruction-popup" id="blok-popup" style="display: none;" role="dialog" aria-labelledby="blok-popup-title" aria-modal="true">
-                <div class="instruction-popup-title" id="blok-popup-title">BLOKBREAKER.EXE</div>
+                <div class="instruction-popup-title" id="blok-popup-title"><span>BLOKBREAKER.EXE</span></div>
                 <div class="instruction-popup-content">
                     <p>Break all bricks to win!</p>
                     <p>Drag paddle to move.</p>
@@ -176,7 +177,7 @@
                 </div>
             </div>
             <div class="instruction-popup" id="blok-endgame-popup" style="display: none;" role="dialog" aria-labelledby="blok-endgame-title" aria-modal="true">
-                <div class="instruction-popup-title" id="blok-endgame-title">GAME OVER</div>
+                <div class="instruction-popup-title" id="blok-endgame-title"><span>GAME OVER</span></div>
                 <div class="instruction-popup-content">
                     <p id="blok-endgame-message">You won!</p>
                     <button id="blok-endgame-ok">OK</button>
@@ -194,7 +195,7 @@
         <!-- Clock popup -->
         <div class="popup-overlay" id="clock-overlay" style="display: none;"></div>
         <div class="instruction-popup clock-popup" id="clock-popup" style="display: none;" role="dialog" aria-labelledby="clock-popup-title" aria-modal="true">
-            <div class="instruction-popup-title" id="clock-popup-title">CLOCK.EXE</div>
+            <div class="instruction-popup-title" id="clock-popup-title"><span>CLOCK.EXE</span></div>
             <div class="instruction-popup-content clock-popup-content">
                 <div id="ascii-clock-display" aria-live="polite" aria-atomic="true"></div>
                 <div id="clock-digital-display"></div>
@@ -237,7 +238,7 @@
 
         <div id="draw-content" class="content tab-content" role="tabpanel" aria-labelledby="draw-tab">
             <div class="instruction-popup" id="draw-popup" style="display: none;" role="dialog" aria-labelledby="draw-popup-title" aria-modal="true">
-                <div class="instruction-popup-title" id="draw-popup-title">DRAWSTRING.EXE</div>
+                <div class="instruction-popup-title" id="draw-popup-title"><span>DRAWSTRING.EXE</span></div>
                 <div class="instruction-popup-content">
                     <p>A simple sketchpad.</p>
                     <p>Touch or click to draw.</p>
@@ -278,6 +279,7 @@
                     • Easy-on-the-eye colour palette: <a href="https://ethanschoonover.com/solarized/" target="_blank" rel="noopener noreferrer">Solarized</a><br>
                     • Fictional web-based operating system: <a href="https://www.windows93.net" target="_blank" rel="noopener noreferrer">Windows93.net</a><br>
                     • Real web-based operating system(s): <a href="https://infinitemac.org" target="_blank" rel="noopener noreferrer">Infinite Mac</a><br>
+                    • System 7 styling: <a href="https://sakofchit.github.io/system.css/" target="_blank" rel="noopener noreferrer">Sakun Acharige</a><br>
                 </p>
                 <p>
                     <span class="highlight">Content</span><br>

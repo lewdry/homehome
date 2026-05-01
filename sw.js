@@ -1,4 +1,4 @@
-const CACHE_NAME = 'homehomehome-20260429';
+const CACHE_NAME = 'homehomehome-20260502';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -13,7 +13,11 @@ const ASSETS_TO_CACHE = [
   '/draw.js',
   '/note.js',
   '/fav.png',
-  '/sounds/click.mp3'
+  '/sounds/click.mp3',
+  '/fonts/ChiKareGo2.woff2',
+  '/fonts/ChiKareGo2.woff',
+  '/fonts/FindersKeepers.woff2',
+  '/fonts/FindersKeepers.woff'
 ];
 
 self.addEventListener('install', event => {

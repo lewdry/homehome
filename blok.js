@@ -707,7 +707,7 @@
                           (!document.body.classList.contains('force-light') && 
                            window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
         ctx.fillStyle = isDarkMode ? '#839496' : '#586e75';
-        ctx.font = 'bold 14px "Courier New", Courier, monospace';
+        ctx.font = 'bold 14px Chicago_12, "Courier New", Courier, monospace';
         
         // Lives
         ctx.fillText(`Lives: ${gameState.lives}`, 6, 20);

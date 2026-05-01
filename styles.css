@@ -1,3 +1,21 @@
+/* ----------------------------------------------------------------
+   System 7 bitmap fonts (self-hosted from system.css)
+   Chicago_12 → ChiKareGo2 (recreation by Giles Booth)
+   Geneva_9   → FindersKeepers (recreation by Giles Booth)
+   ---------------------------------------------------------------- */
+@font-face {
+    font-family: Chicago_12;
+    src: url('fonts/ChiKareGo2.woff2') format('woff2'),
+         url('fonts/ChiKareGo2.woff')  format('woff');
+    font-display: swap;
+}
+@font-face {
+    font-family: Geneva_9;
+    src: url('fonts/FindersKeepers.woff2') format('woff2'),
+         url('fonts/FindersKeepers.woff')  format('woff');
+    font-display: swap;
+}
+
 /* h1 keeps 1.4em, .book-link-h1 matches book text size */
 /* Book reader links match THKS tab links */
 .book-reader-content a {
@@ -170,7 +188,7 @@ body.force-dark h1, body.force-dark .book-link-h1 {
     padding: 0;
 }
 .book-list-item {
-    font-family: 'Courier New', Courier, monospace;
+    font-family: Chicago_12, 'Courier New', Courier, monospace;
     font-size: 0.9rem;
     padding: 5px 18px 5px 32px;
     border-bottom: 1px solid var(--border-color);
@@ -211,6 +229,13 @@ body.force-dark h1, body.force-dark .book-link-h1 {
 .book-list-item.unread {
     font-weight: normal;
 }
+.book-title {
+    font-family: Chicago_12, 'Courier New', Courier, monospace;
+}
+.book-author,
+.book-author-name {
+    font-family: Chicago_12, 'Courier New', Courier, monospace;
+}
 
 /* Book reader container */
 .book-reader-container {
@@ -225,23 +250,31 @@ body.force-dark h1, body.force-dark .book-link-h1 {
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
-    box-shadow: 2px 2px 0 var(--border-color);
-    border: 2px solid var(--border-color);
     padding: 0;
     overflow: hidden;
+    /* System 7 double-border */
+    border: 2px solid var(--border-color);
+    box-shadow:
+        inset 0 0 0 1px var(--bg-surface),
+        inset 0 0 0 3px var(--border-color);
 }
 .book-reader-header {
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    background: var(--bg-surface);
+    /* System 7 horizontal stripe title bar */
+    background-color: var(--bg-surface);
+    background-image: linear-gradient(var(--border-color) 50%, transparent 50%);
+    background-size: 100% 13.333%;
+    background-clip: content-box;
     border-bottom: 2px solid var(--border-color);
-    padding: 8px 12px;
-    font-family: inherit;
-    font-size: 1em;
+    padding: 6px 12px;
+    font-family: Chicago_12, 'Courier New', Courier, monospace;
+    font-size: 0.9em;
     font-weight: bold;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
+    min-height: 28px;
 }
 .book-reader-close {
     cursor: pointer;
@@ -260,7 +293,7 @@ body.force-dark h1, body.force-dark .book-link-h1 {
     flex: 1;
     overflow-y: auto;
     padding: 24px 18px 24px 18px;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: Chicago_12, 'Courier New', Courier, monospace;
     font-size: 1.1em;
     /* Use a dedicated --book-text variable so we can increase contrast in
        light mode without changing the global --text-primary for other UI. */
@@ -282,7 +315,7 @@ body.force-dark h1, body.force-dark .book-link-h1 {
 
 /* ASCII spinner */
 .book-spinner {
-    font-family: 'Courier New', Courier, monospace;
+    font-family: Chicago_12, 'Courier New', Courier, monospace;
     font-size: 1.2em;
     color: #268bd2;
     text-align: center;
@@ -377,7 +410,10 @@ body.force-dark {
 }
 
 body {
+    /* Subtle dither outside the main window: 1-in-4 dot pattern over bg-base */
     background-color: var(--bg-base);
+    background-image: radial-gradient(circle, var(--text-secondary) 1px, transparent 1px);
+    background-size: 6px 6px;
     color: var(--text-primary);
     font-family: 'Courier New', 'Courier', monospace;
     display: flex;
@@ -410,11 +446,16 @@ body {
     aspect-ratio: 2 / 3;
     height: min(80vh, 900px);
     max-height: 700px; /* Absolute maximum height for better performance on large displays */
-    border: 3px solid var(--border-color);
     background-color: var(--bg-surface);
     display: flex;
     flex-direction: column;
-    box-shadow: 4px 4px 0px var(--border-color);
+    /* System 7 double-border: outer 2px → 1px gap → inner 2px → 4px drop shadow */
+    border: 2px solid var(--border-color);
+    box-shadow:
+        0 0 0 1px var(--bg-surface),
+        0 0 0 3px var(--border-color),
+        6px 6px 0 1px var(--border-color);
+    outline: none;
 }
 
 main {
@@ -425,112 +466,157 @@ main {
 }
 
 .menu-bar {
-    background-color: #268bd2;
-    background-image: 
-        repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.15) 2px,
-            rgba(0, 0, 0, 0.15) 4px
-        ),
-        repeating-linear-gradient(
-            -45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.15) 2px,
-            rgba(0, 0, 0, 0.15) 4px
-        );
-    background-size: 4px 4px;
-    color: var(--bg-base);
-    padding: 8px 12px;
-    border-bottom: 3px solid var(--border-color);
+    /* System 7 title-bar horizontal stripe pattern */
+    background-color: var(--bg-surface);
+    background-image: linear-gradient(var(--border-color) 50%, transparent 50%);
+    background-size: 100% 13.333%;
+    background-clip: content-box;
+    color: var(--text-primary);
+    padding: 6px 8px;
+    border-bottom: 2px solid var(--border-color);
+    font-family: Chicago_12, 'Courier New', Courier, monospace;
     font-weight: bold;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     user-select: none;
     overflow: hidden;
+    min-height: 28px;
 }
 
+/* The center title text sits in a 'chip' — solid background behind the title
+   so it pops out of the stripes exactly as in System 7 */
 .menu-bar > span:nth-child(2) {
-    flex: 1;
+    flex: 0 1 auto; /* shrink to text width, don't grow */
     text-align: center;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    background: var(--bg-surface);
+    padding: 0 8px;
+    position: relative;
+    z-index: 1;
+    font-family: Chicago_12, 'Courier New', Courier, monospace;
+    font-size: 0.9em;
+    letter-spacing: 1px;
+    /* Centre the chip within the flex row */
+    margin: 0 auto;
 }
 
+/* System 7-style window chrome box buttons */
 .theme-toggle {
     cursor: pointer;
-    padding: 4px 8px;
-    margin: -4px 0;
-    transition: opacity 0.2s;
     user-select: none;
-    line-height: 1;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color);
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    font-size: 0.85em;
+    line-height: 1;
+    padding: 0;
+    flex-shrink: 0;
+    transition: background-color 0.1s;
+    font-family: inherit;
+    position: relative;
+    z-index: 1;
 }
 
 .theme-toggle:hover {
-    opacity: 0.7;
+    background-color: var(--border-color);
+    color: var(--bg-base);
 }
 
 .theme-toggle:active {
-    opacity: 0.5;
+    background-color: var(--text-primary);
+    color: var(--bg-base);
 }
 
 .mute-toggle {
     cursor: pointer;
-    padding: 4px 8px;
-    margin: -4px 0;
-    transition: opacity 0.2s;
     user-select: none;
-    font-size: 1.2em;
-    line-height: 1;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color);
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    font-size: 0.75em;
+    line-height: 1;
+    padding: 0;
+    flex-shrink: 0;
+    transition: background-color 0.1s;
+    font-family: inherit;
+    position: relative;
+    z-index: 1;
 }
 
 .mute-toggle:hover {
-    opacity: 0.7;
+    background-color: var(--border-color);
+    color: var(--bg-base);
 }
 
 .mute-toggle:active {
-    opacity: 0.5;
+    background-color: var(--text-primary);
+    color: var(--bg-base);
 }
 
 .reset-app {
     cursor: pointer;
-    padding: 4px 8px;
-    margin: -4px 0;
-    transition: opacity 0.2s;
     user-select: none;
-    font-size: 1.3em;
-    line-height: 1;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color);
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    font-size: 0.85em;
+    line-height: 1;
+    padding: 0;
+    flex-shrink: 0;
+    transition: background-color 0.1s;
+    font-family: inherit;
+    position: relative;
+    z-index: 1;
 }
 
 .reset-app:hover {
-    opacity: 0.7;
+    background-color: var(--border-color);
+    color: var(--bg-base);
 }
 
 .reset-app:active {
-    opacity: 0.5;
+    background-color: var(--text-primary);
+    color: var(--bg-base);
 }
 
 .menu-bar-right {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
+    position: relative;
+    z-index: 1;
 }
 
 .menu-bar-right > span:last-child {
     line-height: 1;
     display: inline-flex;
     align-items: center;
+}
+
+/* Thin separator line between title bar and tabs */
+.separator {
+    height: 0;
+    border-top: 2px solid var(--border-color);
+    flex-shrink: 0;
 }
 
 /* Force dark mode when class is applied */
@@ -553,58 +639,29 @@ body.force-light {
 
 .tabs {
     display: flex;
-    background-color: var(--text-secondary);
-    background-image: 
-        repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.06) 2px,
-            rgba(0, 0, 0, 0.06) 4px
-        ),
-        repeating-linear-gradient(
-            -45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.06) 2px,
-            rgba(0, 0, 0, 0.06) 4px
-        );
-    background-size: 4px 4px;
-    border-bottom: 3px solid var(--border-color);
+    background-color: var(--border-color);
+    border-bottom: 2px solid var(--border-color);
 }
 
 .tab {
-    padding: 8px 16px;
+    padding: 6px 12px;
     cursor: pointer;
-    /* Keep a readable tab font size by default; responsive classes can reduce this */
-    font-size: 0.9em;
+    font-size: 0.85em;
+    font-family: Chicago_12, 'Courier New', 'Courier', monospace;
     background-color: var(--border-color);
-    background-image: 
-        repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.04) 2px,
-            rgba(0, 0, 0, 0.04) 4px
-        ),
-        repeating-linear-gradient(
-            -45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.04) 2px,
-            rgba(0, 0, 0, 0.04) 4px
-        );
-    background-size: 4px 4px;
     color: var(--bg-base);
-    border-right: 2px solid var(--text-secondary);
+    border-right: 1px solid var(--text-secondary);
     font-weight: bold;
-    letter-spacing: 1px;
-    transition: background-color 0.2s;
+    letter-spacing: 0;
+    transition: background-color 0.15s;
     user-select: none;
     white-space: nowrap;
-    /* Make tabs flex so they evenly fill available horizontal space */
     flex: 1 1 0;
     text-align: center;
+    /* 3D bevel on inactive tabs */
+    box-shadow:
+        inset 1px 1px 0 rgba(255,255,255,0.2),
+        inset -1px -1px 0 rgba(0,0,0,0.15);
 }
 
 .tab:hover {
@@ -614,6 +671,11 @@ body.force-light {
 .tab.active {
     background-color: var(--bg-surface);
     color: var(--text-primary);
+    /* Remove bottom border so active tab appears lifted into content area */
+    box-shadow:
+        inset 1px 1px 0 rgba(255,255,255,0.2),
+        inset -1px 0 0 rgba(0,0,0,0.1),
+        0 2px 0 var(--bg-surface);
 }
 
 .tab-content {
@@ -637,6 +699,7 @@ body.force-light {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    font-family: Chicago_12, 'Courier New', Courier, monospace;
 }
 
 canvas {
@@ -702,6 +765,7 @@ canvas {
 
 .ascii-art {
     color: #dc322f;
+    font-family: 'Courier New', Courier, monospace;
     font-size: 0.7em;
     line-height: 1.2;
     margin-bottom: 16px;
@@ -766,9 +830,10 @@ body.force-dark .ascii-art.glow {
 }
 
 h1 {
+    font-family: Chicago_12, 'Courier New', Courier, monospace;
     font-size: 1.4em;
     margin-bottom: 2px;
-    letter-spacing: 3px;
+    letter-spacing: 1px;
     background-color: #1e7bb2;
     background-image: 
         repeating-linear-gradient(
@@ -1052,44 +1117,50 @@ a:focus-visible {
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: var(--bg-surface);
-    border: 3px solid var(--border-color);
-    box-shadow: 4px 4px 0px var(--border-color);
     max-width: 400px;
     width: 80%;
     z-index: 50;
     text-align: center;
     display: flex;
     flex-direction: column;
+    /* System 7 double-border */
+    border: 2px solid var(--border-color);
+    box-shadow:
+        0 0 0 1px var(--bg-surface),
+        0 0 0 3px var(--border-color),
+        6px 6px 0 1px var(--border-color);
 }
 
 .instruction-popup-title {
-    background-color: #268bd2;
-    background-image: 
-        repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.15) 2px,
-            rgba(0, 0, 0, 0.15) 4px
-        ),
-        repeating-linear-gradient(
-            -45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.15) 2px,
-            rgba(0, 0, 0, 0.15) 4px
-        );
-    background-size: 4px 4px;
-    color: var(--bg-base);
-    padding: 8px 12px;
-    border-bottom: 3px solid var(--border-color);
+    /* System 7 horizontal stripe title bar — matches .menu-bar */
+    background-color: var(--bg-surface);
+    background-image: linear-gradient(var(--border-color) 50%, transparent 50%);
+    background-size: 100% 13.333%;
+    background-clip: content-box;
+    color: var(--text-primary);
+    padding: 6px 12px;
+    border-bottom: 2px solid var(--border-color);
+    font-family: Chicago_12, 'Courier New', Courier, monospace;
     font-weight: bold;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
     text-align: center;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Title chip — solid background behind the text so it reads against the stripes */
+.instruction-popup-title > span {
+    background: var(--bg-surface);
+    padding: 0 8px;
+    position: relative;
+    z-index: 1;
 }
 
 .instruction-popup-content {
     padding: 12px;
+    font-family: Chicago_12, 'Courier New', Courier, monospace;
 }
 
 .instruction-popup-content p {
@@ -1099,33 +1170,30 @@ a:focus-visible {
 }
 
 .instruction-popup button {
-    font-family: 'Courier New', 'Courier', monospace;
+    font-family: Chicago_12, 'Courier New', 'Courier', monospace;
     font-size: 1em;
     font-weight: bold;
-    padding: 12px 32px;
-    border: 3px solid var(--border-color);
+    padding: 10px 28px;
+    border: 2px solid var(--border-color);
     background-color: #859900;
-    background-image: 
-        repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.15) 2px,
-            rgba(0, 0, 0, 0.15) 4px
-        ),
-        repeating-linear-gradient(
-            -45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.15) 2px,
-            rgba(0, 0, 0, 0.15) 4px
-        );
-    background-size: 4px 4px;
     color: var(--bg-base);
     cursor: pointer;
-    box-shadow: 2px 2px 0px var(--border-color);
+    /* 3D bevel */
+    box-shadow:
+        inset 1px 1px 0 rgba(255,255,255,0.25),
+        inset -1px -1px 0 rgba(0,0,0,0.3),
+        2px 2px 0 var(--border-color);
     margin-top: 16px;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
+    transition: background-color 0.1s;
+}
+
+.instruction-popup button:active {
+    box-shadow:
+        inset -1px -1px 0 rgba(255,255,255,0.25),
+        inset 1px 1px 0 rgba(0,0,0,0.3),
+        0 0 0 var(--border-color);
+    transform: translate(2px, 2px);
 }
 
 .instruction-popup button:hover {
@@ -1160,24 +1228,10 @@ a:focus-visible {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: var(--bg-surface);
-    background-image: 
-        repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.04) 2px,
-            rgba(0, 0, 0, 0.04) 4px
-        ),
-        repeating-linear-gradient(
-            90deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.04) 2px,
-            rgba(0, 0, 0, 0.04) 4px
-        );
+    /* Single-layer dot stipple — ~20% coverage, genuinely see-through */
+    background-color: transparent;
+    background-image: radial-gradient(circle, var(--text-secondary) 1px, transparent 1px);
     background-size: 4px 4px;
-    opacity: 0.95;
     z-index: 999;
     display: none;
 }
@@ -1260,7 +1314,7 @@ body.force-dark #ascii-clock-display {
 }
 
 #clock-date-display {
-    font-family: 'Courier New', 'Courier', monospace;
+    font-family: Chicago_12, 'Courier New', Courier, monospace;
     font-size: 1em;
     font-weight: bold;
     text-align: center;
@@ -1328,7 +1382,7 @@ body.force-dark #clock-date-display {
 }
 
 #clock-digital-display {
-    font-family: 'Courier New', 'Courier', monospace;
+    font-family: Chicago_12, 'Courier New', Courier, monospace;
     font-size: 0.9em;
     font-weight: 700;
     text-align: center;
@@ -1342,30 +1396,19 @@ body.force-dark #clock-date-display {
 }
 
 .footer {
-    border-top: 3px solid var(--border-color);
-    padding: 8px 12px;
-    background-color: var(--text-secondary);
-    background-image: 
-        repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.06) 2px,
-            rgba(0, 0, 0, 0.06) 4px
-        ),
-        repeating-linear-gradient(
-            -45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.06) 2px,
-            rgba(0, 0, 0, 0.06) 4px
-        );
-    background-size: 4px 4px;
-    color: var(--bg-base);
-    font-size: 0.9em;
+    border-top: 2px solid var(--border-color);
+    padding: 6px 10px;
+    /* System 7 horizontal stripe like the title bar, using border-color */
+    background-color: var(--bg-surface);
+    background-image: linear-gradient(var(--border-color) 50%, transparent 50%);
+    background-size: 100% 16.666%;
+    background-clip: content-box;
+    color: var(--text-primary);
+    font-family: Chicago_12, 'Courier New', Courier, monospace;
+    font-size: 0.85em;
     font-weight: 500;
     text-align: left;
-    letter-spacing: 1px;
+    letter-spacing: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1376,6 +1419,10 @@ body.force-dark #clock-date-display {
     transition: opacity 0.2s;
     font-weight: bold;
     user-select: none;
+    background: var(--bg-surface);
+    padding: 0 4px;
+    position: relative;
+    z-index: 1;
 }
 
 .footer-text:hover {
@@ -1398,29 +1445,22 @@ body.force-dark #clock-date-display {
 }
 
 .thks-header {
-    background-color: var(--text-secondary);
-    background-image: 
-        repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.06) 2px,
-            rgba(0, 0, 0, 0.06) 4px
-        ),
-        repeating-linear-gradient(
-            -45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.06) 2px,
-            rgba(0, 0, 0, 0.06) 4px
-        );
-    background-size: 4px 4px;
-    padding: 8px 16px;
-    color: var(--bg-base);
-    border-bottom: 3px solid var(--border-color);
+    /* System 7 horizontal stripe — matches .menu-bar and popup titles */
+    background-color: var(--bg-surface);
+    background-image: linear-gradient(var(--border-color) 50%, transparent 50%);
+    background-size: 100% 13.333%;
+    background-clip: content-box;
+    padding: 6px 16px;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--border-color);
+    font-family: Chicago_12, 'Courier New', Courier, monospace;
     font-weight: bold;
     letter-spacing: 1px;
     text-align: center;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .thks-content-area {
@@ -1440,6 +1480,7 @@ body.force-dark #clock-date-display {
     /* Hide scrollbars on Webkit */
     scrollbar-width: thin;
     scrollbar-color: var(--border-color) var(--bg-surface);
+    font-family: Chicago_12, 'Courier New', Courier, monospace;
 }
 
 .thks-content-area::-webkit-scrollbar {
@@ -1573,6 +1614,12 @@ body.force-dark .thks-content-area a {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    /* System 7 double-border */
+    border: 2px solid var(--border-color);
+    padding: 8px;
+    box-shadow:
+        0 0 0 1px var(--bg-surface),
+        0 0 0 3px var(--border-color);
 }
 
 .calc-display {
@@ -1640,32 +1687,20 @@ body.force-dark .calc-result {
 }
 
 .calc-btn {
-    font-family: 'Courier New', 'Courier', monospace;
-    font-size: 1.5em;
+    font-family: Chicago_12, 'Courier New', 'Courier', monospace;
+    font-size: 1.3em;
     font-weight: bold;
     padding: 16px;
-    border: 3px solid var(--border-color);
+    border: 2px solid var(--border-color);
     background-color: var(--bg-surface);
-    background-image: 
-        repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.08) 2px,
-            rgba(0, 0, 0, 0.08) 4px
-        ),
-        repeating-linear-gradient(
-            -45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.08) 2px,
-            rgba(0, 0, 0, 0.08) 4px
-        );
-    background-size: 4px 4px;
     color: var(--text-primary);
     cursor: pointer;
-    transition: all 0.1s;
-    box-shadow: 2px 2px 0px var(--border-color);
+    transition: background-color 0.1s;
+    /* 3D bevel: light top-left, dark bottom-right */
+    box-shadow:
+        inset 1px 1px 0 rgba(255,255,255,0.35),
+        inset -1px -1px 0 rgba(0,0,0,0.25),
+        2px 2px 0 var(--border-color);
     touch-action: manipulation;
     user-select: none;
     -webkit-user-select: none;
@@ -1681,28 +1716,16 @@ body.force-dark .calc-result {
 }
 
 .calc-btn:active {
-    box-shadow: 0px 0px 0px var(--border-color);
+    /* reverse bevel on press */
+    box-shadow:
+        inset -1px -1px 0 rgba(255,255,255,0.35),
+        inset 1px 1px 0 rgba(0,0,0,0.25),
+        0 0 0 var(--border-color);
     transform: translate(2px, 2px);
 }
 
 .calc-operator {
     background-color: #268bd2;
-    background-image: 
-        repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.15) 2px,
-            rgba(0, 0, 0, 0.15) 4px
-        ),
-        repeating-linear-gradient(
-            -45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.15) 2px,
-            rgba(0, 0, 0, 0.15) 4px
-        );
-    background-size: 4px 4px;
     color: var(--bg-base);
 }
 
@@ -1712,22 +1735,6 @@ body.force-dark .calc-result {
 
 .calc-equals {
     background-color: #859900;
-    background-image: 
-        repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.15) 2px,
-            rgba(0, 0, 0, 0.15) 4px
-        ),
-        repeating-linear-gradient(
-            -45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.15) 2px,
-            rgba(0, 0, 0, 0.15) 4px
-        );
-    background-size: 4px 4px;
     color: var(--bg-base);
 }
 
@@ -1737,22 +1744,6 @@ body.force-dark .calc-result {
 
 .calc-clear {
     background-color: #dc322f;
-    background-image: 
-        repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.15) 2px,
-            rgba(0, 0, 0, 0.15) 4px
-        ),
-        repeating-linear-gradient(
-            -45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.15) 2px,
-            rgba(0, 0, 0, 0.15) 4px
-        );
-    background-size: 4px 4px;
     color: var(--bg-base);
 }
 
@@ -1780,7 +1771,7 @@ body.force-dark .calc-result {
     flex: 1;
     background-color: var(--bg-base);
     padding: 16px;
-    font-family: 'Courier New', 'Courier', monospace;
+    font-family: Chicago_12, 'Courier New', 'Courier', monospace;
     font-size: 1.6em;
     font-weight: bold;
     overflow-wrap: break-word;
@@ -1890,30 +1881,18 @@ body.force-dark .note-text-area > div {
     flex: 0 0 auto;
     width: calc((100% - (9 * 2px)) / 10);
     min-width: 40px;
-    font-family: 'Courier New', 'Courier', monospace;
-    font-size: 1em;
+    font-family: Chicago_12, 'Courier New', 'Courier', monospace;
+    font-size: 0.9em;
     font-weight: bold;
-    border: 1px solid var(--border-color);
+    border: 2px solid var(--border-color);
     background-color: var(--bg-surface);
-    background-image: 
-        repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.04) 2px,
-            rgba(0, 0, 0, 0.04) 4px
-        ),
-        repeating-linear-gradient(
-            -45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.04) 2px,
-            rgba(0, 0, 0, 0.04) 4px
-        );
-    background-size: 4px 4px;
     color: var(--text-primary);
     cursor: pointer;
-    transition: all 0.1s;
+    transition: background-color 0.1s;
+    /* 3D bevel */
+    box-shadow:
+        inset 1px 1px 0 rgba(255,255,255,0.35),
+        inset -1px -1px 0 rgba(0,0,0,0.25);
     touch-action: manipulation;
     user-select: none;
     -webkit-user-select: none;
@@ -1928,6 +1907,9 @@ body.force-dark .note-text-area > div {
 }
 
 .note-key:active {
+    box-shadow:
+        inset -1px -1px 0 rgba(255,255,255,0.35),
+        inset 1px 1px 0 rgba(0,0,0,0.25);
     background-color: var(--text-secondary);
 }
 
@@ -1937,25 +1919,9 @@ body.force-dark .note-text-area > div {
 
 .note-key.backspace {
     background-color: #dc322f;
-    background-image: 
-        repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.15) 2px,
-            rgba(0, 0, 0, 0.15) 4px
-        ),
-        repeating-linear-gradient(
-            -45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.15) 2px,
-            rgba(0, 0, 0, 0.15) 4px
-        );
-    background-size: 4px 4px;
     color: var(--bg-base);
     flex: 2;
-    font-size: 1.3em;
+    font-size: 1.1em;
 }
 
 .note-key.backspace:hover {
@@ -1964,22 +1930,6 @@ body.force-dark .note-text-area > div {
 
 .note-key.shift {
     background-color: #2aa198;
-    background-image: 
-        repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.15) 2px,
-            rgba(0, 0, 0, 0.15) 4px
-        ),
-        repeating-linear-gradient(
-            -45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.15) 2px,
-            rgba(0, 0, 0, 0.15) 4px
-        );
-    background-size: 4px 4px;
     color: var(--bg-base);
     flex: 2;
 }
@@ -1990,22 +1940,6 @@ body.force-dark .note-text-area > div {
 
 .note-key.shift.active {
     background-color: #859900;
-    background-image: 
-        repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.15) 2px,
-            rgba(0, 0, 0, 0.15) 4px
-        ),
-        repeating-linear-gradient(
-            -45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.15) 2px,
-            rgba(0, 0, 0, 0.15) 4px
-        );
-    background-size: 4px 4px;
 }
 
 .note-key.shift.active:hover {
@@ -2385,7 +2319,7 @@ body.force-dark .note-text-area > div {
     display: flex;
     align-items: center;
     gap: 4px;
-    font-family: 'Courier New', 'Courier', monospace;
+    font-family: Chicago_12, 'Courier New', 'Courier', monospace;
     font-size: 14px;
     font-weight: bold;
     user-select: none;
@@ -2402,9 +2336,13 @@ body.force-dark .note-text-area > div {
     border: 2px solid var(--border-color);
     background-color: var(--bg-surface);
     color: var(--text-primary);
-    transition: all 0.2s;
+    transition: background-color 0.1s;
     min-width: 24px;
     text-align: center;
+    font-family: Chicago_12, 'Courier New', 'Courier', monospace;
+    box-shadow:
+        inset 1px 1px 0 rgba(255,255,255,0.3),
+        inset -1px -1px 0 rgba(0,0,0,0.2);
 }
 
 .blok-speed-slider .speed-step:hover {
@@ -2413,22 +2351,9 @@ body.force-dark .note-text-area > div {
 
 .blok-speed-slider .speed-step.active {
     background-color: #268bd2;
-    background-image: 
-        repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.15) 2px,
-            rgba(0, 0, 0, 0.15) 4px
-        ),
-        repeating-linear-gradient(
-            -45deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 0, 0, 0.15) 2px,
-            rgba(0, 0, 0, 0.15) 4px
-        );
-    background-size: 4px 4px;
     color: var(--bg-base);
     border-color: #268bd2;
+    box-shadow:
+        inset -1px -1px 0 rgba(255,255,255,0.2),
+        inset 1px 1px 0 rgba(0,0,0,0.25);
 }
