@@ -743,10 +743,10 @@
         
         // Set message
         if (won) {
-            endgameTitle.textContent = 'YOU WIN!';
+            endgameTitle.querySelector('span').textContent = 'YOU WIN!';
             endgameMessage.textContent = `Perfect! You scored ${gameState.score} points!`;
         } else {
-            endgameTitle.textContent = 'GAME OVER';
+            endgameTitle.querySelector('span').textContent = 'GAME OVER';
             endgameMessage.textContent = `You scored ${gameState.score} points. Try again?`;
         }
         

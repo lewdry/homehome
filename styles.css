@@ -442,10 +442,10 @@ body {
 
 .container {
     position: relative;
-    width: min(600px, 100%);
+    width: min(600px, 100%, calc((100vh - 40px) * 2 / 3));
     aspect-ratio: 2 / 3;
-    height: min(80vh, 900px);
-    max-height: 700px; /* Absolute maximum height for better performance on large displays */
+    max-height: 600px;
+    max-width: 400px;
     background-color: var(--bg-surface);
     display: flex;
     flex-direction: column;
@@ -500,6 +500,7 @@ main {
     font-family: Chicago_12, 'Courier New', Courier, monospace;
     font-size: 0.9em;
     letter-spacing: 1px;
+    border: 2px solid var(--border-color);
     /* Centre the chip within the flex row */
     margin: 0 auto;
 }
@@ -770,7 +771,6 @@ canvas {
     line-height: 1.2;
     margin-bottom: 16px;
     white-space: pre;
-    overflow: hidden;
     text-align: left;
     transition: text-shadow 0.3s ease;
 }
@@ -1153,9 +1153,11 @@ a:focus-visible {
 /* Title chip — solid background behind the text so it reads against the stripes */
 .instruction-popup-title > span {
     background: var(--bg-surface);
-    padding: 0 8px;
+    padding: 3px 8px;
     position: relative;
     z-index: 1;
+    border: 2px solid var(--border-color);
+    line-height: 1;
 }
 
 .instruction-popup-content {
@@ -1212,7 +1214,8 @@ a:focus-visible {
 
 /* Clock popup styles */
 .clock-popup {
-    max-width: 500px;
+    max-width: 400px;
+    width: 80%;
     z-index: 1000;
     /* Use fixed positioning so the popup sits above the full-screen overlay
        and remains centered regardless of scroll or parent stacking contexts. */
@@ -1417,25 +1420,20 @@ body.force-dark #clock-date-display {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: relative;
 }
 
 .footer-text {
     cursor: pointer;
-    transition: opacity 0.2s;
     font-weight: bold;
     user-select: none;
     background: var(--bg-surface);
-    padding: 0 4px;
+    padding: 3px 4px;
     position: relative;
     z-index: 1;
-}
-
-.footer-text:hover {
-    opacity: 0.7;
-}
-
-.footer-text:active {
-    opacity: 0.5;
+    white-space: nowrap;
+    line-height: 1;
+    border: 2px solid var(--border-color);
 }
 
 /* Credits tab styles */
@@ -1589,16 +1587,16 @@ body.force-dark .thks-content-area a {
 }
 
 .clock {
-    font-family: 'Courier New', 'Courier', monospace;
-    font-size: 0.9em;
-    font-weight: 600;
-    padding: 4px 8px;
-    background-color: var(--bg-surface);
+    font-family: Chicago_12, 'Courier New', 'Courier', monospace;
+    font-weight: bold;
+    padding: 3px 4px;
+    background: var(--bg-surface);
     color: var(--text-primary);
-    border: 2px solid var(--border-color);
     letter-spacing: 1px;
     user-select: none;
     cursor: pointer;
+    border: 2px solid var(--border-color);
+    line-height: 1;
 }
 
 .clock-colon {
@@ -1606,7 +1604,7 @@ body.force-dark .thks-content-area a {
 }
 
 .divider {
-    color: #6f8000;
+    color: var(--text-secondary);
     margin: 10px 0;
 }
 
@@ -2150,8 +2148,7 @@ body.force-dark .note-text-area > div {
     }
     
     .container {
-        height: calc(100vh - 20px);
-        max-height: calc(100vh - 20px);
+        width: min(100%, calc((100vh - 20px) * 2 / 3));
     }
     
     .ascii-art {
@@ -2203,8 +2200,7 @@ body.force-dark .note-text-area > div {
     }
     
     .container {
-        height: calc(100dvh - 20px);
-        max-height: calc(100dvh - 20px);
+        width: min(100%, calc((100dvh - 20px) * 2 / 3));
     }
 }
 

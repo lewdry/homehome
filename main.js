@@ -24,6 +24,9 @@ function applyTheme() {
         body.classList.add('force-light');
     }
     // null means no override - CSS media query handles it
+    const currentTheme = getCurrentTheme();
+    themeToggle.textContent = currentTheme === 'dark' ? '☾' : '☀';
+    themeToggle.setAttribute('aria-label', currentTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
 }
 
 function getCurrentTheme() {
@@ -921,14 +924,17 @@ window.addEventListener('beforeunload', () => {
 // Random modern tech term
 const modernTechTerms = [
     'the cloud',
+    'the world wide web',
     'cyberspace',
-    'an alternate universe',
+    'alternate universes',
     'virtual reality',
     'the metaverse',
     'blockchain',
     'the matrix',
     'quantum space',
-    'space tourism'
+    'space tourism',
+    'smart appliances',
+    'targeted ads'
 ];
 
 // Get a random term that's different from the default "the cloud"
