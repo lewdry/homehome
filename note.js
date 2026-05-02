@@ -56,8 +56,13 @@ let backspaceDeleteSpeed = 150; // Start speed in ms
 function downloadNote() {
     try {
         // Generate filename with timestamp
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-        const filename = `note-${timestamp}.txt`;
+        const _d = new Date();
+        const yy = String(_d.getFullYear()).slice(-2);
+        const mm = String(_d.getMonth() + 1).padStart(2, '0');
+        const dd = String(_d.getDate()).padStart(2, '0');
+        const hh = String(_d.getHours()).padStart(2, '0');
+        const mn = String(_d.getMinutes()).padStart(2, '0');
+        const filename = `NOTE-${yy}${mm}${dd}-${hh}${mn}.txt`;
         
         // Check if Web Share API is available
         if (navigator.share) {

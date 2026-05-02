@@ -328,8 +328,8 @@ function downloadDrawing() {
         tempCanvas.height = drawCanvas.height;
         const tempCtx = tempCanvas.getContext('2d');
         
-        // Get the --bg-surface CSS variable value
-        const bgSurface = getComputedStyle(document.documentElement).getPropertyValue('--bg-surface').trim();
+        // Get the --bg-surface CSS variable value (read from body so force-dark/force-light classes are respected)
+        const bgSurface = getComputedStyle(document.body).getPropertyValue('--bg-surface').trim();
         
         // Fill the background with --bg-surface color
         tempCtx.fillStyle = bgSurface;
@@ -339,8 +339,13 @@ function downloadDrawing() {
         tempCtx.drawImage(drawCanvas, 0, 0);
         
         // Generate filename with timestamp
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-        const filename = `drawing-${timestamp}.png`;
+        const _d = new Date();
+        const yy = String(_d.getFullYear()).slice(-2);
+        const mm = String(_d.getMonth() + 1).padStart(2, '0');
+        const dd = String(_d.getDate()).padStart(2, '0');
+        const hh = String(_d.getHours()).padStart(2, '0');
+        const mn = String(_d.getMinutes()).padStart(2, '0');
+        const filename = `DRAW-${yy}${mm}${dd}-${hh}${mn}.png`;
         
         // Check if Web Share API is available and supports sharing files
         if (navigator.share && navigator.canShare) {
