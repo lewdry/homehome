@@ -45,9 +45,9 @@ function toggleTheme() {
     // Simply toggle between light and dark
     const currentTheme = getCurrentTheme();
     themeOverride = currentTheme === 'dark' ? 'light' : 'dark';
-    
+
     applyTheme();
-    
+
     // Trigger ASCII glow if on HOME tab
     const currentTab = document.querySelector('.tab.active');
     if (currentTab && currentTab.getAttribute('data-tab') === 'home') {
@@ -55,10 +55,10 @@ function toggleTheme() {
             triggerAsciiGlow();
         }
     }
-    
+
     // Announce theme change for screen readers
     const announcement = `${themeOverride.charAt(0).toUpperCase() + themeOverride.slice(1)} mode enabled`;
-    
+
     // Create temporary announcement element
     const announcer = document.createElement('div');
     announcer.setAttribute('role', 'status');
@@ -71,7 +71,7 @@ function toggleTheme() {
 
 function toggleMute() {
     window.isMuted = !window.isMuted;
-    
+
     if (window.isMuted) {
         muteToggle.textContent = '∅';
         muteToggle.setAttribute('aria-label', 'Sound is off. Click to unmute');
@@ -80,14 +80,14 @@ function toggleMute() {
         muteToggle.setAttribute('aria-label', 'Sound is on. Click to mute');
         // Play click sound when unmuting
         if (window.playRetroClick) {
-            try { 
-                window.playRetroClick(); 
-            } catch (err) {}
+            try {
+                window.playRetroClick();
+            } catch (err) { }
         }
     }
-    
+
     // Don't save mute state to localStorage - only persist during session
-    
+
     // Announce mute state change for screen readers
     const announcement = window.isMuted ? 'Sound muted' : 'Sound unmuted';
     const announcer = document.createElement('div');
@@ -101,9 +101,9 @@ function toggleMute() {
 
 themeToggle.addEventListener('click', () => {
     if (window.playRetroClick) {
-        try { 
-            window.playRetroClick(); 
-        } catch (err) {}
+        try {
+            window.playRetroClick();
+        } catch (err) { }
     }
     toggleTheme();
 });
@@ -111,9 +111,9 @@ themeToggle.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         if (window.playRetroClick) {
-            try { 
-                window.playRetroClick(); 
-            } catch (err) {}
+            try {
+                window.playRetroClick();
+            } catch (err) { }
         }
         toggleTheme();
     }
@@ -131,33 +131,33 @@ muteToggle.addEventListener('keydown', (e) => {
 function handleResetApp() {
     // Cleanup all games before reload
     if (window.BonkGame && window.BonkGame.cleanup) {
-        try { window.BonkGame.cleanup(); } catch (e) {}
+        try { window.BonkGame.cleanup(); } catch (e) { }
     }
     if (window.BlokGame && window.BlokGame.cleanup) {
-        try { window.BlokGame.cleanup(); } catch (e) {}
+        try { window.BlokGame.cleanup(); } catch (e) { }
     }
     if (window.cleanupDrawing) {
-        try { window.cleanupDrawing(); } catch (e) {}
+        try { window.cleanupDrawing(); } catch (e) { }
     }
     if (window.cleanupNote) {
-        try { window.cleanupNote(); } catch (e) {}
+        try { window.cleanupNote(); } catch (e) { }
     }
     if (window.cleanupCalculator) {
-        try { window.cleanupCalculator(); } catch (e) {}
+        try { window.cleanupCalculator(); } catch (e) { }
     }
-    
+
     // Clear bonk ever-started flag
     bonkEverStarted = false;
     // Clear blok ever-started flag
     blokEverStarted = false;
-    
+
     // Play click sound before reload
     if (window.playRetroClick) {
-        try { 
-            window.playRetroClick(); 
-        } catch (err) {}
+        try {
+            window.playRetroClick();
+        } catch (err) { }
     }
-    
+
     // Brief delay to let sound play, then navigate back to HOME tab and force a reload
     setTimeout(() => {
         try {
@@ -187,11 +187,11 @@ function handleResetApp() {
                 window.location.replace(reloadUrl);
             } catch (navErr) {
                 // Fallback to a standard reload if building a URL fails
-                try { window.location.reload(); } catch (e) {}
+                try { window.location.reload(); } catch (e) { }
             }
         } catch (err) {
             // Final fallback - try a normal reload
-            try { window.location.reload(); } catch (e) {}
+            try { window.location.reload(); } catch (e) { }
         }
     }, 120);
 }
@@ -478,41 +478,41 @@ function switchToTab(tab) {
     const tabName = tab.getAttribute('data-tab');
     const currentTab = document.querySelector('.tab.active');
     const currentTabName = currentTab ? currentTab.getAttribute('data-tab') : null;
-    
+
     // Hide credits if visible
     if (thksVisible) {
         thksVisible = false;
         thksContent.classList.remove('active');
     }
-    
+
     // Cleanup when leaving tabs
     if (currentTabName === 'bonk' && bonkInitialized && window.BonkGame) {
         if (window.BonkGame.isRunning()) {
             window.BonkGame.stop();
         }
     }
-    
+
     if (currentTabName === 'blok' && blokInitialized && window.BlokGame) {
         if (window.BlokGame.isRunning()) {
             window.BlokGame.stop();
         }
     }
-    
+
     if (currentTabName === 'draw' && window.cleanupDrawing) {
         // Note: We don't fully cleanup draw, just pause it
         // Could add cleanup here if needed
     }
-    
+
     if (currentTabName === 'note' && window.cleanupNote) {
         // Clean up note keyboard listener when leaving note tab
         window.cleanupNote();
     }
-    
+
     if (currentTabName === 'calc' && window.cleanupCalculator) {
         // Clean up calculator listeners when leaving calc tab
         window.cleanupCalculator();
     }
-    
+
     // Update active tab
     tabs.forEach(t => {
         t.classList.remove('active');
@@ -522,12 +522,12 @@ function switchToTab(tab) {
     tab.classList.add('active');
     tab.setAttribute('aria-selected', 'true');
     tab.setAttribute('tabindex', '0');
-    
+
     // Update active content
     tabContents.forEach(content => content.classList.remove('active'));
     const activeContent = document.getElementById(`${tabName}-content`);
     activeContent.classList.add('active');
-    
+
     // Trigger ASCII glow when returning to HOME tab
     if (tabName === 'home' && typeof triggerAsciiGlow === 'function') {
         triggerAsciiGlow();
@@ -552,7 +552,7 @@ function switchToTab(tab) {
 
     // Announce tab switch for screen reader users
     announceForA11y(`${tabName.charAt(0).toUpperCase() + tabName.slice(1)} tab activated`);
-    
+
     // Initialize bonk game on first click
     if (tabName === 'bonk' && !bonkInitialized) {
         bonkInitialized = true;
@@ -574,7 +574,7 @@ function switchToTab(tab) {
         // Resume game when returning to tab
         window.BonkGame.resume();
     }
-    
+
     // Initialize blok game on first click
     if (tabName === 'blok' && !blokInitialized) {
         blokInitialized = true;
@@ -591,7 +591,7 @@ function switchToTab(tab) {
         // Resume game when returning to tab
         window.BlokGame.resume();
     }
-    
+
     // Initialize drawing on first click
     if (tabName === 'draw' && !drawInitialized) {
         drawInitialized = true;
@@ -602,7 +602,7 @@ function switchToTab(tab) {
             initDrawing();
         }
     }
-    
+
     // Initialize note on first click
     if (tabName === 'note' && !noteInitialized) {
         noteInitialized = true;
@@ -610,7 +610,7 @@ function switchToTab(tab) {
             initNote();
         }
     }
-    
+
     // Initialize calculator on first click (listeners will be re-attached each time)
     if (tabName === 'calc') {
         if (typeof initCalculator === 'function') {
@@ -640,7 +640,7 @@ tabs.forEach(tab => {
         }
         switchToTab(tab);
     });
-    
+
     // Keyboard navigation for tabs
     tab.addEventListener('keydown', (e) => {
         // Prevent tab switching if clock popup is visible
@@ -649,11 +649,11 @@ tabs.forEach(tab => {
             e.stopPropagation();
             return;
         }
-        
+
         let targetTab = null;
         const currentIndex = Array.from(tabs).indexOf(tab);
-        
-        switch(e.key) {
+
+        switch (e.key) {
             case 'ArrowRight':
             case 'ArrowDown':
                 e.preventDefault();
@@ -674,13 +674,13 @@ tabs.forEach(tab => {
                 break;
             case 'Enter':
             case ' ':
-        e.preventDefault();
-        // Play sound for keyboard activation
-        if (window.playRetroClick) try { window.playRetroClick(); } catch (err) {}
-        switchToTab(tab);
-        return;
+                e.preventDefault();
+                // Play sound for keyboard activation
+                if (window.playRetroClick) try { window.playRetroClick(); } catch (err) { }
+                switchToTab(tab);
+                return;
         }
-        
+
         if (targetTab) {
             switchToTab(targetTab);
         }
@@ -708,7 +708,7 @@ function enableThksContentDragScroll() {
             pointerId = e.pointerId;
             lastY = e.clientY;
             lastScrollTop = thksArea.scrollTop;
-            try { thksArea.setPointerCapture(pointerId); } catch (err) {}
+            try { thksArea.setPointerCapture(pointerId); } catch (err) { }
             thksArea.style.cursor = 'grabbing';
             e.preventDefault();
         }
@@ -756,7 +756,7 @@ function showCreditsWithScroll() {
 
 // Patch toggleCredits to use showCreditsWithScroll
 const origToggleCredits = toggleCredits;
-toggleCredits = function() {
+toggleCredits = function () {
     if (thksVisible) {
         hideCredits();
     } else {
@@ -773,7 +773,7 @@ function showCredits() {
             window.BonkGame.stop();
         }
     }
-    
+
     // Stop/pause blok game when leaving blok tab
     if (blokInitialized && window.BlokGame && window.BlokGame.isRunning()) {
         const currentTab = document.querySelector('.tab.active');
@@ -841,14 +841,14 @@ function toggleCredits() {
     if (clockPopupVisible) {
         return;
     }
-    
+
     // Only play the retro click here for keyboard-triggered activation.
     // Pointer interactions are handled globally by the pointerdown listener
     // (which already plays the click), so avoid playing twice.
     const event = arguments[0];
     if (event && (event.type === 'keydown' || event.type === 'keypress')) {
         if (window.playRetroClick) {
-            try { window.playRetroClick(); } catch (err) {}
+            try { window.playRetroClick(); } catch (err) { }
         }
     }
 
@@ -902,7 +902,7 @@ function updateClock() {
     const now = new Date();
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
-    
+
     const clockElement = document.getElementById('clock');
     if (clockElement) {
         clockElement.innerHTML = `${hours}<span class="clock-colon">:</span>${minutes}`;
@@ -923,22 +923,27 @@ window.addEventListener('beforeunload', () => {
 
 // Random modern tech term
 const modernTechTerms = [
-    'the cloud',
-    'the world wide web',
-    'cyberspace',
-    'alternate universes',
-    'virtual reality',
+    'walled gardens',
+    'disinformation',
+    'augmented reality',
+    'dark patterns',
     'the metaverse',
     'blockchain',
     'the matrix',
-    'quantum space',
     'space tourism',
     'smart appliances',
-    'targeted ads'
+    'targeted ads',
+    'doomscrolling',
+    'algorithmic bias',
+    'surveillance capitalism',
+    'data harvesting',
+    'deepfakes',
+    'the attention economy',
+    'planned obsolescence'
 ];
 
 // Get a random term that's different from the default "the cloud"
-const defaultTerm = 'utopia';
+const defaultTerm = 'the cloud';
 let randomTerm;
 do {
     randomTerm = modernTechTerms[Math.floor(Math.random() * modernTechTerms.length)];
@@ -954,7 +959,7 @@ function triggerAsciiGlow() {
         // Force reflow to restart animation
         void asciiArt.offsetWidth;
         asciiArt.classList.add('glow');
-        
+
         // Remove class after animation completes
         setTimeout(() => {
             asciiArt.classList.remove('glow');
@@ -978,10 +983,10 @@ function drawAsciiClock(hours, minutes, seconds) {
     const centerX = 20;
     const centerY = 10;
     const radius = 9;
-    
+
     // Create 2D array for the clock face with character and color info
     const grid = Array(21).fill(null).map(() => Array(41).fill(null).map(() => ({ char: ' ', color: null })));
-    
+
     // Draw circle
     for (let angle = 0; angle < 360; angle += 3) {
         const rad = angle * Math.PI / 180;
@@ -991,7 +996,7 @@ function drawAsciiClock(hours, minutes, seconds) {
             grid[y][x] = { char: '○', color: null };
         }
     }
-    
+
     // Draw hour markers
     for (let i = 0; i < 12; i++) {
         const angle = (i * 30 - 90) * Math.PI / 180;
@@ -1001,7 +1006,7 @@ function drawAsciiClock(hours, minutes, seconds) {
             grid[y][x] = { char: '•', color: null };
         }
     }
-    
+
     // Replace all hour markers with bold numbers (1-12)
     const numbers = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
     for (let i = 0; i < 12; i++) {
@@ -1009,7 +1014,7 @@ function drawAsciiClock(hours, minutes, seconds) {
         const x = Math.round(centerX + (radius - 1) * 1.8 * Math.cos(angle));
         const y = Math.round(centerY + (radius - 1) * Math.sin(angle));
         const num = numbers[i].toString();
-        
+
         if (num.length === 1) {
             // Single digit numbers (1-9)
             if (y >= 0 && y < 21 && x >= 0 && x < 41) {
@@ -1029,10 +1034,10 @@ function drawAsciiClock(hours, minutes, seconds) {
             }
         }
     }
-    
+
     // Draw center
     grid[centerY][centerX] = { char: '●', color: null };
-    
+
     // Draw hour hand (blue - #1e7bb2)
     const hourAngle = ((hours % 12) * 30 + minutes * 0.5 - 90) * Math.PI / 180;
     for (let i = 1; i <= 5; i++) {
@@ -1042,7 +1047,7 @@ function drawAsciiClock(hours, minutes, seconds) {
             grid[y][x] = { char: '█', color: '#1e7bb2' };
         }
     }
-    
+
     // Draw minute hand (green - #719e07)
     const minuteAngle = (minutes * 6 - 90) * Math.PI / 180;
     for (let i = 1; i <= 7; i++) {
@@ -1052,7 +1057,7 @@ function drawAsciiClock(hours, minutes, seconds) {
             grid[y][x] = { char: '║', color: '#719e07' };
         }
     }
-    
+
     // Draw second hand (red - #ec423f)
     const secondAngle = (seconds * 6 - 90) * Math.PI / 180;
     for (let i = 1; i <= 8; i++) {
@@ -1062,7 +1067,7 @@ function drawAsciiClock(hours, minutes, seconds) {
             grid[y][x] = { char: '│', color: '#ec423f' };
         }
     }
-    
+
     // Convert grid to HTML string with colored spans
     return grid.map(row => {
         return row.map(cell => {
@@ -1081,13 +1086,13 @@ function updateClockPopup() {
     const hours = now.getHours();
     const minutes = now.getMinutes();
     const seconds = now.getSeconds();
-    
+
     // Update ASCII clock
     const asciiClockDisplay = document.getElementById('ascii-clock-display');
     if (asciiClockDisplay) {
         asciiClockDisplay.innerHTML = drawAsciiClock(hours, minutes, seconds);
     }
-    
+
     // Update digital clock (HH:MM:SS)
     const digitalDisplay = document.getElementById('clock-digital-display');
     if (digitalDisplay) {
@@ -1096,19 +1101,19 @@ function updateClockPopup() {
         const secondsStr = String(seconds).padStart(2, '0');
         digitalDisplay.innerHTML = `<span style=\"color:#1e7bb2\">${hoursStr}</span><span class=\"clock-colon\">:</span><span style=\"color:#859900\">${minutesStr}</span><span class=\"clock-colon\">:</span><span style=\"color:#dc322f\">${secondsStr}</span>`;
     }
-    
+
     // Update date display
     const dateDisplay = document.getElementById('clock-date-display');
     if (dateDisplay) {
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const months = ['January', 'February', 'March', 'April', 'May', 'June', 
-                       'July', 'August', 'September', 'October', 'November', 'December'];
-        
+        const months = ['January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'];
+
         const dayName = days[now.getDay()];
         const day = now.getDate();
         const monthName = months[now.getMonth()];
         const year = now.getFullYear();
-        
+
         dateDisplay.textContent = `${dayName}, ${day} ${monthName} ${year}`;
     }
 }
@@ -1119,21 +1124,21 @@ function showClockPopup() {
     const clockOverlay = document.getElementById('clock-overlay');
     clockPopup.style.display = 'flex';
     if (clockOverlay) clockOverlay.style.display = 'block';
-    
+
     // Stop bonk game if running (but keep bonkStarted and bonkInitialized)
     if (bonkInitialized && window.BonkGame && window.BonkGame.isRunning()) {
         window.BonkGame.stop();
     }
-    
+
     // Stop blok game if running
     if (blokInitialized && window.BlokGame && window.BlokGame.isRunning()) {
         window.BlokGame.stop();
     }
-    
+
     // Update clock popup immediately and start popup interval
     updateClockPopup();
     popupClockInterval = setInterval(updateClockPopup, 1000);
-    
+
     // Focus the Home button for keyboard users
     setTimeout(() => clockHomeBtn.focus(), 100);
 
@@ -1145,7 +1150,7 @@ function showClockPopup() {
             const pathToPush = (base === '/' ? '/' : base) + `?=${encodeURIComponent('clock')}`;
             updateHistory(pathToPush);
         }
-    } catch (err) {}
+    } catch (err) { }
 }
 
 // Hide clock popup
@@ -1162,26 +1167,26 @@ function hideClockPopup() {
     const clockOverlay = document.getElementById('clock-overlay');
     clockPopup.style.display = 'none';
     if (clockOverlay) clockOverlay.style.display = 'none';
-    
+
     // Clear popup interval
     if (popupClockInterval) {
         clearInterval(popupClockInterval);
         popupClockInterval = null;
     }
-    
+
     // Resume games if they were on their respective tabs
     const currentTab = document.querySelector('.tab.active');
-    
+
     // Resume bonk game if it was on the bonk tab
     if (currentTab && currentTab.getAttribute('data-tab') === 'bonk' && bonkInitialized && window.BonkGame) {
         window.BonkGame.resume();
     }
-    
+
     // Resume blok game if it was on the blok tab
     if (currentTab && currentTab.getAttribute('data-tab') === 'blok' && blokInitialized && window.BlokGame) {
         window.BlokGame.resume();
     }
-    
+
     // Return focus to the footer clock
     footerClock.focus();
 
@@ -1191,7 +1196,7 @@ function hideClockPopup() {
             const to = previousPathBeforePopup || '/';
             updateHistory(to, true);
         }
-    } catch (err) {}
+    } catch (err) { }
     previousPathBeforePopup = null;
 }
 
@@ -1217,7 +1222,7 @@ footerClock.addEventListener('keydown', (e) => {
         e.preventDefault();
         if (!clockPopupVisible) {
             if (window.playRetroClick) {
-                try { window.playRetroClick(); } catch (err) {}
+                try { window.playRetroClick(); } catch (err) { }
             }
             showClockPopup();
         }
@@ -1232,7 +1237,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // ring on page load.
         suppressNextTabFocus = true;
         setTimeout(() => route(location.pathname || '/'), 50);
-    } catch (err) {}
+    } catch (err) { }
 
     // Register the service worker for PWA offline support
     if ('serviceWorker' in navigator) {
