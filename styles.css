@@ -648,6 +648,14 @@ main {
     color: var(--bg-base);
 }
 
+.menu-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    z-index: 1;
+}
+
 .menu-bar-right {
     display: flex;
     align-items: center;
@@ -822,6 +830,8 @@ canvas {
     white-space: pre;
     text-align: left;
     transition: text-shadow 0.3s ease;
+    cursor: pointer;
+    user-select: none;
 }
 
 .ascii-art.glow {
@@ -881,6 +891,46 @@ body.force-dark .ascii-art.glow {
 
     100% {
         text-shadow: none;
+    }
+}
+
+.ascii-art.glow-active {
+    animation: ascii-glow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes ascii-glow-pulse {
+    0%, 100% {
+        text-shadow: 0 0 2px #dc322f, 0 0 4px #dc322f;
+    }
+
+    50% {
+        text-shadow: 0 0 6px #dc322f, 0 0 12px #dc322f, 0 0 20px #dc322f;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    @keyframes ascii-glow-pulse {
+        0%, 100% {
+            text-shadow: 0 0 2px #db5b26, 0 0 4px #db5b26;
+        }
+
+        50% {
+            text-shadow: 0 0 6px #db5b26, 0 0 12px #db5b26, 0 0 20px #db5b26;
+        }
+    }
+}
+
+body.force-dark .ascii-art.glow-active {
+    animation: ascii-glow-pulse-dark 2s ease-in-out infinite;
+}
+
+@keyframes ascii-glow-pulse-dark {
+    0%, 100% {
+        text-shadow: 0 0 2px #db5b26, 0 0 4px #db5b26;
+    }
+
+    50% {
+        text-shadow: 0 0 6px #db5b26, 0 0 12px #db5b26, 0 0 20px #db5b26;
     }
 }
 

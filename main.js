@@ -409,19 +409,9 @@ setTimeout(updateTabOverflowClass, 100);
         footerEl.textContent = `© ${yearText} Homehomehome`;
     }
 
-    // Update some meta tags and the document title for consistency
-    try {
-        const titleText = `Homehomehome ⌂ Web 0.1 (1988-${now})`;
-        document.title = titleText;
-        const metaTitle = document.querySelector('meta[name="title"]');
-        if (metaTitle) metaTitle.setAttribute('content', titleText);
-        const ogTitle = document.querySelector('meta[property="og:title"]');
-        if (ogTitle) ogTitle.setAttribute('content', titleText);
-        const twitterTitle = document.querySelector('meta[name="twitter:title"]');
-        if (twitterTitle) twitterTitle.setAttribute('content', titleText);
-        const copyrightMeta = document.querySelector('meta[name="copyright"]');
-        if (copyrightMeta) copyrightMeta.setAttribute('content', `© 1988-${now} Lewis Dryburgh`);
-    } catch (err) { /* ignore errors in older browsers */ }
+    // Keep copyright meta tag year current
+    const copyrightMeta = document.querySelector('meta[name="copyright"]');
+    if (copyrightMeta) copyrightMeta.setAttribute('content', `© 1988-${now} Lewis Dryburgh`);
 })();
 
 // Popup elements
@@ -970,6 +960,14 @@ function triggerAsciiGlow() {
 // Trigger glow on page load
 window.addEventListener('load', () => {
     triggerAsciiGlow();
+
+    // Toggle persistent glow on click/touch
+    const asciiArt = document.querySelector('.ascii-art');
+    if (asciiArt) {
+        asciiArt.addEventListener('click', () => {
+            asciiArt.classList.toggle('glow-active');
+        });
+    }
 });
 
 // Clock popup functionality

@@ -3,14 +3,13 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="content-language" content="en">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="google" content="notranslate">
 
     <!-- Primary Meta Tags -->
-    <title>Homehomehome ⌂ Web 0.1</title>
+    <title>Homehomehome ⌂</title>
     <script type="application/ld+json">
     {
     "@context": "https://schema.org",
@@ -18,7 +17,7 @@
     "name": "Homehomehome",
     "operatingSystem": "Web",
     "applicationCategory": "BrowserApplication",
-    "description": "An imaginary Web 0.1 portal and retro operating system experience from 1988. Includes a book reader, drawing tools, and classic games.",
+    "description": "Homehomehome is a free, retro-styled virtual OS and Web 0.1 portal — play Breakout and physics games, read 40 classic books, sketch on a pixel canvas, and type notes, all in a Solarized System 7 interface.",
     "url": "https://homehomehome.org",
     "author": {
         "@type": "Person",
@@ -26,28 +25,32 @@
         "url": "https://lewisdryburgh.com"
     },
     "browserRequirements": "Requires JavaScript for interactive retro components.",
-    "softwareVersion": "0.1"
+    "softwareVersion": "0.1",
+    "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+    }
     }
     </script>
-    <meta name="title" content="Homehomehome ⌂ Web 0.1 (1988-2026)">
     <meta name="description"
-        content="Experience a 1988 Web 0.1 portal. Homehomehome is a lo-fi, Solarized-themed virtual OS featuring retro games, a Project Gutenberg reader and pixel art tools. A study in nostalgic UI by Lewis Dryburgh.">
+        content="Homehomehome is a free, retro-styled virtual OS and Web 0.1 portal. Play Breakout and physics games, read 40 classic books, sketch on a pixel canvas, and type notes, all in a Solarized System 7 interface.">
     <meta name="keywords"
         content="web 0.1, retro portal, 1988, information superhighway, vintage computer, pixel art, solarized, javascript game, breakout, calculator, drawing app, notepad, retro web app, retro ui, nostalgic computing, ascii art, web-based os">
     <meta name="author" content="Lewis Dryburgh">
     <meta name="copyright" content="© 1988-2026 Lewis Dryburgh">
     <meta name="robots" content="index, follow">
-    <meta name="language" content="English">
-    <meta name="revisit-after" content="7 days">
     <meta name="theme-color" content="#002b36">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://homehomehome.org">
-    <meta property="og:title" content="Homehomehome ⌂ Web 0.1 (1988-2026)">
+    <meta property="og:title" content="Homehomehome ⌂ — Retro Web Portal &amp; Virtual OS">
     <meta property="og:description"
-        content="1988's hottest website. An imaginary Web 0.1 portal experience from 1988, before the information superhighway was born. Who needs the cloud? We're staying Homehomehome.">
+        content="Homehomehome is a free, retro-styled virtual OS and Web 0.1 portal. Play Breakout and physics games, read 40 classic books, sketch on a pixel canvas, and type notes, all in a Solarized System 7 interface.">
     <meta property="og:image" content="https://homehomehome.org/preview.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="Homehomehome retro portal interface">
     <meta property="og:site_name" content="Homehomehome">
     <meta property="og:locale" content="en_US">
@@ -55,9 +58,9 @@
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://homehomehome.org">
-    <meta name="twitter:title" content="Homehomehome ⌂ Web 0.1 (1988-2026)">
+    <meta name="twitter:title" content="Homehomehome ⌂ — Retro Web Portal &amp; Virtual OS">
     <meta name="twitter:description"
-        content="1988's hottest website. An imaginary Web 0.1 portal experience from 1988, before the information superhighway was born. Who needs the cloud? We're staying Homehomehome.">
+        content="Homehomehome is a free, retro-styled virtual OS and Web 0.1 portal. Play Breakout and physics games, read 40 classic books, sketch on a pixel canvas, and type notes, all in a Solarized System 7 interface.">
     <meta name="twitter:image" content="https://homehomehome.org/preview.png">
     <meta name="twitter:image:alt" content="Homehomehome retro portal interface">
     <meta name="twitter:creator" content="@lewdryburgh">
@@ -65,7 +68,6 @@
     <!-- Favicons -->
     <link rel="icon" type="image/png" href="fav.png">
     <link rel="apple-touch-icon" href="fav.png">
-    <link rel="shortcut icon" href="fav.png">
     <link rel="icon" type="image/png" sizes="192x192" href="fav.png">
     <link rel="icon" type="image/png" sizes="512x512" href="fav.png">
 
@@ -91,10 +93,12 @@
     <div id="a11y-announcer" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
     <div class="container">
         <div class="menu-bar">
-            <button class="theme-toggle" tabindex="0" aria-label="Toggle dark mode and light mode">☀</button>
+            <div class="menu-bar-left">
+                <button class="theme-toggle" tabindex="0" aria-label="Toggle dark mode and light mode">☀</button>
+                <button class="mute-toggle" tabindex="0" aria-label="Toggle sound on and off">♫</button>
+            </div>
             <span>HOMEHOMEHOME.ORG</span>
             <div class="menu-bar-right">
-                <button class="mute-toggle" tabindex="0" aria-label="Toggle sound on and off">♫</button>
                 <button class="reset-app" tabindex="0" aria-label="Reset application to initial state">↺</button>
             </div>
         </div>
