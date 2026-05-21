@@ -354,7 +354,7 @@ function downloadDrawing() {
                 const file = new File([blob], filename, { type: 'image/png' });
                 const shareData = {
                     files: [file],
-                    text: 'Check out my drawing from homehomehome.org!'
+                    text: 'Check out my drawing from Homehomehome!'
                 };
                 
                 // Check if the device can share this data
