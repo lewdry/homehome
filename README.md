@@ -118,21 +118,18 @@ homehomehome/
 
 ## Inspirations
 
-- **Ethos and image style:** [Low Tech Magazine](https://solar.lowtechmagazine.com)
-- **The best fictitious OS:** [Windows93.net](https://www.windows93.net)
-- **Colors:** [Solarized by Ethan Schoonover](https://ethanschoonover.com/solarized/)
+- **Low-fi ethos:** [Low Tech Magazine](https://solar.lowtechmagazine.com)
+- **Colour palette:** [Solarized](https://ethanschoonover.com/solarized/)
+- **Interface:** [Sakun Acharige](https://sakofchit.github.io/system.css/)
+- **Fictional web OS:** [Windows93.net](https://www.windows93.net)
+- **Real web OS:** [Infinite Mac](https://infinitemac.org)
 
 ## Attribution
 
-- **BLOK** adapted from [Mozilla's 2D breakout tutorial](https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript)
-- **BONK and DRAW** adapted from [Playpip Games](https://playpip.games)
-
-## Browser Compatibility
-
-Tested on:
-- Chrome, Firefox, Safari, Edge
-- Mobile Safari (iOS)
-- Mobile Chrome (Android)
+- **BLOK** adapted from: [Mozilla MDN](https://developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript)
+- **BONK and DRAW** adapted from: [Playpip](https://lewdry.github.io/playpip)
+- **All books from:** [Project Gutenberg](https://www.gutenberg.org)
+- **Sounds by:** me ☺︎
 
 Requires JavaScript and Web Audio API support.
 
@@ -142,7 +139,7 @@ MIT — see [LICENSE](LICENSE)
 
 ## Author
 
-[Lewis Dryburgh](https://lewisdryburgh.com), 2025
+[Lewis Dryburgh](https://lewisdryburgh.com), 2026
 
 ---
 
