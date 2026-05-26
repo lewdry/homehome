@@ -683,6 +683,8 @@ function enableThksContentDragScroll() {
         // For mouse: implement click-drag scrolling. For touch/pen let native scrolling handle momentum.
         if (e.pointerType === 'mouse') {
             if (e.button !== 0) return;
+            // If the original target is a link, allow default navigation
+            if (e.target.closest('a')) return;
             isPointerDown = true;
             pointerId = e.pointerId;
             lastY = e.clientY;
